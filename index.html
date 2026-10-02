@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Charge! Games · Big-screen Bible games for youth groups</title>
+  <meta name="description" content="Big-screen Bible games your youth group plays from their tables. The TV runs the game, the leader's phone is the controller. No app, no prep.">
+  <link rel="canonical" href="https://pastorontherun.github.io/charge-games/">
+  <meta name="theme-color" content="#0B1020">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Charge! Games">
+  <meta property="og:title" content="Charge! Games · Big-screen Bible games for youth groups">
+  <meta property="og:description" content="The TV runs the game, the leader's phone is the controller. No app, no prep. Play Sword Drills free.">
+  <meta property="og:url" content="https://pastorontherun.github.io/charge-games/">
+  <meta property="og:image" content="https://pastorontherun.github.io/charge-games/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Charge! Games: big-screen Bible games your youth group plays from their tables">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Manrope:wght@500;600;700;800&display=swap">
+  <style>
+    :root { --ink: #0B1020; --deep: #070B16; --panel: #121A2E; --line: #24324F; --cyan: #19D3FF; --gold: #FFC53D; --mute: #A3AEC4; --text: #EAF0FA;
+      --disp: "Russo One", "Arial Black", sans-serif; --body: Manrope, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--deep); color: var(--text); font: 500 17px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
+    a { color: var(--cyan); }
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+    h1, h2, h3, .disp { font-family: var(--disp); font-weight: 400; letter-spacing: .01em; font-synthesis: none; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+
+    /* wordmark */
+    .wm { display: inline-flex; align-items: center; min-height: 48px; text-decoration: none; color: var(--text); line-height: 1; }
+    .wm svg { width: 38px; height: 38px; flex: 0 0 auto; }
+    .wm .w { margin-left: 10px; font-family: var(--disp); font-size: 22px; letter-spacing: .02em; transform: skewX(-8deg); white-space: nowrap; }
+    .wm .w i { font-style: normal; color: var(--gold); }
+    .wm .w span { color: var(--cyan); }
+
+    /* header */
+    header.top { position: sticky; top: 0; z-index: 10; background: rgba(7,11,22,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid rgba(36,50,79,.7); }
+    header.top .wrap { display: flex; align-items: center; height: 68px; }
+    nav { margin-left: auto; display: flex; align-items: center; }
+    nav a { color: var(--mute); text-decoration: none; font-weight: 700; font-size: 15px; margin-left: 26px; padding: 12px 0; }
+    nav a:hover { color: var(--text); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 12px; font: 800 16px var(--body); text-decoration: none; white-space: nowrap; }
+    .btn.p { background: var(--cyan); color: var(--ink); box-shadow: 0 6px 24px rgba(25,211,255,.28); }
+    .btn.p:hover { background: #5BE1FF; }
+    .btn.g { border: 2px solid var(--line); color: var(--text); }
+    .btn.g:hover { border-color: var(--cyan); }
+    nav .btn { margin-left: 26px; min-height: 42px; padding: 0 16px; font-size: 15px; color: var(--ink); }
+
+    /* hero */
+    .hero { position: relative; overflow: hidden; padding: 72px 0 84px;
+      background: radial-gradient(900px 480px at 85% 10%, rgba(25,211,255,.16), transparent 60%), radial-gradient(700px 420px at 0% 100%, rgba(255,197,61,.10), transparent 60%),
+                  linear-gradient(var(--ink), var(--deep)); }
+    .hero:before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1.4px); background-size: 22px 22px; pointer-events: none; }
+    .hero .wrap { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+    .kick { display: inline-block; font: 800 13px var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(255,197,61,.4); border-radius: 999px; padding: 6px 12px; }
+    .hero h1 { margin: 18px 0 0; font-size: 84px; line-height: .95; transform: skewX(-6deg); transform-origin: left; }
+    .hero h1 .c { color: var(--cyan); } .hero h1 .x { color: var(--gold); }
+    .hero h1 .slash { display: block; width: 210px; height: 10px; margin-top: 14px; border-radius: 4px; background: linear-gradient(90deg, var(--gold), var(--cyan)); transform: skewX(-30deg); }
+    .tag { margin: 22px 0 0; font: 800 28px/1.25 var(--body); color: var(--text); max-width: 560px; }
+    .lede { margin: 14px 0 0; color: var(--mute); font-size: 19px; max-width: 540px; }
+    .ctas { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .ctas .btn { min-height: 56px; font-size: 17px; padding: 0 26px; }
+
+    /* hero illustration: CSS TV + phone (no photos) */
+    .scene { position: relative; height: 420px; }
+    .tv { position: absolute; left: 0; right: 96px; top: 10px; aspect-ratio: 16 / 9; background: #02040A; border: 10px solid #1A2440; border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px #2B3A5E; padding: 16px; display: flex; flex-direction: column; }
+    .tv:after { content: ""; position: absolute; left: 50%; bottom: -34px; width: 120px; height: 24px; transform: translateX(-50%); background: #1A2440; border-radius: 0 0 10px 10px; }
+    .tv .bar { display: flex; align-items: center; font: 800 10px var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+    .tv .bar b { margin-left: auto; font: 400 16px var(--disp); color: var(--cyan); letter-spacing: .08em; }
+    .reel { flex: 1; margin-top: 10px; display: flex; gap: 10px; border: 3px solid var(--cyan); border-radius: 12px; padding: 10px; background: var(--panel); box-shadow: 0 0 30px rgba(25,211,255,.2); }
+    .reel div { border-radius: 8px; background: var(--cyan); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--disp); text-align: center; }
+    .reel .r1 { flex: 1; } .reel .r1 small { font-size: 15px; letter-spacing: .06em; } .reel .r1 strong { font-weight: 400; font-size: 44px; line-height: 1; }
+    .reel .r2 { flex: 0 0 30%; background: var(--gold); font-size: 34px; }
+    .tv .tables { display: flex; gap: 6px; margin-top: 10px; }
+    .tv .tables span { flex: 1; height: 30px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); font: 800 9px var(--body); color: var(--mute); display: flex; align-items: center; justify-content: center; letter-spacing: .08em; }
+    .tv .tables span.l { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+    .phone { position: absolute; right: 0; bottom: 0; width: 150px; height: 290px; background: #EEF2F8; border: 7px solid #1A2440; border-radius: 28px; box-shadow: 0 24px 60px rgba(0,0,0,.6); padding: 14px 10px; display: flex; flex-direction: column; transform: rotate(4deg); }
+    .phone .now { background: var(--ink); border-radius: 9px; color: #fff; padding: 8px; font: 800 8px var(--body); letter-spacing: .1em; text-transform: uppercase; }
+    .phone .now b { display: block; font: 400 14px var(--disp); letter-spacing: 0; text-transform: none; margin-top: 3px; color: #fff; }
+    .phone .spin { margin-top: 8px; height: 36px; border-radius: 8px; background: var(--cyan); color: var(--ink); font: 400 15px var(--disp); display: flex; align-items: center; justify-content: center; }
+    .phone .grid { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; flex: 1; }
+    .phone .grid i { border: 1.5px solid var(--ink); border-radius: 7px; background: #fff; font: 400 9px var(--disp); font-style: normal; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+    .phone .grid i.l { background: var(--gold); border-color: var(--gold); }
+
+    /* sections */
+    section.s { padding: 88px 0; }
+    section.s.alt { background: var(--ink); border-top: 1px solid rgba(36,50,79,.6); border-bottom: 1px solid rgba(36,50,79,.6); }
+    .eyebrow { font: 800 13px var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--cyan); }
+    .s h2 { margin: 10px 0 0; font-size: 46px; line-height: 1.05; }
+    .s .intro { margin: 14px 0 0; color: var(--mute); max-width: 640px; font-size: 18px; }
+    .steps { margin: 40px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: st; }
+    .steps li { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px 24px 26px; }
+    .steps li:before { counter-increment: st; content: counter(st); display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 14px; background: var(--cyan); color: var(--ink); font: 400 26px var(--disp); transform: skewX(-8deg); }
+    .steps li:nth-child(3):before { background: var(--gold); }
+    .steps h3 { margin: 18px 0 6px; font-size: 22px; line-height: 1.2; }
+    .steps p { margin: 0; color: var(--mute); }
+
+    .games { margin-top: 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .card { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; }
+    .card .badge + .ic { margin-top: 0; }
+    .card .ic { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: #1A2440; }
+    .card .ic svg { width: 30px; height: 30px; }
+    .card h3 { margin: 16px 0 6px; font-size: 24px; line-height: 1.15; }
+    .card p { margin: 0; color: var(--mute); }
+    .badge { position: absolute; top: 22px; right: 22px; font: 800 11px var(--body); letter-spacing: .12em; text-transform: uppercase; border-radius: 999px; padding: 5px 10px; background: #1A2440; color: var(--mute); }
+    .card.live { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; padding: 30px; border: 2px solid var(--cyan); background: linear-gradient(135deg, rgba(25,211,255,.10), rgba(18,26,46,1) 55%); box-shadow: 0 0 50px rgba(25,211,255,.12); }
+    .card.live .badge { background: var(--cyan); color: var(--ink); position: static; display: inline-block; justify-self: start; align-self: start; }
+    .card.live h3 { font-size: 40px; margin-top: 14px; }
+    .card.live .ctas { margin-top: 22px; }
+    .modes { margin: 0; padding: 0; list-style: none; align-self: center; }
+    .modes li { background: rgba(7,11,22,.6); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; color: var(--mute); }
+    .modes li:last-child { margin-bottom: 0; }
+    .modes b { display: block; font: 400 18px var(--disp); color: var(--text); margin-bottom: 2px; }
+    .modes li:nth-child(3) b { color: var(--gold); }
+
+    .needs { margin: 40px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .needs li { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+    .needs svg { width: 40px; height: 40px; }
+    .needs b { display: block; margin-top: 12px; font: 400 19px var(--disp); }
+    .needs span { display: block; margin-top: 4px; color: var(--mute); font-size: 15px; }
+
+    .faq { margin-top: 32px; max-width: 820px; }
+    .faq details { border: 1px solid var(--line); background: var(--panel); border-radius: 14px; margin-bottom: 12px; }
+    .faq summary { cursor: pointer; list-style: none; padding: 18px 54px 18px 20px; font-weight: 800; font-size: 18px; position: relative; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary:after { content: "+"; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font: 400 26px var(--disp); color: var(--cyan); }
+    .faq details[open] summary:after { content: "–"; }
+    .faq details p { margin: 0; padding: 0 20px 18px; color: var(--mute); }
+
+    .soon { margin-top: 36px; display: flex; align-items: center; gap: 14px; background: linear-gradient(90deg, rgba(255,197,61,.12), rgba(255,197,61,0)); border: 1px solid rgba(255,197,61,.35); border-radius: 14px; padding: 16px 20px; max-width: 820px; }
+    .soon b { font: 400 18px var(--disp); color: var(--gold); white-space: nowrap; }
+    .soon span { color: var(--mute); }
+
+    footer { padding: 40px 0 48px; border-top: 1px solid rgba(36,50,79,.7); }
+    footer .wrap { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+    footer small { margin-left: auto; color: var(--mute); font-size: 14px; }
+
+    @media (max-width: 980px) {
+      .hero .wrap { grid-template-columns: 1fr; }
+      .scene { height: 360px; max-width: 560px; }
+      .games { grid-template-columns: 1fr 1fr; } .card.live { grid-template-columns: 1fr; }
+      .needs { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      body { font-size: 16px; }
+      .wrap { padding: 0 18px; }
+      nav a:not(.btn) { display: none; }
+      nav .btn { margin-left: 0; }
+      .wm .w { font-size: 19px; } .wm svg { width: 34px; height: 34px; }
+      .hero { padding: 44px 0 56px; }
+      .hero h1 { font-size: 56px; }
+      .tag { font-size: 22px; } .lede { font-size: 17px; }
+      .ctas .btn { flex: 1 1 100%; }
+      .scene { height: 260px; }
+      .tv { right: 84px; border-width: 7px; padding: 9px; border-radius: 14px; }
+      .tv .bar { font-size: 8px; } .tv .bar b { font-size: 12px; }
+      .reel { padding: 6px; gap: 6px; margin-top: 6px; } .reel .r1 small { font-size: 10px; } .reel .r1 strong { font-size: 24px; } .reel .r2 { font-size: 20px; }
+      .tv .tables { margin-top: 6px; gap: 4px; } .tv .tables span { height: 18px; font-size: 6px; }
+      .phone { width: 104px; height: 200px; border-width: 5px; border-radius: 20px; padding: 9px 7px; }
+      .phone .now { font-size: 6px; padding: 5px; } .phone .now b { font-size: 10px; }
+      .phone .spin { height: 24px; font-size: 11px; margin-top: 6px; } .phone .grid { gap: 3px; margin-top: 6px; } .phone .grid i { font-size: 7px; border-radius: 5px; }
+      section.s { padding: 60px 0; }
+      .s h2 { font-size: 34px; }
+      .steps, .games, .needs { grid-template-columns: 1fr; }
+      .card.live { grid-column: auto; padding: 22px; } .card.live h3 { font-size: 32px; }
+      .soon { flex-direction: column; align-items: flex-start; gap: 4px; }
+      footer small { margin-left: 0; width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="wm" href="./" aria-label="Charge! Games home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#19D3FF"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#0B1020" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg>
+      <span class="w">CHARGE<i>!</i> <span>GAMES</span></span>
+    </a>
+    <nav aria-label="Main">
+      <a href="#how">How it works</a><a href="#games">Games</a><a href="#faq">FAQ</a>
+      <a class="btn p" href="sword-drills/">Play Sword Drills</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="kick">Bible games for youth groups</span>
+        <h1>Charge<span class="x">!</span><br><span class="c">Games</span><span class="slash" aria-hidden="true"></span></h1>
+        <p class="tag">Big-screen Bible games your youth group plays from their tables.</p>
+        <p class="lede">The TV runs the game. The leader’s phone is the controller. No app to install, no prep, no accounts.</p>
+        <div class="ctas"><a class="btn p" href="sword-drills/">Play Sword Drills</a><a class="btn g" href="#how">How it works</a></div>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div class="tv">
+          <div class="bar">Sword Drills<b>K7QX</b></div>
+          <div class="reel"><div class="r1"><small>ROMANS</small><strong>8:28</strong></div><div class="r2">300</div></div>
+          <div class="tables"><span>T1</span><span class="l">T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span></div>
+        </div>
+        <div class="phone">
+          <div class="now">Classic<b>Romans 8:28</b></div>
+          <div class="spin">SPIN</div>
+          <div class="grid"><i>T1</i><i class="l">T2</i><i>T3</i><i>T4</i><i>T5</i><i>T6</i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="how">
+    <div class="wrap">
+      <div class="eyebrow">How it works</div>
+      <h2>Three steps. Two minutes.</h2>
+      <ol class="steps">
+        <li><h3>Open the game on the TV</h3><p>Any smart TV browser, or a laptop plugged into the TV or projector with HDMI.</p></li>
+        <li><h3>Scan the QR with your phone</h3><p>The leader’s phone becomes the controller: spin, award points, undo, change settings.</p></li>
+        <li><h3>Split into tables and play</h3><p>Bibles out, eyes on the screen. The first table to find it wins the points.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="s alt" id="games">
+    <div class="wrap">
+      <div class="eyebrow">Games</div>
+      <h2>Pick a game</h2>
+      <p class="intro">Each game runs on the big screen and is controlled from one phone. More are on the way.</p>
+      <div class="games">
+        <article class="card live">
+          <div>
+            <span class="badge">Play now · free</span>
+            <h3>Sword Drills</h3>
+            <p>The classic Bible race on a slot-machine screen. Bibles closed and held up, the reels land on a reference, and the first table standing and reading it wins the points. Scores stay on the screen all night.</p>
+            <div class="ctas"><a class="btn p" href="sword-drills/">Open Sword Drills</a></div>
+          </div>
+          <ul class="modes">
+            <li><b>Classic</b>Any well-known verse from anywhere in the Bible, with random point values and the occasional bonus.</li>
+            <li><b>Themed</b>Each round picks a theme, like Courage or God’s Love, and draws 2–4 verses from it.</li>
+            <li><b>Wildcard</b>1 to 6 verses at once for double points. Award each verse separately, or make it the final round.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="badge">Coming soon</span>
+          <div class="ic"><svg viewBox="0 0 32 32" fill="none" stroke="#19D3FF" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="6" width="24" height="20" rx="3"/><path d="M9 12h14M9 17h10M9 22h6"/></svg></div>
+          <h3>Survey Showdown</h3>
+          <p>Two tables face off to guess the top answers from a survey of youth groups. Reveal answers one by one on the big screen.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Coming soon</span>
+          <div class="ic"><svg viewBox="0 0 32 32" fill="none" stroke="#FFC53D" stroke-width="2.4"><rect x="4" y="5" width="7" height="6" rx="1.5"/><rect x="12.5" y="5" width="7" height="6" rx="1.5"/><rect x="21" y="5" width="7" height="6" rx="1.5"/><rect x="4" y="13" width="7" height="6" rx="1.5"/><rect x="12.5" y="13" width="7" height="6" rx="1.5"/><rect x="21" y="13" width="7" height="6" rx="1.5"/><rect x="4" y="21" width="7" height="6" rx="1.5"/><rect x="12.5" y="21" width="7" height="6" rx="1.5"/><rect x="21" y="21" width="7" height="6" rx="1.5"/></svg></div>
+          <h3>Category Clash</h3>
+          <p>A Bible trivia board with categories and point values. Tables pick a square, answer, and climb the scoreboard.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Coming soon</span>
+          <div class="ic"><svg viewBox="0 0 32 32" fill="none" stroke="#19D3FF" stroke-width="2.4" stroke-linecap="round"><circle cx="16" cy="12" r="6"/><path d="M6 28c1.5-5 5.5-8 10-8s8.5 3 10 8"/><path d="M14.5 10.5a2 2 0 1 1 2.5 2c-.6.3-1 .8-1 1.5"/></svg></div>
+          <h3>Who Am I?</h3>
+          <p>Clues appear one at a time about a person from the Bible. The fewer clues a table needs, the more points it scores.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Coming soon</span>
+          <div class="ic"><svg viewBox="0 0 32 32" fill="none" stroke="#FFC53D" stroke-width="2.4" stroke-linecap="round"><rect x="3" y="9" width="8" height="14" rx="2"/><rect x="12" y="9" width="8" height="14" rx="2" transform="rotate(8 16 16)"/><rect x="21" y="9" width="8" height="14" rx="2" transform="rotate(-6 25 16)"/></svg></div>
+          <h3>Scripture Scramble</h3>
+          <p>A well-known verse appears with its words shuffled. Tables race to put it back in order and call it out.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="s" id="need">
+    <div class="wrap">
+      <div class="eyebrow">What you need</div>
+      <h2>Stuff you already have</h2>
+      <ul class="needs">
+        <li><svg viewBox="0 0 40 40" fill="none" stroke="#19D3FF" stroke-width="2.6" stroke-linecap="round"><rect x="4" y="7" width="32" height="20" rx="3"/><path d="M14 33h12M20 27v6"/></svg><b>A big screen</b><span>A TV with a web browser, or a laptop connected to a TV or projector with HDMI.</span></li>
+        <li><svg viewBox="0 0 40 40" fill="none" stroke="#FFC53D" stroke-width="2.6" stroke-linecap="round"><rect x="12" y="4" width="16" height="32" rx="4"/><path d="M18 31h4"/></svg><b>A phone</b><span>The leader’s phone, iPhone or Android, with a camera to scan the QR code.</span></li>
+        <li><svg viewBox="0 0 40 40" fill="none" stroke="#19D3FF" stroke-width="2.6" stroke-linecap="round"><path d="M5 16a21 21 0 0 1 30 0M10 22a14 14 0 0 1 20 0M15 28a7 7 0 0 1 10 0"/><circle cx="20" cy="33" r="1.6" fill="#19D3FF"/></svg><b>Internet</b><span>Wi-Fi or cell data on both the screen and the phone.</span></li>
+        <li><svg viewBox="0 0 40 40" fill="none" stroke="#FFC53D" stroke-width="2.6" stroke-linejoin="round"><path d="M20 10c-4-3-9-3-14-2v24c5-1 10-1 14 2 4-3 9-3 14-2V8c-5-1-10-1-14 2z"/><path d="M20 10v24"/></svg><b>Bibles</b><span>Printed Bibles, one per student or per table. Any translation works.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="s alt" id="faq">
+    <div class="wrap">
+      <div class="eyebrow">FAQ</div>
+      <h2>Questions</h2>
+      <div class="faq">
+        <details><summary>Can students join with their phones?</summary><p>No. Only the leader’s phone connects, as the controller. Students play with Bibles at their tables, so nobody needs a phone, an account, or an app.</p></details>
+        <details><summary>Does it work offline?</summary><p>No. The screen and the phone talk over the internet, so both need a connection (Wi-Fi or cell data). If the connection drops, scores are saved on the screen and the phone reconnects on its own.</p></details>
+        <details><summary>Which Bible translation does it use?</summary><p>None. The games show references only (like “Romans 8:28”), never the verse text, so any translation your group reads works.</p></details>
+        <details><summary>Do I need to sign up or install anything?</summary><p>No. Open the game in a browser and scan the code. Nothing to install and no sign-in.</p></details>
+      </div>
+      <div class="soon"><b>Subscriptions coming soon</b><span>Sword Drills is free to play today. New games will arrive here first.</span></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="wm" href="./" aria-label="Charge! Games home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#19D3FF"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#0B1020" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg>
+      <span class="w">CHARGE<i>!</i> <span>GAMES</span></span>
+    </a>
+    <small>© 2026 Charge! Games</small>
+  </div>
+</footer>
+</body>
+</html>

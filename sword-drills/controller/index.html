@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#EEF2F8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Sword Drills · Controller · Charge! Games</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <!-- Sword Drills phone controller (the leader's phone). Joins the screen (../) by 4-letter room code or QR (?room=CODE).
+       Sends commands only; the screen keeps the scores. No service worker, no sign-in, no names. -->
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: #EEF2F8; }
+    body { min-height: 100vh; min-height: 100dvh; color: #0B1020; font-family: Inter, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 17px;
+      background-image: radial-gradient(circle, rgba(11,16,32,.16) 1px, transparent 1.4px); background-size: 18px 18px;
+      padding: calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom)); -webkit-user-select: none; user-select: none; }
+    .mono { font-family: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, monospace; }
+    .wide { font-family: "Russo One", "Arial Black", sans-serif; } .wide, .wide * { font-synthesis: none; }
+    button { font: inherit; color: inherit; border: 0; touch-action: manipulation; cursor: pointer; }
+    button:disabled { opacity: .38; cursor: default; }
+    .hd { display: flex; align-items: center; margin-bottom: 10px; }
+    .hd .mark { height: 34px; width: 34px; display: block; flex: 0 0 auto; }
+    .hd .t { margin-left: 10px; padding-left: 10px; border-left: 2px solid #19D3FF; min-width: 0; flex: 1 1 auto; }
+    .hd h1 { margin: 0; font-weight: 900; font-size: 15px; line-height: 1.05; white-space: nowrap; }
+    .hd .r { font-weight: 700; font-size: 11px; letter-spacing: .1em; color: #0B6E99; text-transform: uppercase; margin-top: 3px; white-space: nowrap; }
+    .pill { margin-left: 8px; flex: 0 0 auto; font-weight: 800; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 6px 10px; background: #DCE3EE; color: #4D5874; white-space: nowrap; }
+    .pill.on { background: #0B1020; color: #4ade80; } .pill.bk { background: #0B1020; color: #FFC53D; } .pill.off { background: #FFC53D; color: #0B1020; }
+    [hidden] { display: none !important; }
+    /* join */
+    .card { background: #fff; border: 1px solid rgba(11,16,32,.18); border-radius: 10px; padding: 18px; }
+    .join h2 { margin: 6px 0 6px; font-weight: 900; font-size: 26px; }
+    .join p { margin: 0 0 16px; color: #2A3756; line-height: 1.4; }
+    .join input { width: 100%; font: 400 44px "Russo One", "Arial Black", sans-serif; text-align: center; letter-spacing: .12em; text-transform: uppercase; padding: 12px 6px; border: 2px solid #0B1020; border-radius: 10px; background: #fff; color: #0B1020; }
+    .join input:focus { outline: 3px solid #19D3FF; outline-offset: 2px; }
+    .big { display: block; width: 100%; min-height: 64px; border-radius: 12px; font-weight: 900; font-size: 22px; background: #19D3FF; color: #0B1020; margin-top: 14px; }
+    .err { color: #0B6E99; font-weight: 700; margin-top: 10px; min-height: 22px; }
+    /* now card */
+    .now { background: #0B1020; color: #fff; border-radius: 12px; padding: 12px 14px 13px; }
+    .now .k { font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #19D3FF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now .ref { font-weight: 900; font-size: 26px; line-height: 1.12; margin-top: 4px; min-height: 30px; }
+    .now .pt { font-weight: 800; font-size: 14px; color: #D5DCE8; margin-top: 3px; }
+    .chips { display: flex; flex-wrap: wrap; margin: 8px -3px 0; }
+    .chips button { flex: 1 0 30%; margin: 3px; min-height: 44px; border-radius: 8px; background: #1C2742; color: #fff; font-weight: 800; font-size: 13px; padding: 4px 6px; line-height: 1.15; }
+    .chips button.sel { background: #19D3FF; color: #0B1020; }
+    .chips button.got { background: #2A3756; color: #AEB8CC; }
+    .chips button.got .r { text-decoration: line-through; } .chips button .w { display: block; color: #19D3FF; font-weight: 900; text-decoration: none; }
+    .tile .vv, .tile.lead .vv, .tile.won .vv { font-weight: 800; font-size: 11px; color: #19D3FF; background: #0B1020; border-radius: 6px; padding: 1px 6px; margin-top: 3px; letter-spacing: .02em; }
+    .note { margin: 6px 0 0; padding: 7px 10px; border-radius: 8px; background: #1C2742; color: #fff; font-size: 13px; font-weight: 700; line-height: 1.3; }
+    .acts { display: flex; margin-top: 10px; }
+    .spin { flex: 2 1 0; min-height: 76px; border-radius: 12px; background: #19D3FF; color: #0B1020; font-weight: 900; font-size: 26px; }
+    .wildb { flex: 1 1 0; margin-left: 8px; min-height: 76px; border-radius: 12px; background: #0B1020; color: #19D3FF; font-weight: 900; font-size: 14px; line-height: 1.15; }
+    .lab { font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #0B6E99; margin: 14px 2px 7px; }
+    .tiles { display: flex; flex-wrap: wrap; margin: -4px; }
+    .tile { flex: 0 0 calc(33.333% - 8px); margin: 4px; min-height: 84px; border-radius: 12px; background: #fff; border: 2px solid #0B1020; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .tiles.c2 .tile { flex-basis: calc(50% - 8px); min-height: 96px; }
+    .tiles.c3 .tile { min-height: 104px; }
+    .tile b { font-weight: 900; font-size: 19px; line-height: 1.05; } .tile span { font-weight: 700; font-size: 13px; color: #4D5874; margin-top: 3px; }
+    .tile.lead { background: #FFC53D; border-color: #FFC53D; } .tile.lead span { color: #0B1020; }
+    .tile.won { background: #0B1020; color: #19D3FF; } .tile.won span { color: #fff; }
+    .tile:active:not(:disabled) { transform: scale(.96); }
+    .row4 { display: flex; margin: 12px -4px 0; }
+    .row4 button { flex: 1 1 0; margin: 0 4px; min-height: 56px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(11,16,32,.3); font-weight: 800; font-size: 14px; }
+    .row4 button.dk { background: #0B1020; color: #fff; border-color: #0B1020; }
+    .foot { margin-top: 10px; text-align: center; font-size: 12px; color: #4D5874; font-weight: 700; }
+    /* settings sheet */
+    .sheet { position: fixed; inset: 0; z-index: 10; background: rgba(11,16,32,.5); display: flex; align-items: flex-end; }
+    .sheet .in { width: 100%; max-height: 100%; overflow-y: auto; background: #EEF2F8; border-radius: 18px 18px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+    .sheet h2 { margin: 0 0 6px; font-weight: 900; font-size: 24px; display: flex; align-items: center; }
+    .sheet h2 button { margin-left: auto; font: 800 15px Inter, -apple-system, sans-serif; background: #0B1020; color: #fff; border-radius: 10px; padding: 10px 16px; min-height: 44px; }
+    .sr { padding: 12px 0; border-top: 1px solid rgba(11,16,32,.15); }
+    .sr .n { font-weight: 800; font-size: 15px; } .sr .h { font-size: 13px; color: #4D5874; margin-top: 2px; }
+    .seg { display: flex; margin-top: 8px; background: #fff; border: 1.5px solid #0B1020; border-radius: 10px; overflow: hidden; }
+    .seg button { flex: 1 1 0; min-height: 50px; font-weight: 800; font-size: 16px; background: #fff; }
+    .seg button + button { border-left: 1.5px solid #0B1020; }
+    .seg button.sel { background: #19D3FF; }
+    .seg.dim { opacity: .4; }
+    .step { display: flex; align-items: center; margin-top: 8px; }
+    .step button { width: 64px; min-height: 52px; border-radius: 10px; background: #0B1020; color: #fff; font-weight: 900; font-size: 26px; }
+    .step b { flex: 1; text-align: center; font-weight: 900; font-size: 32px; }
+    .danger { width: 100%; min-height: 52px; margin-top: 8px; border-radius: 10px; background: #fff; border: 2px solid #C8213D !important; color: #C8213D; font-weight: 900; font-size: 16px; }
+    .danger.arm { background: #C8213D; color: #fff; }
+    .link { background: none; color: #0B6E99; font-weight: 800; font-size: 14px; text-decoration: underline; min-height: 44px; padding: 0; }
+  </style>
+</head>
+<body>
+  <div class="hd">
+    <a href="../../" aria-label="Charge! Games home"><svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect width="64" height="64" rx="14" fill="#0B1020"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#19D3FF" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg></a>
+    <div class="t"><h1 class="wide">SWORD DRILLS</h1><div class="r mono" id="room">Controller</div></div>
+    <div class="pill mono" id="pill">Not joined</div>
+  </div>
+
+  <section class="join" id="v-join">
+    <div class="card">
+      <h2 class="wide">Join the screen</h2>
+      <p>Scan the QR code on the screen with your camera, or type the 4-letter code from the top-right corner.</p>
+      <form id="jf" autocomplete="off"><input id="ci" maxlength="4" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="ABCD" aria-label="Room code">
+      <button class="big wide" type="submit">Join</button></form>
+      <div class="err" id="jerr"></div>
+    </div>
+  </section>
+
+  <section id="v-main" hidden>
+    <div class="now">
+      <div class="k mono" id="nk">Classic</div>
+      <div class="ref wide" id="nref">Waiting for the screen…</div>
+      <div class="pt" id="npt"></div>
+      <div class="chips" id="chips" hidden></div>
+      <div class="note" id="wnote" role="status" hidden></div>
+    </div>
+    <div class="acts">
+      <button class="spin wide" id="b-spin" data-a="spin">SPIN</button>
+      <button class="wildb wide" id="b-wild" data-a="wild">WILD<br>CARD</button>
+    </div>
+    <div class="lab mono" id="tlab">Tap the table that read it first</div>
+    <div class="tiles" id="tiles"></div>
+    <div class="row4">
+      <button data-a="rules">Rules</button><button data-a="scores">Scores</button><button id="b-undo" data-a="undo">Undo</button><button class="dk" id="b-set">Settings</button>
+    </div>
+    <div class="foot mono" id="foot"></div>
+  </section>
+
+  <div class="sheet" id="sheet" hidden>
+    <div class="in">
+      <h2 class="wide">Settings <button id="b-done">Done</button></h2>
+      <div class="sr"><div class="n">Game mode</div><div class="h">Classic: any verse. Themed: one theme, a few verses per round.</div>
+        <div class="seg" id="s-mode"><button data-v="classic">Classic</button><button data-v="themed">Themed</button></div></div>
+      <div class="sr"><div class="n">Tables</div>
+        <div class="step"><button id="t-minus" aria-label="Fewer tables">−</button><b class="wide" id="s-tables">6</b><button id="t-plus" aria-label="More tables">+</button></div></div>
+      <div class="sr"><div class="n">Verses per themed round</div>
+        <div class="seg" id="s-per"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+      <div class="sr"><div class="n">End with a Wildcard round</div><div class="h">The Wildcard becomes the final round, then the screen shows final scores.</div>
+        <div class="seg" id="s-final"><button data-v="0">Off</button><button data-v="1">On</button></div></div>
+      <div class="sr"><div class="n">Reset scores</div><div class="h">Clears every table and the current spin.</div>
+        <button class="danger" id="b-reset">Reset scores</button></div>
+      <div class="sr"><button class="link" id="b-leave">Leave this room</button></div>
+    </div>
+  </div>
+
+<script src="../vendor/peerjs.min.js"></script>
+<script src="../link.js"></script>
+<script>
+(function () {
+  "use strict";
+  var RKEY = "chargegames:sworddrills:room";
+  var $ = function (id) { return document.getElementById(id); };
+  var room = "", st = null, rev = -1, sel = -1;
+  var pend = {}, pendSpin = null, noteT = null, lastAw = null;   // wildcard awards sent but not yet confirmed by the screen: { slot: { t: table, at: ms } }
+  var peer = null, conn = null, lastSeen = 0, dialT = null, lastDial = 0, startAt = 0, relay = null, viaRelay = false, relaySeen = 0;
+
+  function setPill(cls, txt) { $("pill").className = "pill mono " + cls; $("pill").textContent = txt; }
+  function fresh() { return !!(conn && conn.open && Date.now() - lastSeen < 10000); }
+  function linkOk() { return fresh() || (viaRelay && !!relay && relay.up() && Date.now() - relaySeen < 120000); }
+  function status() {
+    if (!room) return setPill("", "Not joined");
+    if (conn && conn.open && Date.now() - lastSeen < 10000) return setPill("on", "● Live");
+    if (viaRelay && linkOk()) return setPill("bk", "● Backup");
+    setPill("off", "Connecting…");
+  }
+
+  /* ---------- link ---------- */
+  function join(code) {
+    room = code; localStorage.setItem(RKEY, code);
+    $("room").textContent = "Room " + code;
+    $("v-join").hidden = true; $("v-main").hidden = false;
+    st = null; rev = -1; render(); startAt = Date.now();
+    if (SD.hasPeer()) startPeer(); else startRelay();
+    status(); wake();
+  }
+  function leave() {
+    room = ""; localStorage.removeItem(RKEY); stopAll();
+    $("v-main").hidden = true; $("v-join").hidden = false; $("sheet").hidden = true; $("room").textContent = "Controller"; status();
+  }
+  function stopAll() {
+    clearTimeout(dialT); if (conn) try { conn.close(); } catch (e) {} conn = null;
+    if (peer) try { peer.destroy(); } catch (e) {} peer = null;
+    if (relay) relay.close(); relay = null; viaRelay = false;
+  }
+  function startPeer() {
+    if (peer) try { peer.destroy(); } catch (e) {}
+    var p = peer = new Peer({ debug: 0 });
+    p.on("open", function () { dial(); });
+    p.on("disconnected", function () { setTimeout(function () { if (p === peer && !p.destroyed && p.disconnected) try { p.reconnect(); } catch (e) {} }, 1000); });
+    p.on("error", function (e) {
+      if (p !== peer) return;
+      if (e.type === "peer-unavailable") { $("foot").textContent = "Screen not found yet. Check the code on the screen."; redial(3000); return; }
+      if (["network", "server-error", "socket-error", "socket-closed", "browser-incompatible"].indexOf(e.type) >= 0 || p.destroyed) setTimeout(function () { if (p === peer && room) startPeer(); }, 3000);
+    });
+  }
+  function dial() {
+    if (!peer || !peer.open || !room) return;
+    if (conn) try { conn.close(); } catch (e) {}
+    var c = conn = peer.connect(SD.peerId(room), { reliable: true, serialization: "json" });
+    c.on("open", function () { lastSeen = Date.now(); c.send({ t: "hello" }); status(); });
+    c.on("data", function (m) { if (c !== conn) return; lastSeen = Date.now(); onMsg(m); });
+    c.on("close", function () { if (c === conn) { status(); redial(1500); } });
+    c.on("error", function () { if (c === conn) redial(2000); });
+  }
+  function redial(ms) { clearTimeout(dialT); dialT = setTimeout(function () { dialT = null; lastDial = Date.now(); if (!room) return; if (!peer || peer.destroyed) startPeer(); else if (peer.disconnected) { try { peer.reconnect(); } catch (e) { startPeer(); } } else dial(); }, ms); }
+  function startRelay() {
+    if (relay || !room) return;
+    var r = relay = SD.relay(SD.topic(room, "s"), function (m) { if (r !== relay) return; viaRelay = true; relaySeen = Date.now(); onMsg(m); }, function () { r.pub(SD.topic(room, "c"), { t: "hello" }); });
+  }
+  setInterval(function () {
+    if (!room) return;
+    if (conn && conn.open) { try { conn.send({ t: "ping" }); } catch (e) {} if (Date.now() - lastSeen > 10000) { try { conn.close(); } catch (e) {} redial(200); } }
+    else if (!dialT && peer && peer.open && Date.now() - lastDial > 12000) redial(100);   // WebRTC never opened: try again now and then
+    if (!fresh() && Date.now() - startAt > 6000) startRelay();
+    if (relay && !fresh() && Date.now() - relaySeen > 45000) relay.pub(SD.topic(room, "c"), { t: "hello" });   // quiet screen: ask for state   // WebRTC not getting through: use the backup relay too
+    if (fresh() && relay && Date.now() - startAt > 60000) { relay.close(); relay = null; viaRelay = false; }   // WebRTC healthy: drop the backup
+    status(); render();
+  }, 3000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden && room) { wake(); if (!(conn && conn.open)) redial(100); else try { conn.send({ t: "hello" }); } catch (e) {} } });
+  window.addEventListener("online", function () { if (room) redial(100); });
+
+  function onMsg(m) {
+    if (!m || m.t !== "state") return;
+    if (typeof m.rev === "number" && m.rev < rev && m.code === (st && st.code)) return;
+    rev = m.rev; st = m; $("foot").textContent = ""; status(); render();
+  }
+  function send(a, x) {
+    var m = { t: "cmd", id: SD.uid(), a: a };
+    for (var k in x || {}) m[k] = x[k];
+    var sent = false;
+    if (conn && conn.open) { try { conn.send(m); sent = true; } catch (e) {} }
+    if (!fresh() && relay) relay.pub(SD.topic(room, "c"), m);   // screen ignores duplicates by id
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    var ok = !!st && linkOk(), sp = st && st.spin;
+    var landed = sp && sp.status === "landed", wild = sp && sp.kind === "wild";
+    if (!st) { $("nk").textContent = "Room " + room; $("nref").textContent = "Waiting for the screen…"; $("npt").textContent = ""; }
+    else {
+      $("nk").textContent = wild ? "Wildcard" + (sp.final ? " · final round" : "") + " · " + sp.count + " verse" + (sp.count > 1 ? "s" : "")
+        : st.mode === "themed" ? "Themed" + (sp && sp.theme ? " · " + sp.theme + " · " + sp.rn + " of " + sp.per : " · " + st.per + " per round") : "Classic";
+      if (!sp) { $("nref").textContent = "Ready. Tap SPIN."; $("npt").textContent = ""; }
+      else if (!landed) { $("nref").textContent = "Spinning…"; $("npt").textContent = "Bibles closed, held up"; }
+      else if (wild) { var left = sp.awards.filter(function (a) { return a === null; }).length;
+        $("nref").textContent = left ? sp.pts + " per verse" : "All verses awarded"; $("npt").textContent = left ? left + " left · pick a verse, then tap the table" : (st.finished ? "Final scores are on the screen" : "Spin or start another round"); }
+      else { $("nref").textContent = sp.ref; $("npt").textContent = (sp.bonus ? "BONUS · " : "") + sp.pts + " points" + (sp.to !== null ? " · awarded to Table " + (sp.to + 1) : ""); }
+    }
+    // wildcard verse chips
+    var ch = $("chips");
+    if (wild && landed) {
+      if (pendSpin !== sp.id) { pend = {}; pendSpin = sp.id; }
+      for (var k in pend) if (sp.awards[k] !== null || Date.now() - pend[k].at > 6000) delete pend[k];   // confirmed, or lost: let it be re-sent
+      if (lastAw && lastAw.id === sp.id) sp.awards.forEach(function (x, i) { if (x === null && lastAw.a[i] !== null) sel = i; });   // undone verse: select it again
+      lastAw = { id: sp.id, a: sp.awards.slice() };
+      if (!free(sp, sel)) sel = firstFree(sp, 0);
+      var h = ""; sp.refs.forEach(function (r, i) { var a = owner(sp, i);
+        h += '<button data-slot="' + i + '" class="' + (a !== null ? "got" : i === sel ? "sel" : "") + '"' + (a !== null ? ' aria-disabled="true"' : "") + '><span class="r">' + (i + 1) + ". " + esc(r) + "</span>" + (a !== null ? '<span class="w">Table ' + (a + 1) + (sp.awards[i] === null ? "…" : "") + "</span>" : "") + "</button>"; });
+      if (ch.getAttribute("data-h") !== h) { ch.innerHTML = h; ch.setAttribute("data-h", h); }   // don't rebuild under a finger
+      ch.hidden = false;
+    } else { ch.hidden = true; ch.innerHTML = ""; ch.removeAttribute("data-h"); sel = -1; pend = {}; $("wnote").hidden = true; }
+    var canAward = ok && landed && (wild ? sel >= 0 : sp.to === null);
+    $("tlab").textContent = !st ? "Tables" : canAward ? "Tap the table that read it first · +" + sp.pts + (wild ? " (verse " + (sel + 1) + ")" : "") : landed && !wild ? "Awarded. Undo to change it." : "Tables";
+    var n = st ? st.tables : 0, tl = $("tiles"), max = st ? Math.max.apply(null, st.scores) : 0, t = "";
+    for (var i = 0; i < n; i++) {
+      var won = sp && landed && !wild && sp.to === i, vv = [];
+      if (wild && landed) sp.refs.forEach(function (_, j) { if (sp.awards[j] === i) vv.push(j + 1); });
+      t += '<button class="tile' + (won ? " won" : max > 0 && st.scores[i] === max ? " lead" : "") + '" data-t="' + i + '"' + (canAward ? "" : " disabled") + '><b class="wide">Table ' + (i + 1) + '</b><span>' + st.scores[i] + ' pts</span>' +
+        (vv.length ? '<span class="vv mono">' + (vv.length > 1 ? "Verses " : "Verse ") + vv.join(" + ") + "</span>" : "") + '</button>';
+    }
+    if (tl.getAttribute("data-h") !== t) { tl.innerHTML = t; tl.setAttribute("data-h", t); }
+    tl.className = "tiles" + (n <= 4 ? " c2" : n <= 6 ? " c3" : "");
+    $("b-spin").disabled = !ok || (sp && !landed) || (st && st.busy);
+    $("b-wild").disabled = !ok || (sp && !landed) || (st && st.busy);
+    $("b-undo").disabled = !ok || !st.canUndo;
+    [].forEach.call(document.querySelectorAll(".row4 [data-a]"), function (b) { if (b.id !== "b-undo") b.disabled = !ok; });
+    if (st) {
+      segSel("s-mode", st.mode); segSel("s-per", String(st.per)); segSel("s-final", st.finalWild ? "1" : "0");
+      $("s-per").classList.toggle("dim", st.mode !== "themed"); $("s-tables").textContent = st.tables;
+    }
+  }
+  // wildcard helpers: a verse is taken if the screen says so or we already sent an award for it
+  function owner(sp, i) { return sp.awards[i] !== null ? sp.awards[i] : pend[i] ? pend[i].t : null; }
+  function free(sp, i) { return i >= 0 && i < sp.count && owner(sp, i) === null; }
+  function firstFree(sp, from) { for (var k = 0; k < sp.count; k++) { var i = (from + k) % sp.count; if (free(sp, i)) return i; } return -1; }
+  function note(txt) { var n = $("wnote"); n.textContent = txt; n.hidden = false; clearTimeout(noteT); noteT = setTimeout(function () { n.hidden = true; }, 4000); }
+  function segSel(id, v) { [].forEach.call($(id).children, function (b) { b.classList.toggle("sel", b.getAttribute("data-v") === v); b.disabled = !linkOk(); }); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  /* ---------- input ---------- */
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b || b.disabled) return;
+    var a = b.getAttribute("data-a");
+    if (a) { send(a); return; }
+    if (b.hasAttribute("data-t")) {
+      var x = { table: +b.getAttribute("data-t") }, sp = st && st.spin;
+      if (sp && sp.kind === "wild") {   // each verse is its own award; the same table can win any number of them
+        if (!free(sp, sel)) return;
+        x.slot = sel; pend[sel] = { t: x.table, at: Date.now() }; pendSpin = sp.id;
+        $("wnote").hidden = true; sel = firstFree(sp, sel + 1);
+      }
+      send("award", x); render(); return;
+    }
+    if (b.hasAttribute("data-slot")) {
+      var i = +b.getAttribute("data-slot"), w = st && st.spin;
+      if (w && w.kind === "wild" && !free(w, i)) { note("Verse " + (i + 1) + " already went to Table " + (owner(w, i) + 1) + ". Tap Undo to change it."); return; }
+      sel = i; $("wnote").hidden = true; render(); return;
+    }
+    var g = b.parentNode.id, v = b.getAttribute("data-v");
+    if (g === "s-mode") send("mode", { mode: v }); else if (g === "s-per") send("per", { n: +v }); else if (g === "s-final") send("final", { on: v === "1" });
+    else if (b.id === "t-minus") send("tables", { d: -1 }); else if (b.id === "t-plus") send("tables", { d: 1 });   // relative, so quick taps all count
+    else if (b.id === "b-set") $("sheet").hidden = false; else if (b.id === "b-done") $("sheet").hidden = true;
+    else if (b.id === "b-reset") armReset(b); else if (b.id === "b-leave") leave();
+  });
+  $("sheet").addEventListener("click", function (e) { if (e.target === $("sheet")) $("sheet").hidden = true; });
+  var armT;
+  function armReset(b) {
+    if (b.classList.contains("arm")) { send("reset"); b.classList.remove("arm"); b.textContent = "Reset scores"; $("sheet").hidden = true; return; }
+    b.classList.add("arm"); b.textContent = "Tap again to reset"; clearTimeout(armT); armT = setTimeout(function () { b.classList.remove("arm"); b.textContent = "Reset scores"; }, 3500);
+  }
+  $("jf").addEventListener("submit", function (e) {
+    e.preventDefault(); var c = SD.normCode($("ci").value);
+    if (!c) { $("jerr").textContent = "Enter the 4 letters shown on the screen."; return; }
+    $("jerr").textContent = ""; $("ci").blur(); join(c);
+  });
+  var wl = null;
+  function wake() { try { if (navigator.wakeLock && !wl) navigator.wakeLock.request("screen").then(function (l) { wl = l; l.addEventListener("release", function () { wl = null; }); }).catch(function () {}); } catch (e) {} }
+  document.addEventListener("touchend", wake, { passive: true });
+
+  window.SDCtrl = { state: function () { return st; }, ok: linkOk, via: function () { return fresh() ? "peer" : viaRelay ? "mqtt" : "none"; } };  // for tests
+  var q = SD.normCode(new URLSearchParams(location.search).get("room")), saved = SD.normCode(localStorage.getItem(RKEY));
+  if (q || saved) join(q || saved); else status();
+})();
+</script>
+</body>
+</html>
