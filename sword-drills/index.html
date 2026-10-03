@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <link rel="stylesheet" href="../shared/charge-core.css">
   <!-- Sword Drills team game, TV/projector screen. The screen holds the game state
        (localStorage) and the phone controller (./controller/) joins by room code / QR via ./link.js.
        References only, no verse text. No service worker, no sign-in, no names. Keyboard: see the ? bar. -->
@@ -59,9 +60,11 @@
     .rules .home:hover { border-color: #FFC53D; }
     .rules .rgt { flex: 0 0 27rem; margin-left: 3rem; display: flex; flex-direction: column; justify-content: center; }
     .qrcard { background: #fff; color: #0B1020; border-radius: .8rem; padding: 1.6rem 1.6rem 1.4rem; text-align: center; }
+    .qrcard .qr { width: 84%; margin: 0 auto; }
     .qrcard .qr svg, .qrcard .qr img { display: block; width: 100%; height: auto; }
     .qrcard .k { margin-top: .9rem; font-weight: 800; font-size: 1.3rem; letter-spacing: .1em; text-transform: uppercase; color: #0B6E99; }
     .qrcard .code { font-weight: 900; font-size: 6rem; line-height: 1; letter-spacing: .06em; margin-top: .3rem; }
+    .tline { margin-top: .7rem; padding-top: .6rem; border-top: 1px solid #D5DBE7; font-weight: 700; font-size: .85rem; line-height: 1.4; color: #4D5874; letter-spacing: .02em; word-break: break-all; } .tline b { color: #0B1020; }
     .qrcard .u { margin-top: .7rem; font-size: 1rem; font-weight: 700; color: #4D5874; word-break: break-all; }
 
     /* Slot machine */
@@ -131,22 +134,14 @@
     .intro p { font-weight: 800; font-size: 2.6rem; letter-spacing: .2em; margin: 2rem 0 0; color: #fff; text-shadow: .2rem .2rem 0 #0B1020; }
     @keyframes zoom { 0% { transform: scale(.2) rotate(-8deg); opacity: 0; } 30% { transform: scale(1.08) rotate(2deg); opacity: 1; } 100% { transform: scale(1); } }
 
-    /* Scoreboard */
-    .board { flex: 0 0 auto; display: flex; flex-wrap: wrap; margin: 0 -0.5rem; }
-    .tb { position: relative; flex: 1 1 0; min-width: 0; margin: 0 .5rem; background: #131B30; border: .15rem solid #27365A; border-radius: .8rem; padding: .7rem 1rem .8rem; cursor: pointer; display: flex; flex-direction: column; justify-content: center; }
-    .tb .nm { font-weight: 800; font-size: 1.3rem; letter-spacing: .12em; text-transform: uppercase; color: #19D3FF; white-space: nowrap; }
-    .tb .sc { font-weight: 900; font-size: 4.2rem; line-height: 1.05; white-space: nowrap; }
-    .tb.lead { background: #FFC53D; border-color: #FFC53D; color: #0B1020; } .tb.lead .nm { color: #0B1020; }
-    .tb.hit { animation: hit .9s ease-out; }
-    @keyframes hit { 0% { transform: scale(1); box-shadow: 0 0 0 0 #fff; } 30% { transform: scale(1.08); box-shadow: 0 0 0 .5rem #fff; } 100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; } }
-    .game .board, .wild .board { margin-top: 1rem; }
-    .board.two .tb { flex: 0 0 auto; margin-bottom: 1rem; padding: .5rem 1rem .6rem; } .board.two .tb .sc { font-size: 3.2rem; }
-    .scores h2 { margin: 0 0 1.6rem; font-weight: 900; font-size: 4.6rem; line-height: 1; } .scores h2 span { color: #19D3FF; }
-    .scores .board { flex: 1 1 0; min-height: 0; overflow: hidden; align-content: flex-start; }
-    .scores .tb { flex: 0 0 auto; margin-bottom: 1.2rem; align-items: center; text-align: center; }
-    .scores .tb .nm { font-size: 2rem; } .scores .tb .sc { font-size: 7rem; }
-    .scores .tb .crown { font-weight: 900; font-size: 1.6rem; letter-spacing: .14em; display: none; } .scores .tb.lead .crown { display: block; }
-
+    /* Scoreboard (shared: ../shared/charge-core.css) */
+    .game .board, .wild .board { margin-top: 1rem; flex: 0 0 auto; }
+    .scores h2 { margin: 0 0 1.4rem; font-weight: 900; font-size: 4.6rem; line-height: 1; } .scores h2 span { color: #19D3FF; }
+    .scores .board { flex: 1 1 0; min-height: 0; }
+    .say .cg-banner { animation: none; }
+    .wild { position: relative; }
+    .wbanner { position: absolute; z-index: 5; left: 0; right: 0; top: 9.6rem; text-align: center; pointer-events: none; }
+    .reqchip { font-weight: 800; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: #0B1020; background: #FFC53D; border-radius: .4rem; padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
     .toast { position: absolute; z-index: 10; left: 50%; top: 42%; transform: translate(-50%,-50%) scale(.6); opacity: 0; pointer-events: none; transition: transform .25s cubic-bezier(.2,1.4,.4,1), opacity .2s;
       background: #0B1020; border: .4rem solid #19D3FF; border-radius: 1.4rem; padding: 1.6rem 3.6rem; text-align: center; box-shadow: 0 1rem 4rem rgba(0,0,0,.6); }
     .toast.on { opacity: 1; transform: translate(-50%,-50%) scale(1); }
@@ -177,6 +172,7 @@
     <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect width="64" height="64" rx="14" fill="#19D3FF"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#0B1020" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg>
     <div class="t"><h1 class="wide">SWORD DRILLS</h1><div class="sub mono">Charge! Games · Bible team game</div></div>
     <div class="sp"></div>
+    <div class="reqchip mono" id="reqchip" hidden></div>
     <div class="chip mono" id="modechip">Classic</div>
     <div class="join"><div class="l mono">Phone<br>code</div><div class="c wide" id="code">····</div><span class="dot" id="dot" title="Phone link"></span></div>
   </div>
@@ -188,7 +184,7 @@
           <li class="wide"><b>1</b>Bibles closed. Hold them up.</li>
           <li class="wide"><b>2</b>The reels reveal the reference.</li>
           <li class="wide"><b>3</b>“Charge!” Race to find it.</li>
-          <li class="wide"><b>4</b>First table standing and reading it wins the points.</li>
+          <li class="wide"><b>4</b>First table standing buzzes in and reads it. Correct wins the points.</li>
           <li class="wide wild"><b>W</b>Wildcard: 1–6 verses, double points each.</li>
         </ol>
         <div class="pline mono" id="ptsline"></div>
@@ -200,6 +196,7 @@
           <div class="k mono">Leader phone: scan or enter code</div>
           <div class="code wide" id="code2">····</div>
           <div class="u mono" id="url"></div>
+          <div class="tline mono" id="tline"></div>
         </div>
       </div>
     </section>
@@ -224,6 +221,7 @@
         <div class="col wpts"><div class="lab mono">Per verse</div><div class="win" id="w-wpts"><div class="strip"></div></div></div>
       </div>
       <div class="cards" id="cards"></div>
+      <div class="wbanner" id="wbanner" hidden></div>
       <div class="board" id="b-wild"></div>
     </section>
     <section class="view scores" id="v-scores">
@@ -235,27 +233,28 @@
   <div class="intro" id="intro"><div class="wide">WILDCARD</div><p class="mono" id="introsub">Double points</p></div>
   <div class="bar" id="bar">
     <button data-k="rules">Rules</button><button class="o" data-k="spin">Spin ␣</button><button class="w" data-k="wild">Wildcard W</button>
-    <button data-k="scores">Scores B</button><button data-k="undo">Undo U</button><button data-k="settings">Settings O</button><button data-k="fs">Full screen F</button>
+    <button data-k="ok">Correct Y</button><button data-k="no">Wrong N</button><button data-k="scores">Scores B</button><button data-k="undo">Undo U</button><button data-k="settings">Settings O</button><button data-k="fs">Full screen F</button>
   </div>
   <div class="set" id="set" role="dialog" aria-label="Settings">
     <h3 class="wide">Settings</h3>
     <div class="row"><span>Game mode<small>Classic: any verse. Themed: one theme, a few verses.</small></span><span class="seg" id="s-mode"><button data-v="classic">Classic</button><button data-v="themed">Themed</button></span></div>
-    <div class="row"><span>Tables<small>2 to 12</small></span><span><button data-k="tminus">−</button><span class="num wide" id="s-tables">6</span><button data-k="tplus">+</button></span></div>
+    <div class="row"><span>Tables<small>2 to 50</small></span><span><button data-k="tminus">−</button><span class="num wide" id="s-tables">6</span><button data-k="tplus">+</button></span></div>
     <div class="row"><span>Verses per themed round</span><span class="seg" id="s-per"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></span></div>
     <div class="row"><span>End with a Wildcard round<small>Wildcard becomes the final round, then final scores.</small></span><span class="seg" id="s-final"><button data-v="0">Off</button><button data-v="1">On</button></span></div>
+    <div class="row"><span>Wrong answer locks that table out<small>For the rest of that question.</small></span><span class="seg" id="s-lock"><button data-v="1">On</button><button data-v="0">Off</button></span></div>
     <div class="row"><span>Reset scores<small>Clears scores and the current spin. Press twice.</small></span><button class="danger" id="s-reset" data-k="reset">Reset</button></div>
-    <div class="keys mono">Keys: Space spin · W wildcard · 1–9, 0, −, = award table 1–12 (click a table works too) · U undo · R rules · G game · B scores · O settings · M mode · [ ] tables · F full screen</div>
+    <div class="keys mono">Keys: Space spin · W wildcard · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · M mode · [ ] tables · F full screen</div>
     <div style="text-align:right;margin-top:1rem"><button class="o" data-k="settings">Done</button></div>
   </div>
 </div>
 <script src="verses.js"></script>
-<script src="vendor/qrcode.js"></script>
-<script src="vendor/peerjs.min.js"></script>
-<script src="link.js"></script>
+<script src="../shared/vendor/qrcode.js"></script>
+<script src="../shared/vendor/peerjs.min.js"></script>
+<script src="../shared/charge-core.js"></script>
 <script>
 (function () {
   "use strict";
-  var KEY = "chargegames:sworddrills:v1", MAXT = 12;
+  var GAME = "sworddrills", KEY = "chargegames:sworddrills:v2";
   var THEMES = window.SD_THEMES, REFS = [];
   THEMES.forEach(function (t, ti) { t.refs.forEach(function (r) { REFS.push({ ref: r, t: ti }); }); });
   var PTS = [100, 100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 300, 300, 300, 300, 500, 500, 500, 1000]; // 1000 = rare bonus (1 in 20)
@@ -264,15 +263,44 @@
   var rnd = function (n) { return Math.floor(Math.random() * n); };
   var pick = function (a) { return a[rnd(a.length)]; };
 
-  function fresh() { return { v: 1, code: "", tables: 6, scores: zeros(), view: "rules", mode: "classic", per: 3, finalWild: false, spin: null, history: [], used: [], round: null, lastTheme: -1, rev: 0 }; }
-  function zeros() { var a = []; for (var i = 0; i < MAXT; i++) a.push(0); return a; }
+
+  function fresh() { return { v: 2, code: "", core: Charge.core.fresh(6), view: "rules", mode: "classic", per: 3, finalWild: false, spin: null, used: [], round: null, lastTheme: -1 }; }
   var S;
   try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-  if (!S || S.v !== 1) S = fresh();
+  if (!S || S.v !== 2) S = fresh();
   var F = fresh(); for (var k in F) if (!(k in S)) S[k] = F[k];
-  if (!S.code) S.code = SD.newCode();
+  S.core = Charge.core.upgrade(S.core, 6);
+  if (!S.code) S.code = Charge.newCode();
   if (S.spin && S.spin.status === "spinning") S.spin.status = "landed";     // refreshed mid-spin: just show the result
-  function save() { S.rev++; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} broadcast(); }
+  var busy = false, hitT = null;
+
+  /* ---------- shared core: teams, buzz-in, undo ---------- */
+  function nextSlot(sp) { return sp.awards.indexOf(null); }
+  function question(slot) {                // key of the question that can be answered now, or null
+    var sp = S.spin; if (!sp || sp.status !== "landed" || busy) return null;
+    if (sp.kind === "std") return sp.to === null ? sp.id : null;
+    if (slot == null || slot < 0 || slot >= sp.count || sp.awards[slot] !== null) return null;
+    return sp.id + ":" + slot;
+  }
+  var core = Charge.core(S.core, {
+    word: "Table",
+    question: question,
+    isOpen: function (q) { var sp = S.spin; if (!sp || !q) return false; return question(sp.kind === "wild" ? +String(q).split(":")[1] : null) === q; },
+    onCorrect: function (team, slot) {     // the buzzed table gets the points automatically
+      var sp = S.spin;
+      if (sp.kind === "wild") sp.awards[slot] = team; else sp.to = team;
+      setTimeout(function () { toast("+" + sp.pts, core.label(team)); hitT = team; render(); hitT = null; finalCheck(sp); }, 0);
+      return sp.pts;
+    },
+    onUndo: function (h) {
+      var sp = S.spin; if (!sp || !h.buzz || String(h.buzz.q).split(":")[0] !== sp.id) return;
+      if (sp.kind === "wild") sp.awards[h.slot] = null; else sp.to = null;
+      if (S.view === "scores") S.view = sp.kind === "wild" ? "wild" : "game";
+    },
+    onChange: function () { save(); render(); }
+  });
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} if (link) link.broadcast(); }
+  function finalCheck(sp) { if (sp.kind === "wild" && sp.final && nextSlot(sp) < 0) setTimeout(function () { if (S.spin === sp && nextSlot(sp) < 0) { S.view = "scores"; save(); render(); } }, 3200); }
 
   /* ---------- drawing references (no repeats until the pool is used up) ---------- */
   function draw(cands) {
@@ -285,10 +313,9 @@
   function freeIn(t) { return themeIdx(t).filter(function (i) { return S.used.indexOf(i) < 0; }).length; }
 
   /* ---------- actions ---------- */
-  var busy = false;
   function spin() {
     if (busy) return;
-    var sp = { id: SD.uid(), kind: "std", pts: pick(PTS), status: "spinning", to: null, theme: null, rn: 0, per: 0, newRound: false };
+    var sp = { id: Charge.uid(), kind: "std", pts: pick(PTS), status: "spinning", to: null, theme: null, rn: 0, per: 0, newRound: false };
     sp.bonus = sp.pts === 1000;
     var idx;
     if (S.mode === "themed") {
@@ -302,41 +329,27 @@
       sp.theme = THEMES[S.round.t].name; sp.rn = S.round.n; sp.per = S.per;
     } else { idx = draw(ALL); S.round = null; }
     sp.ref = REFS[idx].ref;
-    S.spin = sp; S.view = "game"; save(); render(); animateStd(sp);
+    core.newQuestionSet(); S.spin = sp; S.view = "game"; save(); render(); animateStd(sp);
   }
   function wildcard() {
     if (busy) return;
     var n = 1 + rnd(6), refs = [];
     for (var i = 0; i < n; i++) refs.push(REFS[draw(ALL)].ref);
-    var sp = { id: SD.uid(), kind: "wild", count: n, refs: refs, awards: refs.map(function () { return null; }), pts: pick(WPTS), status: "spinning", final: !!S.finalWild };
-    S.round = null; S.spin = sp; S.view = "wild"; save(); render(); animateWild(sp);
+    var sp = { id: Charge.uid(), kind: "wild", count: n, refs: refs, awards: refs.map(function () { return null; }), pts: pick(WPTS), status: "spinning", final: !!S.finalWild };
+    core.newQuestionSet(); S.round = null; S.spin = sp; S.view = "wild"; save(); render(); animateWild(sp);
   }
-  function nextSlot(sp) { return sp.awards.indexOf(null); }
-  function award(t, slot) {
-    var sp = S.spin; if (!sp || sp.status !== "landed" || busy || t < 0 || t >= S.tables) return;
-    if (sp.kind === "wild") {
-      if (slot == null || slot < 0 || slot >= sp.count || sp.awards[slot] !== null) slot = nextSlot(sp);
-      if (slot < 0) return;
-      sp.awards[slot] = t;
-    } else { if (sp.to !== null) return; sp.to = t; }
-    S.scores[t] += sp.pts; S.history.push({ t: t, pts: sp.pts, spin: sp.id, slot: sp.kind === "wild" ? slot : null });
-    save(); render(); toast("+" + sp.pts, "Table " + (t + 1)); hit(t);
-    if (sp.kind === "wild" && sp.final && nextSlot(sp) < 0) setTimeout(function () { if (S.spin === sp && nextSlot(sp) < 0) { S.view = "scores"; save(); render(); } }, 3200);
-  }
+  // a table buzzes in (screen click/keys, the leader's phone, or a table device). Wildcard: the verse the leader picked, else the next open one
+  function buzz(t, slot, src) { var sp = S.spin; if (!sp) return; if (sp.kind === "wild" && (slot == null || question(slot) === null)) slot = nextSlot(sp); if (sp.kind === "std") slot = null; if (core.buzz(t, slot, src || "remote")) board.game.show(t), board.wild.show(t); }
+  function judge(ok) { var B = S.core.buzz; if (B.team === null) return; if (ok) core.correct(B.q, B.team); else { var t = B.team; if (core.wrong(B.q, t)) toast("✕", core.label(t) + (S.core.lockout ? " is out" : "")); } }
   function undo() {
-    var h = S.history.pop(); if (!h) return;
-    S.scores[h.t] -= h.pts;
-    var sp = S.spin;
-    if (sp && sp.id === h.spin) { if (sp.kind === "wild") sp.awards[h.slot] = null; else sp.to = null; if (S.view === "scores") S.view = sp.kind === "wild" ? "wild" : "game"; }
-    save(); render(); toast("Undo", "−" + h.pts + " · Table " + (h.t + 1));
+    var h = core.undo(); if (!h) return;
+    toast("Undo", h.k === "award" ? "−" + h.pts + " · " + core.label(h.t) : core.label(h.t) + " back in");
   }
-  function reset() { S.scores = zeros(); S.history = []; S.spin = null; S.round = null; S.used = []; S.view = "rules"; save(); render(); }
-  function setTables(n) { n = Math.max(2, Math.min(MAXT, n | 0)); if (n === S.tables) return; S.tables = n; save(); render(); }
+  function reset() { core.reset(); S.spin = null; S.round = null; S.used = []; S.view = "rules"; save(); render(); }
   function setMode(m) { if (m !== "classic" && m !== "themed") return; S.mode = m; S.round = null; save(); render(); }
   function setPer(n) { n = n | 0; if (n < 2 || n > 4) return; S.per = n; save(); render(); }
   function setFinal(on) { S.finalWild = !!on; save(); render(); }
   function view(v) { if (v === "game" && S.spin && S.spin.kind === "wild") v = "wild"; S.view = v; save(); render(); }
-
   /* ---------- reels ---------- */
   function refCell(r) { var m = r.match(/^(.*) (\d+:\d+)$/); return '<div class="cell"><div class="bk wide">' + esc(m[1]) + '</div><div class="cv wide">' + m[2] + '</div></div>'; }
   function ptsCell(p, tag) { return '<div class="cell"><div class="pv wide">' + p + '</div>' + (tag ? '<div class="tag mono">' + tag + '</div>' : '') + '</div>'; }
@@ -396,32 +409,18 @@
   function land(sp) { busy = false; if (S.spin && S.spin.id === sp.id) { sp.status = "landed"; save(); } render(); if (sp.bonus) $("w-pts").classList.add("bonus"); }
 
   /* ---------- render ---------- */
-  function boardHTML(cls) {
-    var max = Math.max.apply(null, S.scores.slice(0, S.tables)), h = "";
-    for (var i = 0; i < S.tables; i++) {
-      var sc = S.scores[i], lead = max > 0 && sc === max;
-      h += '<div class="tb' + (lead ? " lead" : "") + '" data-t="' + i + '"><div class="nm mono">Table ' + (i + 1) + '</div><div class="sc wide">' + sc + '</div>' + (cls === "scores" ? '<div class="crown mono">' + (finished() ? "Winner" : "Leading") + '</div>' : "") + '</div>';
-    }
-    return h;
-  }
+  var board = { game: Charge.board($("b-game"), { mode: "strip" }), wild: Charge.board($("b-wild"), { mode: "strip" }), scores: Charge.board($("b-scores"), { mode: "full" }) };
   function finished() { var sp = S.spin; return !!(sp && sp.kind === "wild" && sp.final && sp.status === "landed" && nextSlot(sp) < 0); }
-  function layoutBoard(el, mode) {
-    var n = S.tables, cards = el.children, perRow, rows;
-    if (mode === "scores") { rows = n <= 4 ? 1 : n <= 8 ? 2 : 3; } else { rows = n <= 6 ? 1 : 2; }
-    perRow = Math.ceil(n / rows);
-    el.classList.toggle("two", rows > 1 && mode !== "scores");
-    var w = (100 - 4.8 + 1) / perRow - 1;   // rem: stage inner width + margins
-    [].forEach.call(cards, function (c) { if (rows > 1 || mode === "scores") c.style.width = w + "rem"; });
-    if (mode === "scores") { var hh = (el.clientHeight / rows) - parseFloat(getComputedStyle(document.documentElement).fontSize) * 1.25; [].forEach.call(cards, function (c) { c.style.height = hh + "px"; }); }
-  }
+  function teamsPub() { return core.pub("screen"); }
+  function openQ() { var B = S.core.buzz; return B.q && question(B.slot) === B.q ? B.q : null; }
   function renderWild(blankCards) {
     var sp = S.spin; if (!sp || sp.kind !== "wild") return;
     var cols = sp.count <= 3 ? sp.count : Math.ceil(sp.count / 2), w = Math.min(44, (95 / cols) - 1.2);
-    var nx = nextSlot(sp), h = "";
+    var B = S.core.buzz, nx = B.team !== null && B.slot != null ? B.slot : nextSlot(sp), h = "";
     sp.refs.forEach(function (r, i) {
       var a = sp.awards[i];
       h += '<div class="wc' + (a !== null ? " done" : "") + (sp.status === "landed" && i === nx ? " next" : "") + '" style="width:' + w + 'rem"><div class="n wide">' + (i + 1) + '</div><div class="win"><div class="strip"></div></div>' +
-        '<div class="got"><b class="wide">' + (a !== null ? "Table " + (a + 1) : "") + '</b><span class="mono">+' + sp.pts + '</span></div></div>';
+        '<div class="got"><b class="wide">' + (a !== null ? esc(core.label(a)) : "") + '</b><span class="mono">+' + sp.pts + '</span></div></div>';
     });
     $("cards").innerHTML = h;
     var wins = document.querySelectorAll("#cards .win");
@@ -431,6 +430,7 @@
     else { still($("w-count"), ptsCell(sp.count)); still($("w-wpts"), ptsTarget(sp)); }
     $("wildsub").textContent = sp.final ? "Final round · double points" : "Double points per verse";
   }
+  function lastWrong(q) { var h = S.core.history[S.core.history.length - 1]; return h && h.k === "wrong" && h.buzz && h.buzz.q === q ? h : null; }
   function render() {
     document.body.classList.toggle("themed", S.mode === "themed");
     $("code").textContent = $("code2").textContent = S.code;
@@ -438,14 +438,16 @@
     $("ptsline").innerHTML = "Points <span>100 · 200 · 300 · 500</span> · rare <span>Bonus 1000</span><br>" +
       (S.mode === "themed" ? "Themed: one theme, <span>" + S.per + " verses</span> per round" : "Classic: <span>any verse</span>, any book") + (S.finalWild ? " · <span>Wildcard</span> ends the game" : "");
     ["rules", "game", "wild", "scores"].forEach(function (v) { $("v-" + v).classList.toggle("on", S.view === v); });
-    var sp = S.spin;
+    var sp = S.spin, B = S.core.buzz, q = openQ(), buzzT = q && B.team !== null ? B.team : null;
     if (!busy) {
       if (sp && sp.kind === "std") {
         still($("w-ref"), refCell(sp.ref)); still($("w-pts"), ptsTarget(sp));
         if (S.mode === "themed" && sp.theme) { still($("w-theme"), themeCell(sp.theme)); $("rn").textContent = "Verse " + sp.rn + " of " + sp.per; }
         else if (S.mode === "themed") { still($("w-theme"), themeCell("Spin to pick")); $("rn").textContent = "–"; }
-        var say = $("say");
-        if (sp.to !== null) { say.className = "say wide up"; say.textContent = "Table " + (sp.to + 1) + " +" + sp.pts; }
+        var say = $("say"), lw = lastWrong(sp.id);
+        if (sp.to !== null) { say.className = "say wide up"; say.textContent = core.label(sp.to) + " +" + sp.pts; }
+        else if (buzzT !== null) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner">' + esc(core.label(buzzT)) + ' buzzed in!<small>Is it right?</small></span>'; }
+        else if (lw) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner no">✕ ' + esc(core.label(lw.t)) + '<small>' + (S.core.lockout ? "locked out · buzzers open" : "buzzers open") + '</small></span>'; }
         else { say.className = "say wide go"; say.textContent = "CHARGE!"; }
         $("refnote").textContent = sp.theme ? "· " + sp.theme : "";
         $("w-pts").classList.toggle("bonus", !!sp.bonus);
@@ -457,93 +459,55 @@
       }
       if (sp && sp.kind === "wild") renderWild(false);
     }
-    $("b-game").innerHTML = $("b-wild").innerHTML = boardHTML("game");
-    $("b-scores").innerHTML = boardHTML("scores");
+    var wb = $("wbanner"), lw2 = sp && sp.kind === "wild" && q ? lastWrong(q) : null;
+    if (sp && sp.kind === "wild" && buzzT !== null) { wb.innerHTML = '<span class="cg-banner">' + esc(core.label(buzzT)) + " buzzed in<small>verse " + (B.slot + 1) + "</small></span>"; wb.hidden = false; }
+    else if (lw2) { wb.innerHTML = '<span class="cg-banner no">✕ ' + esc(core.label(lw2.t)) + "<small>verse " + (lw2.slot + 1) + " · buzzers open</small></span>"; wb.hidden = false; }
+    else wb.hidden = true;
+    var T = teamsPub(), X = { buzz: buzzT, locked: q ? core.lockedFor(q) : [], finished: finished(), hit: hitT };
+    board.game.render(T, X); board.wild.render(T, X); board.scores.render(T, X);
     $("scoretitle").innerHTML = finished() ? 'Final <span>scores</span>' : 'Score<span>board</span>';
-    layoutBoard($("b-game"), "game"); layoutBoard($("b-wild"), "game"); layoutBoard($("b-scores"), "scores");
-    // settings panel
-    sel("s-mode", S.mode); sel("s-per", String(S.per)); sel("s-final", S.finalWild ? "1" : "0");
-    $("s-per").classList.toggle("off", S.mode !== "themed"); $("s-tables").textContent = S.tables;
+    sel("s-mode", S.mode); sel("s-per", String(S.per)); sel("s-final", S.finalWild ? "1" : "0"); sel("s-lock", S.core.lockout ? "1" : "0");
+    $("s-per").classList.toggle("off", S.mode !== "themed"); $("s-tables").textContent = S.core.n;
+    var nreq = S.core.requests.length; $("reqchip").hidden = !nreq; $("reqchip").textContent = nreq + " name request" + (nreq > 1 ? "s" : "") + " · approve on the phone";
   }
   function sel(id, v) { [].forEach.call($(id).children, function (b) { b.classList.toggle("sel", b.getAttribute("data-v") === v); }); }
   var tt;
   function toast(a, b) { $("toastpts").textContent = a; $("toastt").textContent = b; $("toast").classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { $("toast").classList.remove("on"); }, 2200); }
-  function hit(t) { [].forEach.call(document.querySelectorAll('.tb[data-t="' + t + '"]'), function (e) { e.classList.remove("hit"); void e.offsetWidth; e.classList.add("hit"); }); }
 
-  /* ---------- QR ---------- */
-  var ctrlUrl = function () { return new URL("controller/?room=" + S.code, location.href.split("#")[0].split("?")[0]).href; };
-  function drawQR() {
-    try { var q = qrcode(0, "M"); q.addData(ctrlUrl()); q.make(); $("qr").innerHTML = q.createSvgTag({ cellSize: 8, margin: 0, scalable: true }); } catch (e) { $("qr").textContent = ""; }
-    $("url").textContent = ctrlUrl().replace(/^https?:\/\//, "");
-  }
-
-  /* ---------- link: PeerJS (primary) + MQTT relay (backup) ---------- */
-  var peer = null, conns = [], tries = 0, relayUntil = 0, relaySeen = 0, seen = [], relay = null;
-  function pub() {
+  /* ---------- link (shared core) ---------- */
+  function pub(role) {
     var sp = S.spin, p = null;
     if (sp) p = sp.kind === "wild" ? { id: sp.id, kind: "wild", count: sp.count, refs: sp.status === "landed" ? sp.refs : [], awards: sp.awards, pts: sp.pts, status: sp.status, final: sp.final }
                                    : { id: sp.id, kind: "std", ref: sp.status === "landed" ? sp.ref : "", pts: sp.status === "landed" ? sp.pts : 0, bonus: sp.status === "landed" && sp.bonus, status: sp.status, to: sp.to, theme: sp.theme, rn: sp.rn, per: sp.per };
-    return { t: "state", rev: S.rev, at: Date.now(), code: S.code, tables: S.tables, scores: S.scores.slice(0, S.tables), view: S.view, mode: S.mode, per: S.per, finalWild: S.finalWild, spin: p,
-             canUndo: S.history.length > 0, last: S.history.length ? S.history[S.history.length - 1] : null, finished: finished(), busy: busy };
-  }
-  var bt;
-  function broadcast() { clearTimeout(bt); bt = setTimeout(sendState, 30); }
-  function sendState() {
-    var m = pub();
-    conns.forEach(function (c) { if (c.open) try { c.send(m); } catch (e) {} });
-    var live = conns.some(function (c) { return c.open && Date.now() - c.lastSeen < 10000; });
-    if (relay && Date.now() < relayUntil && !live) relay.pub(SD.topic(S.code, "s"), m);   // backup relay only when a phone is using it
-    setDot();
-  }
-  function setDot() {
-    var on = conns.some(function (c) { return c.open; }) || Date.now() - relaySeen < 90000;
-    $("dot").className = "dot" + (on ? " on" : peer && peer.open ? "" : " wait");
-    $("dot").title = on ? "Phone connected" : peer && peer.open ? "Waiting for phone" : "Connecting to relay";
-  }
-  function handle(m, via) {
-    if (!m || typeof m !== "object") return;
-    if (m.t === "ping") return "pong";
-    if (via === "relay") { relayUntil = Date.now() + 3 * 3600e3; relaySeen = Date.now(); }
-    if (m.t === "hello") { broadcast(); return; }
-    if (m.t !== "cmd" || !m.id || seen.indexOf(m.id) >= 0) return;
-    seen.push(m.id); if (seen.length > 300) seen.shift();
-    run(m.a, m);
-    broadcast();
+    return { core: core.pub(role), view: S.view, mode: S.mode, per: S.per, finalWild: S.finalWild, spin: p, finished: finished(), busy: busy };
   }
   function run(a, m) {
     m = m || {};
-    if (a === "spin") spin(); else if (a === "wild") wildcard(); else if (a === "award") award(m.table | 0, m.slot);
-    else if (a === "undo") undo(); else if (a === "reset") reset(); else if (a === "tables") setTables(m.d ? S.tables + (m.d > 0 ? 1 : -1) : m.n);
-    else if (a === "mode") setMode(m.mode); else if (a === "per") setPer(m.n); else if (a === "final") setFinal(m.on);
-    else if (a === "rules" || a === "game" || a === "scores") view(a);
+    if (a === "core.reset") { reset(); return; }
+    if (a === "core.buzz") { buzz(m.team | 0, m.slot == null ? null : m.slot | 0, "remote"); return; }
+    if (a === "core.correct" || a === "core.wrong") { var B = S.core.buzz; if (B.team === null || B.q !== m.q || B.team !== (m.team | 0)) return; judge(a === "core.correct"); return; }
+    if (a === "core.undo") { undo(); return; }
+    if (core.command(a, m)) return;
+    if (a === "sd.spin") spin(); else if (a === "sd.wild") wildcard();
+    else if (a === "sd.mode") setMode(m.mode); else if (a === "sd.per") setPer(m.n); else if (a === "sd.final") setFinal(m.on);
+    else if (a === "sd.view") view(m.v);
   }
-  function startPeer() {
-    if (!SD.hasPeer()) return;
-    if (peer) try { peer.destroy(); } catch (e) {}
-    var p = peer = new Peer(SD.peerId(S.code), { debug: 0 });
-    p.on("open", function () { tries = 0; setDot(); });
-    p.on("connection", function (c) {
-      c.lastSeen = Date.now();
-      c.on("open", function () { conns.push(c); try { c.send(pub()); } catch (e) {} setDot(); });
-      c.on("data", function (m) { c.lastSeen = Date.now(); var r = handle(m, "peer"); if (r === "pong") try { c.send({ t: "pong" }); } catch (e) {} });
-      c.on("close", function () { conns = conns.filter(function (x) { return x !== c; }); setDot(); });
-      c.on("error", function () {});
-    });
-    p.on("disconnected", function () { setDot(); setTimeout(function () { if (p === peer && !p.destroyed && p.disconnected) try { p.reconnect(); } catch (e) {} }, 1500); });
-    p.on("error", function (e) {
-      if (p !== peer) return;
-      setDot();
-      if (e.type === "peer-unavailable") return;
-      if (e.type === "unavailable-id") { tries++; if (tries > 6) { S.code = SD.newCode(); tries = 0; save(); drawQR(); render(); restartRelay(); } }
-      setTimeout(function () { if (p === peer) startPeer(); }, Math.min(15000, 2500 * Math.max(1, tries)));
-    });
-  }
-  setInterval(function () { // drop silent phones (no ping in 15 s) and keep the relay alive
-    conns.forEach(function (c) { if (Date.now() - c.lastSeen > 15000) try { c.close(); } catch (e) {} });
-    if (peer && !peer.destroyed && peer.disconnected) try { peer.reconnect(); } catch (e) {}
-    setDot();
-  }, 5000);
-  function restartRelay() { if (relay) relay.close(); relay = SD.relay(SD.topic(S.code, "c"), function (m) { handle(m, "relay"); }); }
+  var link = null;
+  link = Charge.host({
+    game: GAME, code: S.code,
+    getState: pub,
+    onCommand: run,
+    onInput: function (kind, m) {    // table devices: name requests and buzzes
+      if (kind === "buzz") { var B = S.core.buzz; if (B.team !== null) return; buzz(m.team | 0, null, "player"); }
+      else core.input(kind, m);
+    },
+    onCode: function (c) { S.code = c; save(); drawQR(); render(); },
+    onLink: function (st) { $("dot").className = "dot" + (st === "on" ? " on" : st === "wait" ? "" : " wait"); $("dot").title = st === "on" ? "Phone connected" : st === "wait" ? "Waiting for phone" : "Connecting to relay"; }
+  });
+
+  /* ---------- QR ---------- */
+  function drawQR() { var u = link.remoteUrl("controller/"); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
+    $("tline").innerHTML = "Table buzzers (optional)<br><b>" + esc(new URL("table/", location.href.split("#")[0].split("?")[0]).href.replace(/^https?:\/\//, "")) + "</b>"; }
 
   /* ---------- keyboard + mouse backup ---------- */
   var armT;
@@ -554,16 +518,17 @@
   function settings(on) { $("set").classList.toggle("on", on == null ? !$("set").classList.contains("on") : on); }
   function key(k, btn) {
     if (k === "rules") view("rules"); else if (k === "spin") spin(); else if (k === "wild") wildcard(); else if (k === "scores") view("scores");
-    else if (k === "undo") undo(); else if (k === "settings") settings(); else if (k === "tminus") setTables(S.tables - 1); else if (k === "tplus") setTables(S.tables + 1);
+    else if (k === "undo") undo(); else if (k === "settings") settings(); else if (k === "tminus") core.setCount(S.core.n - 1); else if (k === "tplus") core.setCount(S.core.n + 1);
+    else if (k === "ok") judge(true); else if (k === "no") judge(false);
     else if (k === "reset") armReset(btn || $("s-reset"));
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); }
   }
   document.addEventListener("click", function (e) {
-    var b = e.target.closest("button"), tb = e.target.closest(".tb");
+    var b = e.target.closest("button"), tb = e.target.closest(".cg-tb");
     if (b) { var sg = b.parentNode.id; var v = b.getAttribute("data-v");
-      if (sg === "s-mode") setMode(v); else if (sg === "s-per") setPer(+v); else if (sg === "s-final") setFinal(v === "1"); else key(b.getAttribute("data-k"), b);
+      if (sg === "s-mode") setMode(v); else if (sg === "s-per") setPer(+v); else if (sg === "s-final") setFinal(v === "1"); else if (sg === "s-lock") core.setLockout(v === "1"); else key(b.getAttribute("data-k"), b);
       b.blur(); return; }
-    if (tb && !$("set").classList.contains("on")) award(+tb.getAttribute("data-t"));
+    if (tb && !$("set").classList.contains("on")) buzz(+tb.getAttribute("data-t"), null, "remote");
   });
   var TK = { "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5, "7": 6, "8": 7, "9": 8, "0": 9, "-": 10, "=": 11 };
   document.addEventListener("keydown", function (e) {
@@ -572,12 +537,14 @@
     if (k === " " || k === "Enter") { e.preventDefault(); if (!setOn) spin(); }
     else if (k === "w" || k === "W") wildcard();
     else if (setOn && (k === "2" || k === "3" || k === "4")) setPer(+k);
-    else if (k in TK) award(TK[k]);
+    else if (k in TK) buzz(TK[k], null, "remote");
+    else if (k === "y" || k === "Y" || k === "c" || k === "C") judge(true);
+    else if (k === "n" || k === "N" || k === "x" || k === "X") judge(false);
     else if (k === "u" || k === "U" || k === "Backspace") undo();
     else if (k === "r" || k === "R") view("rules"); else if (k === "g" || k === "G") view("game"); else if (k === "b" || k === "B" || k === "s" || k === "S") view("scores");
     else if (k === "o" || k === "O") settings(); else if (k === "Escape") settings(false);
     else if (k === "m" || k === "M") setMode(S.mode === "themed" ? "classic" : "themed");
-    else if (k === "[") setTables(S.tables - 1); else if (k === "]") setTables(S.tables + 1);
+    else if (k === "[") core.setCount(S.core.n - 1); else if (k === "]") core.setCount(S.core.n + 1);
     else if (k === "f" || k === "F") key("fs");
     poke();
   });
@@ -585,14 +552,12 @@
   function poke() { document.body.classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(function () { if (!$("set").classList.contains("on")) document.body.classList.add("idle"); }, 3500); }
   document.addEventListener("mousemove", poke); poke();
   window.addEventListener("resize", function () { render(); });
-  window.addEventListener("storage", function (e) { if (e.key === KEY && e.newValue) { try { S = JSON.parse(e.newValue); render(); } catch (x) {} } });
-  // keep the projector laptop awake while the game is open
   function wake() { try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(function () {}); } catch (e) {} }
   document.addEventListener("visibilitychange", function () { if (!document.hidden) wake(); }); wake();
 
-  window.SDScreen = { state: function () { return S; }, run: run, busy: function () { return busy; } };   // for tests
+  window.SDScreen = { state: function () { return S; }, run: run, busy: function () { return busy; }, core: core, input: function (kind, m) { var r = { kind: kind }; for (var k in m) r[k] = m[k]; return r; } };   // for tests
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
-  drawQR(); render(); startPeer(); restartRelay();
+  drawQR(); render();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { render(); });
 })();
 </script>

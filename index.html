@@ -116,6 +116,17 @@
     .card.live .badge { background: var(--cyan); color: var(--ink); position: static; display: inline-block; justify-self: start; align-self: start; }
     .card.live h3 { font-size: 40px; margin-top: 14px; }
     .card.live .ctas { margin-top: 22px; }
+    .facts { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
+    .facts li { position: relative; padding-left: 26px; color: var(--text, #E6ECF7); font-weight: 600; }
+    .facts li::before { content: ""; position: absolute; left: 0; top: .32em; width: 14px; height: 14px; border-radius: 4px; background: var(--cyan); box-shadow: 0 0 12px rgba(25,211,255,.5); }
+    .big { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: center; background: linear-gradient(135deg, rgba(255,197,61,.10), rgba(18,26,46,1) 60%); border: 1px solid rgba(255,197,61,.35); border-radius: 22px; padding: 34px; }
+    .big h2 { margin-top: 6px; }
+    .big p { color: var(--mute); margin: 12px 0 0; }
+    .big ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .big li { background: rgba(7,11,22,.55); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+    .big li b { display: block; font: 400 17px var(--disp); color: var(--gold); }
+    .big li span { color: var(--mute); font-size: 15px; }
+    .big .tag { display: inline-block; font: 800 12px/1 var(--body, inherit); letter-spacing: .12em; text-transform: uppercase; background: var(--gold); color: var(--ink); border-radius: 999px; padding: 7px 12px; }
     .modes { margin: 0; padding: 0; list-style: none; align-self: center; }
     .modes li { background: rgba(7,11,22,.6); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; color: var(--mute); }
     .modes li:last-child { margin-bottom: 0; }
@@ -145,12 +156,14 @@
     footer small { margin-left: auto; color: var(--mute); font-size: 14px; }
 
     @media (max-width: 980px) {
+      .big { grid-template-columns: 1fr; }
       .hero .wrap { grid-template-columns: 1fr; }
       .scene { height: 360px; max-width: 560px; }
       .games { grid-template-columns: 1fr 1fr; } .card.live { grid-template-columns: 1fr; }
       .needs { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 640px) {
+      .big { padding: 22px; border-radius: 18px; }
       body { font-size: 16px; }
       .wrap { padding: 0 18px; }
       nav a:not(.btn) { display: none; }
@@ -239,7 +252,12 @@
           <div>
             <span class="badge">Play now · free</span>
             <h3>Sword Drills</h3>
-            <p>The classic Bible race on a slot-machine screen. Bibles closed and held up, the reels land on a reference, and the first table standing and reading it wins the points. Scores stay on the screen all night.</p>
+            <p>The classic Bible race on a slot-machine screen. Bibles closed and held up, the reels land on a reference, and the first table to find it buzzes in. Tap Correct and the points go straight to that table; tap Wrong and the buzzers reopen. Scores stay on the screen all night.</p>
+            <ul class="facts">
+              <li>2 to 50 tables, with a scoreboard that fits them all</li>
+              <li>Optional buzzer for each table on any phone or tablet</li>
+              <li>Team names show only after the leader approves them</li>
+            </ul>
             <div class="ctas"><a class="btn p" href="sword-drills/">Open Sword Drills</a></div>
           </div>
           <ul class="modes">
@@ -289,12 +307,29 @@
     </div>
   </section>
 
+  <section class="s" id="big-events">
+    <div class="wrap">
+      <div class="big">
+        <div>
+          <span class="tag">Coming soon</span>
+          <h2>Hosting a big event? Large-group mode is coming soon</h2>
+          <p>Camps, conferences, and multi-church nights with hundreds of players. Everyone plays along on their own phone while the big screen runs the show. Sword Drills already handles up to 50 tables today.</p>
+        </div>
+        <ul>
+          <li><b>Every player on their phone</b><span>Buzz in, answer, and see your team’s score live.</span></li>
+          <li><b>Built for big rooms</b><span>Hundreds of phones connected at once, with no lag on the big screen.</span></li>
+          <li><b>Same simple setup</b><span>One screen, one leader phone, one room code.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <section class="s alt" id="faq">
     <div class="wrap">
       <div class="eyebrow">FAQ</div>
       <h2>Questions</h2>
       <div class="faq">
-        <details><summary>Can students join with their phones?</summary><p>No. Only the leader’s phone connects, as the controller. Students play with Bibles at their tables, so nobody needs a phone, an account, or an app.</p></details>
+        <details><summary>Do students need phones?</summary><p>No. The leader’s phone runs the game, and students play with Bibles at their tables. If you like, each table can use one phone or tablet as its buzzer and send in a team name. Names show on the screen only after the leader approves them. No accounts or apps.</p></details>
         <details><summary>Does it work offline?</summary><p>No. The screen and the phone talk over the internet, so both need a connection (Wi-Fi or cell data). If the connection drops, scores are saved on the screen and the phone reconnects on its own.</p></details>
         <details><summary>Which Bible translation does it use?</summary><p>None. The games show references only (like “Romans 8:28”), never the verse text, so any translation your group reads works.</p></details>
         <details><summary>Do I need to sign up or install anything?</summary><p>No. Open the game in a browser and scan the code. Nothing to install and no sign-in.</p></details>

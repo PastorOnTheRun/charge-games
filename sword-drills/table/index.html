@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0B1020">
+  <title>Sword Drills · Table · Charge! Games</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <link rel="stylesheet" href="../../shared/charge-core.css">
+  <!-- Sword Drills table device (role "player"): one per table, optional. Sends a team name (the leader approves it) and buzzes in.
+       Built on ../../shared/charge-core.js. No sign-in; nothing personal is sent. -->
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: #0B1020; }
+    body { min-height: 100vh; min-height: 100dvh; color: #EAF0FA; font: 500 17px Inter, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: calc(10px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); -webkit-user-select: none; user-select: none; }
+    .wide { font-family: "Russo One", "Arial Black", sans-serif; font-weight: 400; font-synthesis: none; }
+    .mono { font-family: ui-monospace, "SF Mono", "Roboto Mono", Menlo, monospace; }
+    button { font: inherit; color: inherit; border: 0; touch-action: manipulation; cursor: pointer; }
+    button:disabled { opacity: .4; cursor: default; }
+    [hidden] { display: none !important; }
+    .hd { display: flex; align-items: center; margin-bottom: 14px; }
+    .hd svg { width: 34px; height: 34px; display: block; }
+    .hd .t { margin-left: 10px; flex: 1 1 auto; min-width: 0; }
+    .hd h1 { margin: 0; font-size: 16px; line-height: 1.05; }
+    .hd .r { font-weight: 700; font-size: 11px; letter-spacing: .1em; color: #19D3FF; text-transform: uppercase; margin-top: 3px; }
+    .pill { flex: 0 0 auto; font-weight: 800; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 6px 10px; background: #1C2742; color: #AEB8CC; }
+    .pill.on { color: #4ade80; } .pill.bk { color: #FFC53D; } .pill.off { background: #FFC53D; color: #0B1020; }
+    .card { background: #131B30; border: 1px solid #27365A; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+    h2 { margin: 0 0 6px; font-size: 22px; }
+    p { margin: 0 0 12px; color: #AEB8CC; line-height: 1.4; font-size: 15px; }
+    input { width: 100%; min-height: 54px; font: 700 20px Inter, -apple-system, sans-serif; padding: 0 14px; border: 2px solid #27365A; border-radius: 12px; background: #fff; color: #0B1020; }
+    input.code { font: 400 40px "Russo One", "Arial Black", sans-serif; text-align: center; letter-spacing: .12em; text-transform: uppercase; }
+    input:focus { outline: 3px solid #19D3FF; outline-offset: 2px; }
+    .big { display: block; width: 100%; min-height: 58px; margin-top: 12px; border-radius: 12px; background: #19D3FF; color: #0B1020; font: 400 20px "Russo One", "Arial Black", sans-serif; }
+    .err { color: #FF8FA3; font-weight: 700; margin-top: 10px; min-height: 22px; font-size: 15px; }
+    .nums { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 50vh; overflow-y: auto; }
+    .nums button { min-height: 54px; border-radius: 10px; background: #1C2742; color: #fff; font: 400 20px "Russo One", sans-serif; }
+    .me { display: flex; align-items: center; }
+    .me .nm { flex: 1 1 auto; min-width: 0; }
+    .me .nm b { display: block; font: 400 26px "Russo One", sans-serif; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .me .nm span { font-size: 13px; color: #AEB8CC; font-weight: 700; }
+    .me .sc { font: 400 30px "Russo One", sans-serif; color: #FFC53D; margin-left: 10px; }
+    .chg { background: none; color: #19D3FF; font-weight: 800; font-size: 14px; text-decoration: underline; min-height: 44px; padding: 0; margin-top: 4px; }
+    .ns { margin-top: 10px; border-radius: 10px; padding: 10px 12px; font-weight: 700; font-size: 15px; line-height: 1.35; }
+    .ns.wait { background: rgba(255,197,61,.14); color: #FFD777; border: 1px solid rgba(255,197,61,.4); }
+    .ns.no { background: rgba(244,63,94,.14); color: #FF8FA3; border: 1px solid rgba(244,63,94,.45); }
+    .ns.ok { background: rgba(34,197,94,.14); color: #86EFAC; border: 1px solid rgba(34,197,94,.4); }
+    .row { display: flex; } .row input { border-radius: 12px 0 0 12px; } .row button { flex: 0 0 auto; min-height: 54px; padding: 0 16px; border-radius: 0 12px 12px 0; background: #19D3FF; color: #0B1020; font-weight: 900; }
+    .bz { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 220px; border-radius: 26px; background: #19D3FF; color: #0B1020; font: 400 54px "Russo One", "Arial Black", sans-serif; box-shadow: 0 10px 0 #0B6E99, 0 0 40px rgba(25,211,255,.35); }
+    .bz small { font: 800 15px Inter, -apple-system, sans-serif; margin-top: 6px; }
+    .bz:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 4px 0 #0B6E99; }
+    .bz.mine, .bz.mine:disabled { color: #0B1020; background: #FFC53D; box-shadow: 0 10px 0 #A87800, 0 0 50px rgba(255,197,61,.5); }
+    .bz:disabled { opacity: 1; background: #1C2742; color: #8C98B3; box-shadow: none; }
+    .q { text-align: center; margin: 12px 0 4px; font-weight: 800; color: #AEB8CC; }
+  </style>
+</head>
+<body>
+  <div class="hd">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#19D3FF"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#0B1020" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg>
+    <div class="t"><h1 class="wide">SWORD DRILLS</h1><div class="r mono" id="room">Table</div></div>
+    <div class="pill mono" id="pill">Not joined</div>
+  </div>
+
+  <section id="v-join" class="card">
+    <h2 class="wide">Join the game</h2>
+    <p>Type the 4-letter room code from the screen.</p>
+    <form id="jf" autocomplete="off"><input class="code" id="ci" maxlength="4" autocapitalize="characters" spellcheck="false" placeholder="ABCD" aria-label="Room code"><button class="big" type="submit">Join</button></form>
+    <div class="err" id="jerr"></div>
+  </section>
+
+  <section id="v-pick" class="card" hidden>
+    <h2 class="wide">Which table are you?</h2>
+    <p>Use the number your leader gave your table.</p>
+    <div class="nums" id="nums"></div>
+  </section>
+
+  <section id="v-main" hidden>
+    <div class="card">
+      <div class="me"><div class="nm"><b id="myname">Table 1</b><span id="mysub">Table 1</span></div><div class="sc" id="myscore">0</div></div>
+      <div class="ns" id="nstat" hidden></div>
+      <form id="nf" autocomplete="off" style="margin-top:10px"><div class="row"><input id="ni" maxlength="20" placeholder="Team name (optional)" aria-label="Team name" enterkeyhint="send"><button type="submit">Send</button></div></form>
+      <button class="chg" id="b-chg">Not this table? Change table</button>
+    </div>
+    <button class="bz" id="bz" disabled>BUZZ<small id="bzs">Wait for the spin</small></button>
+    <div class="q" id="qline"></div>
+  </section>
+
+<script src="../../shared/vendor/peerjs.min.js"></script>
+<script src="../../shared/charge-core.js"></script>
+<script>
+(function () {
+  "use strict";
+  var GAME = "sworddrills", KEY = "chargegames:sworddrills:table";
+  var $ = function (id) { return document.getElementById(id); };
+  var saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+  var st = null, me = saved.team == null ? null : saved.team, asked = saved.asked || "", room = "";
+  var R = Charge.remote({
+    game: GAME, role: "player",
+    onState: function (s) { st = s; render(); },
+    onStatus: function (k, txt) { $("pill").className = "pill mono " + (k === "on" ? "on" : k === "backup" ? "bk" : k === "off" ? "off" : ""); $("pill").textContent = txt; }
+  });
+  function keep() { localStorage.setItem(KEY, JSON.stringify({ room: room, team: me, asked: asked })); }
+  function join(c) { room = c; keep(); $("room").textContent = "Room " + c; $("v-join").hidden = true; R.join(c); render(); }
+  function openQ(sp) { if (!sp || sp.status !== "landed") return null; if (sp.kind === "std") return sp.to === null ? sp.id : null; var i = sp.awards.indexOf(null); return i < 0 ? null : sp.id + ":" + i; }
+  function render() {
+    if (!room) return;
+    if (!st) { $("v-pick").hidden = true; $("v-main").hidden = true; return; }
+    var T = st.core;
+    if (me === null || me >= T.n) {
+      $("v-pick").hidden = false; $("v-main").hidden = true;
+      if ($("nums").children.length !== T.n) { var h = ""; for (var i = 0; i < T.n; i++) h += '<button data-n="' + i + '">' + (i + 1) + "</button>"; $("nums").innerHTML = h; }
+      return;
+    }
+    $("v-pick").hidden = true; $("v-main").hidden = false;
+    var def = (T.word || "Table") + " " + (me + 1), approved = (T.names[me] || "").trim(), ns = T.nameState[me];
+    $("myname").textContent = approved || def; $("mysub").textContent = approved ? def : "No team name yet";
+    $("myscore").textContent = T.scores[me];
+    var n = $("nstat");
+    if (ns === "pending") { n.className = "ns wait"; n.textContent = "Waiting for approval" + (asked ? ": “" + asked + "”" : "") + ". Until then the screen shows “" + def + "”."; n.hidden = false; }
+    else if (ns === "rejected") { n.className = "ns no"; n.textContent = (asked ? "“" + asked + "” wasn't approved. " : "That name wasn't approved. ") + "Pick another name."; n.hidden = false; }
+    else if (approved && asked) { n.className = "ns ok"; n.textContent = "Approved! The screen now shows “" + approved + "”" + (approved !== asked ? " (the leader edited it)." : "."); n.hidden = false; }
+    else n.hidden = true;
+    // buzzer
+    var sp = st.spin, q = openQ(sp), B = T.buzz, locked = q ? (T.locked[q] || []) : [], bz = $("bz"), s = $("bzs");
+    var ok = R.ok();
+    if (!ok) { bz.disabled = true; s.textContent = "Connecting…"; bz.className = "bz"; }
+    else if (!q) { bz.disabled = true; bz.className = "bz"; s.textContent = sp && sp.status !== "landed" ? "Bibles closed, held up" : "Wait for the spin"; }
+    else if (B.team === me && B.q === q) { bz.disabled = true; bz.className = "bz mine"; s.textContent = "You buzzed in! Read it out loud"; }
+    else if (locked.indexOf(me) >= 0) { bz.disabled = true; bz.className = "bz"; s.textContent = "Locked out for this one"; }
+    else if (B.team !== null && B.q === q) { bz.disabled = true; bz.className = "bz"; s.textContent = Charge.label(T, B.team) + " buzzed in first"; }
+    else { bz.disabled = false; bz.className = "bz"; s.textContent = "Found it? Tap!"; }
+    $("qline").textContent = sp && sp.status === "landed" ? (sp.kind === "std" ? sp.ref : "Wildcard · " + sp.awards.filter(function (a) { return a === null; }).length + " verse(s) left") : "";
+  }
+  $("jf").addEventListener("submit", function (e) { e.preventDefault(); var c = Charge.normCode($("ci").value); if (!c) { $("jerr").textContent = "Enter the 4 letters shown on the screen."; return; } $("jerr").textContent = ""; $("ci").blur(); join(c); });
+  $("nums").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; me = +b.getAttribute("data-n"); asked = ""; keep(); render(); });
+  $("b-chg").addEventListener("click", function () { me = null; asked = ""; keep(); render(); });
+  $("nf").addEventListener("submit", function (e) {
+    e.preventDefault(); var v = Charge.cleanName($("ni").value); if (!v || me === null) return;
+    asked = v; keep(); R.send("name", { team: me, name: v }); $("ni").value = ""; $("ni").blur();
+    if (st) { st.core.nameState[me] = "pending"; render(); }                  // show "waiting" right away; the screen confirms
+  });
+  $("bz").addEventListener("click", function () { if (me === null) return; R.send("buzz", { team: me }); $("bzs").textContent = "Sent…"; });
+  document.addEventListener("touchend", Charge.wake, { passive: true });
+  setInterval(render, 3000);
+  window.SDTable = { state: function () { return st; }, ok: R.ok, me: function () { return me; } };   // for tests
+  var q = Charge.normCode(new URLSearchParams(location.search).get("room"));
+  if (q || saved.room) join(q || saved.room);
+})();
+</script>
+</body>
+</html>
