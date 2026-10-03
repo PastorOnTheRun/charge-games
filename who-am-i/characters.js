@@ -1,0 +1,197 @@
+/* Who Am I? characters. Each has 5 clues, hardest first, easiest last.
+   t: "OT" | "NT". ref: one CSB Scripture reference shown with the answer (reference only, no verse text).
+   Clues are short paraphrases, not quotations. Review list: CHARACTERS.md */
+window.WA_CHARACTERS = [
+  { name: "Adam", t: "OT", ref: "Genesis 2:7", clues: [
+    "I lived 930 years.",
+    "My third son named in Scripture was Seth.",
+    "God brought every animal to me to see what I would name it.",
+    "God made my wife from one of my ribs.",
+    "I was the first man, placed in the garden of Eden." ] },
+  { name: "Noah", t: "OT", ref: "Genesis 6:13-14", clues: [
+    "My father was Lamech.",
+    "After the disaster I planted a vineyard.",
+    "My sons were Shem, Ham, and Japheth.",
+    "I sent out a raven and then a dove to look for dry land.",
+    "I built an ark and survived the flood." ] },
+  { name: "Abraham", t: "OT", ref: "Genesis 12:1-3", clues: [
+    "I gave a tenth of everything to Melchizedek, king of Salem.",
+    "I came from Ur of the Chaldeans.",
+    "God made my name longer when he made a covenant with me.",
+    "My son was born when I was 100 years old.",
+    "My wife was Sarah and my son of the promise was Isaac." ] },
+  { name: "Jacob", t: "OT", ref: "Genesis 32:28", clues: [
+    "I set up a stone pillar at Bethel after a dream about a stairway to heaven.",
+    "I worked fourteen years for my father-in-law Laban to marry his daughters.",
+    "I wrestled all night and was given the new name Israel.",
+    "I traded a bowl of stew for my brother's birthright.",
+    "I am Esau's twin, and I tricked my father Isaac to get the blessing." ] },
+  { name: "Joseph", t: "OT", ref: "Genesis 41:39-41", clues: [
+    "I married Asenath, daughter of a priest of On.",
+    "I was put in charge of everything in Potiphar's house.",
+    "In prison I explained the dreams of the cupbearer and the baker.",
+    "My jealous brothers sold me to traders headed for Egypt.",
+    "My father Jacob gave me a special robe, and I dreamed my brothers bowed to me." ] },
+  { name: "Moses", t: "OT", ref: "Exodus 3:10", clues: [
+    "My father-in-law Jethro told me to appoint leaders to help me judge the people.",
+    "My mother hid me for three months when I was a baby.",
+    "I killed an Egyptian and ran away to Midian.",
+    "God spoke to me from a bush that was on fire but did not burn up.",
+    "I led Israel out of Egypt and brought down the Ten Commandments." ] },
+  { name: "Joshua", t: "OT", ref: "Joshua 6:20", clues: [
+    "I am the son of Nun.",
+    "When I prayed at Gibeon, the sun stood still.",
+    "I was one of only two spies who said Israel could take the land.",
+    "I led Israel after Moses died.",
+    "The walls of Jericho fell after we marched around the city." ] },
+  { name: "Rahab", t: "OT", ref: "Joshua 2:1", clues: [
+    "I am named in Jesus' family line in Matthew 1.",
+    "My house was built into the city wall.",
+    "I hid two men under stalks of flax on my roof.",
+    "I tied a scarlet cord in my window.",
+    "I hid Israel's spies in Jericho, and my family was saved when the city fell." ] },
+  { name: "Deborah", t: "OT", ref: "Judges 4:4-5", clues: [
+    "My husband was Lappidoth.",
+    "I held court under a palm tree between Ramah and Bethel.",
+    "I sang a victory song with Barak.",
+    "I told Barak to go fight Sisera's army.",
+    "I was a prophetess who judged Israel." ] },
+  { name: "Gideon", t: "OT", ref: "Judges 7:7", clues: [
+    "I was also called Jerubbaal.",
+    "An angel found me threshing wheat in a winepress.",
+    "I asked God for a sign with a wool fleece, wet and then dry.",
+    "God cut my army down to 300 men.",
+    "My men blew trumpets, broke jars, and held up torches to defeat Midian." ] },
+  { name: "Samson", t: "OT", ref: "Judges 16:28-30", clues: [
+    "I told a riddle about honey I found in a lion's carcass.",
+    "I tied torches to foxes' tails to burn the Philistines' fields.",
+    "I killed a thousand men with a donkey's jawbone.",
+    "I was a Nazirite, and my hair was never to be cut.",
+    "Delilah found out the secret of my strength." ] },
+  { name: "Ruth", t: "OT", ref: "Ruth 1:16", clues: [
+    "My first husband was Mahlon.",
+    "I came from Moab.",
+    "I promised my mother-in-law I would go wherever she went.",
+    "I gathered leftover grain in the fields of Boaz.",
+    "I married Boaz and became King David's great-grandmother." ] },
+  { name: "Hannah", t: "OT", ref: "1 Samuel 1:27-28", clues: [
+    "My husband Elkanah had another wife, Peninnah.",
+    "Eli the priest thought I was drunk.",
+    "I prayed at Shiloh for a son, my lips moving without sound.",
+    "I gave my son to serve the Lord all his life.",
+    "I am the mother of the prophet Samuel." ] },
+  { name: "Samuel", t: "OT", ref: "1 Samuel 3:10", clues: [
+    "I set up a stone and named it Ebenezer.",
+    "My sons Joel and Abijah took bribes, so the people asked for a king.",
+    "I anointed both Saul and David.",
+    "As a boy I served the Lord under Eli the priest.",
+    "God called my name in the night, and at first I thought it was Eli." ] },
+  { name: "David", t: "OT", ref: "1 Samuel 17:49-50", clues: [
+    "I pretended to be insane in front of the king of Gath.",
+    "My great-grandmother was Ruth.",
+    "I was the youngest son of Jesse and took care of sheep.",
+    "I played the lyre to calm King Saul.",
+    "I defeated Goliath with a sling and a stone." ] },
+  { name: "Solomon", t: "OT", ref: "1 Kings 3:9-12", clues: [
+    "I had 700 wives and 300 concubines.",
+    "The queen of Sheba came to test me with hard questions.",
+    "My mother was Bathsheba.",
+    "I built the first temple in Jerusalem.",
+    "I asked God for wisdom, and he made me the wisest king." ] },
+  { name: "Elijah", t: "OT", ref: "1 Kings 18:36-38", clues: [
+    "I was a Tishbite from Gilead.",
+    "Ravens brought me bread and meat by a brook.",
+    "I brought the widow of Zarephath's son back to life.",
+    "I faced 450 prophets of Baal on Mount Carmel, and God sent fire.",
+    "I went up to heaven in a whirlwind, with a chariot of fire." ] },
+  { name: "Elisha", t: "OT", ref: "2 Kings 2:9-14", clues: [
+    "I was plowing with twelve teams of oxen when I was called.",
+    "I made an iron axe head float.",
+    "I told Naaman to wash seven times in the Jordan River.",
+    "I asked for a double portion of my master's spirit.",
+    "I picked up Elijah's mantle after he was taken to heaven." ] },
+  { name: "Esther", t: "OT", ref: "Esther 4:14", clues: [
+    "My Hebrew name was Hadassah.",
+    "My cousin Mordecai raised me after my parents died.",
+    "I was chosen as queen of Persia.",
+    "I asked the Jews to fast three days before I went to the king uninvited.",
+    "I exposed Haman's plot to destroy my people." ] },
+  { name: "Nehemiah", t: "OT", ref: "Nehemiah 6:15", clues: [
+    "I was cupbearer to King Artaxerxes.",
+    "Sanballat and Tobiah mocked and opposed my work.",
+    "I inspected the broken walls at night.",
+    "Some builders worked with one hand and held a weapon in the other.",
+    "I led the rebuilding of Jerusalem's walls in 52 days." ] },
+  { name: "Daniel", t: "OT", ref: "Daniel 6:22", clues: [
+    "In Babylon I was given the name Belteshazzar.",
+    "I refused the king's food and ate vegetables with my three friends.",
+    "I read the writing on the wall for King Belshazzar.",
+    "I kept praying three times a day even when it was against the law.",
+    "God shut the lions' mouths when I was thrown into their den." ] },
+  { name: "Jonah", t: "OT", ref: "Jonah 1:17", clues: [
+    "My father was Amittai.",
+    "I was angry when the plant that shaded me withered.",
+    "I paid the fare for a ship going to Tarshish.",
+    "Sailors threw me overboard to calm a storm.",
+    "A huge fish swallowed me, and later I preached in Nineveh." ] },
+  { name: "Mary, mother of Jesus", t: "NT", ref: "Luke 1:30-31", clues: [
+    "When I visited my relative Elizabeth, her baby leaped inside her.",
+    "I was engaged to Joseph of Nazareth.",
+    "The angel Gabriel told me I would have a son.",
+    "I laid my newborn son in a manger in Bethlehem.",
+    "I am the mother of Jesus." ] },
+  { name: "John the Baptist", t: "NT", ref: "Matthew 3:13-17", clues: [
+    "My father Zechariah could not speak until I was named.",
+    "I leaped in my mother's womb when Mary came to visit.",
+    "I ate locusts and wild honey and wore camel hair.",
+    "Herod had me beheaded.",
+    "I baptized Jesus in the Jordan River." ] },
+  { name: "Peter", t: "NT", ref: "Matthew 16:16-18", clues: [
+    "My brother Andrew brought me to Jesus.",
+    "Jesus healed my mother-in-law of a fever.",
+    "I walked on water for a moment, then began to sink.",
+    "I denied Jesus three times before the rooster crowed.",
+    "Jesus changed my name from Simon, and I preached at Pentecost." ] },
+  { name: "Thomas", t: "NT", ref: "John 20:27-28", clues: [
+    "I was also called Didymus, which means Twin.",
+    "When Jesus headed back toward Judea, I told the others we should go and die with him.",
+    "I asked Jesus how we could know the way.",
+    "I was not with the other disciples when the risen Jesus first came to them.",
+    "I said I would not believe until I touched the wounds in Jesus' hands and side." ] },
+  { name: "Nicodemus", t: "NT", ref: "John 3:1-3", clues: [
+    "I brought about 75 pounds of myrrh and aloes to bury Jesus.",
+    "I told the other leaders the law does not condemn a man without a hearing.",
+    "I was a Pharisee and a ruler of the Jews.",
+    "I came to see Jesus at night.",
+    "Jesus told me I must be born again." ] },
+  { name: "Zacchaeus", t: "NT", ref: "Luke 19:5", clues: [
+    "I lived in Jericho.",
+    "I was a chief tax collector, and I was rich.",
+    "I promised to give half of what I owned to the poor.",
+    "Jesus said he must stay at my house today.",
+    "I was short, so I climbed a sycamore tree to see Jesus." ] },
+  { name: "Lazarus", t: "NT", ref: "John 11:43-44", clues: [
+    "The chief priests planned to kill me too, because people believed in Jesus because of me.",
+    "I lived in Bethany.",
+    "My sisters were Martha and Mary.",
+    "I had been in the tomb four days when Jesus arrived.",
+    "Jesus called me out of my tomb alive." ] },
+  { name: "Mary Magdalene", t: "NT", ref: "John 20:16-18", clues: [
+    "Jesus drove seven demons out of me.",
+    "I helped support Jesus and his disciples from my own money.",
+    "I watched Jesus die on the cross.",
+    "I went to the tomb early on the first day of the week.",
+    "I thought the risen Jesus was the gardener until he said my name." ] },
+  { name: "Stephen", t: "NT", ref: "Acts 7:59-60", clues: [
+    "I was one of seven men chosen to make sure widows got their food.",
+    "I gave a long speech about Israel's history to the Sanhedrin.",
+    "I saw heaven open and Jesus standing at God's right hand.",
+    "Saul watched over the coats of the men who killed me.",
+    "I was stoned to death and prayed for the people throwing the stones." ] },
+  { name: "Paul", t: "NT", ref: "Acts 9:3-6", clues: [
+    "I was from Tarsus and made tents for a living.",
+    "A viper bit me on Malta after a shipwreck, and I was not harmed.",
+    "Silas and I sang hymns at midnight in a prison in Philippi.",
+    "A bright light blinded me on the road to Damascus.",
+    "I used to be called Saul, and I wrote many New Testament letters." ] }
+];

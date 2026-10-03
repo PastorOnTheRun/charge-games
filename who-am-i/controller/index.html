@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#EEF2F8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Who Am I? · Leader remote · Charge! Games</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <link rel="stylesheet" href="../../shared/charge-core.css">
+  <!-- Who Am I? leader remote (the leader's phone), built on ../../shared/charge-core.js. Joins the screen (../) by 4-letter room code or QR (?room=CODE).
+       Sends commands only; the screen keeps the scores. The host phone sees the answer; tables never do. -->
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--cg-paper); }
+    body { min-height: 100vh; min-height: 100dvh; color: var(--cg-ink); font-family: Inter, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 17px;
+      background-image: radial-gradient(circle, rgba(var(--cg-ink-rgb),.16) 1px, transparent 1.4px); background-size: 18px 18px;
+      padding: calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom)); -webkit-user-select: none; user-select: none; }
+    .mono { font-family: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, monospace; }
+    .wide { font-family: var(--cg-disp); } .wide, .wide * { font-synthesis: none; }
+    button { font: inherit; color: inherit; border: 0; touch-action: manipulation; cursor: pointer; }
+    button:disabled { opacity: .38; cursor: default; }
+    .hd { display: flex; align-items: center; margin-bottom: 10px; }
+    .hd .mark { height: 34px; width: 34px; display: block; flex: 0 0 auto; }
+    .hd .t { margin-left: 10px; padding-left: 10px; border-left: 2px solid var(--cg-acc); min-width: 0; flex: 1 1 auto; }
+    .hd h1 { margin: 0; font-weight: 900; font-size: 15px; line-height: 1.05; white-space: nowrap; }
+    .hd .r { font-weight: 700; font-size: 11px; letter-spacing: .1em; color: var(--cg-acc-dk); text-transform: uppercase; margin-top: 3px; white-space: nowrap; }
+    .pill { margin-left: 8px; flex: 0 0 auto; font-weight: 800; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 6px 10px; background: var(--cg-paper2); color: var(--cg-slate); white-space: nowrap; }
+    .pill.on { background: var(--cg-ink); color: #4ade80; } .pill.bk { background: var(--cg-ink); color: var(--cg-gold); } .pill.off { background: var(--cg-gold); color: var(--cg-ink); }
+    [hidden] { display: none !important; }
+    /* join */
+    .card { background: #fff; border: 1px solid rgba(var(--cg-ink-rgb),.18); border-radius: 10px; padding: 18px; }
+    .join h2 { margin: 6px 0 6px; font-weight: 900; font-size: 26px; }
+    .join p { margin: 0 0 16px; color: var(--cg-line2); line-height: 1.4; }
+    .join input { width: 100%; font: 400 44px var(--cg-disp); text-align: center; letter-spacing: .12em; text-transform: uppercase; padding: 12px 6px; border: 2px solid var(--cg-ink); border-radius: 10px; background: #fff; color: var(--cg-ink); }
+    .join input:focus { outline: 3px solid var(--cg-acc); outline-offset: 2px; }
+    .big { display: block; width: 100%; min-height: 64px; border-radius: 12px; font-weight: 900; font-size: 22px; background: var(--cg-acc); color: var(--cg-ink); margin-top: 14px; }
+    .err { color: var(--cg-acc-dk); font-weight: 700; margin-top: 10px; min-height: 22px; }
+    /* now card */
+    .now { background: var(--cg-ink); color: #fff; border-radius: 12px; padding: 12px 14px 13px; }
+    .now .k { font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-acc); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now .ans { display: flex; align-items: baseline; margin-top: 6px; }
+    .now .ans span { flex: 0 0 auto; font-weight: 800; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-gold); margin-right: 8px; }
+    .now .ans b { font-family: var(--cg-disp); font-weight: 400; font-size: 26px; line-height: 1.1; min-width: 0; overflow-wrap: anywhere; }
+    .now .rf { font-weight: 700; font-size: 13px; color: var(--cg-soft); margin-top: 2px; }
+    .now .cl { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: var(--cg-panel2); font-size: 15px; font-weight: 700; line-height: 1.3; }
+    .now .cl small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-acc); margin-bottom: 2px; }
+    .now .pt { font-weight: 800; font-size: 14px; color: var(--cg-soft); margin-top: 6px; }
+    .acts { display: flex; margin-top: 10px; }
+    .go { flex: 2 1 0; min-height: 76px; border-radius: 12px; background: var(--cg-acc); color: var(--cg-ink); font-weight: 900; font-size: 24px; line-height: 1.1; }
+    .rev { flex: 1 1 0; margin-left: 8px; min-height: 76px; border-radius: 12px; background: var(--cg-ink); color: var(--cg-gold); font-weight: 900; font-size: 14px; line-height: 1.15; }
+    .lab { font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-acc-dk); margin: 14px 2px 7px; }
+    .row4 { display: flex; margin: 12px -4px 0; }
+    .row4 button { flex: 1 1 0; margin: 0 4px; min-height: 56px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(var(--cg-ink-rgb),.3); font-weight: 800; font-size: 14px; }
+    .row4 button.dk { background: var(--cg-ink); color: #fff; border-color: var(--cg-ink); }
+    .foot { margin-top: 10px; text-align: center; font-size: 12px; color: var(--cg-slate); font-weight: 700; }
+    /* settings sheet */
+    .sheet { position: fixed; inset: 0; z-index: 10; background: rgba(var(--cg-ink-rgb),.5); display: flex; align-items: flex-end; }
+    .sheet .in { width: 100%; max-height: 100%; overflow-y: auto; background: var(--cg-paper); border-radius: 18px 18px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+    .sheet h2 { margin: 0 0 6px; font-weight: 900; font-size: 24px; display: flex; align-items: center; }
+    .sheet h2 button { margin-left: auto; font: 800 15px Inter, -apple-system, sans-serif; background: var(--cg-ink); color: #fff; border-radius: 10px; padding: 10px 16px; min-height: 44px; }
+    .sr { padding: 12px 0; border-top: 1px solid rgba(var(--cg-ink-rgb),.15); }
+    .sr .n { font-weight: 800; font-size: 15px; } .sr .h { font-size: 13px; color: var(--cg-slate); margin-top: 2px; }
+    .seg { display: flex; margin-top: 8px; background: #fff; border: 1.5px solid var(--cg-ink); border-radius: 10px; overflow: hidden; }
+    .seg button { flex: 1 1 0; min-height: 50px; font-weight: 800; font-size: 16px; background: #fff; }
+    .seg button + button { border-left: 1.5px solid var(--cg-ink); }
+    .seg button.sel { background: var(--cg-acc); }
+    .seg.dim { opacity: .4; }
+    .danger { width: 100%; min-height: 52px; margin-top: 8px; border-radius: 10px; background: #fff; border: 2px solid #C8213D !important; color: #C8213D; font-weight: 900; font-size: 16px; }
+    .danger.arm { background: #C8213D; color: #fff; }
+    .link { background: none; color: var(--cg-acc-dk); font-weight: 800; font-size: 14px; text-decoration: underline; min-height: 44px; padding: 0; }
+      .nreq { margin-left: 8px; flex: 0 0 auto; position: relative; min-height: 34px; padding: 0 10px; border-radius: 999px; background: #fff; border: 1.5px solid var(--cg-ink); font-weight: 800; font-size: 12px; }
+    .nreq .bdg { position: absolute; top: -7px; right: -7px; min-width: 20px; height: 20px; border-radius: 10px; background: #F43F5E; color: #fff; font-size: 12px; line-height: 20px; padding: 0 5px; }
+    .rq { display: flex; flex-wrap: wrap; align-items: center; padding: 10px 0; border-top: 1px solid rgba(var(--cg-ink-rgb),.15); }
+    .rq .who { flex: 1 1 100%; font-size: 13px; font-weight: 700; color: var(--cg-slate); }
+    .rq input { flex: 1 1 auto; min-width: 0; margin-top: 6px; min-height: 48px; font: 700 18px Inter, -apple-system, sans-serif; padding: 0 12px; border: 2px solid var(--cg-ink); border-radius: 10px; background: #fff; color: var(--cg-ink); }
+    .rq .bt { display: flex; flex: 1 1 100%; margin: 8px -4px 0; }
+    .rq .bt button { flex: 1 1 0; margin: 0 4px; min-height: 48px; border-radius: 10px; font-weight: 900; font-size: 15px; color: #fff; }
+    .rq .ap { background: #15803D; } .rq .rj { background: #BE123C; }
+    .empty { padding: 14px 0; color: var(--cg-slate); font-weight: 600; line-height: 1.4; }
+    .tjoin { margin-top: 6px; padding: 10px 12px; border-radius: 10px; background: #fff; border: 1px dashed rgba(var(--cg-ink-rgb),.35); font-size: 13px; line-height: 1.4; color: var(--cg-ink); word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="hd">
+    <a href="../../" aria-label="Charge! Games home" data-cg-home-mark><svg class="mark" data-cg-logo="light" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect width="64" height="64" rx="14" fill="#0B1020"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#19D3FF" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg></a>
+    <div class="t"><h1 class="wide">WHO AM I?</h1><div class="r mono" id="room">Leader remote</div></div>
+    <button class="nreq" id="b-req" hidden>Names<span class="bdg" id="reqn" hidden>0</span></button>
+    <div class="pill mono" id="pill">Not joined</div>
+  </div>
+
+  <section class="join" id="v-join">
+    <div class="card">
+      <h2 class="wide">Join the screen</h2>
+      <p>Scan the QR code on the screen with your camera, or type the 4-letter code from the top-right corner.</p>
+      <form id="jf" autocomplete="off"><input id="ci" maxlength="4" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="ABCD" aria-label="Room code">
+      <button class="big wide" type="submit">Join</button></form>
+      <div class="err" id="jerr"></div>
+    </div>
+  </section>
+
+  <section id="v-main" hidden>
+    <div class="now">
+      <div class="k mono" id="nk">Who Am I?</div>
+      <div class="ans" id="nans"><span class="mono">Answer</span><b id="nname">Waiting for the screen…</b></div>
+      <div class="rf mono" id="nref"></div>
+      <div class="cl" id="ncl" hidden></div>
+      <div class="pt" id="npt"></div>
+    </div>
+    <div id="buzz" hidden></div>
+    <div class="acts">
+      <button class="go wide" id="b-go">NEXT CHARACTER</button>
+      <button class="rev wide" id="b-rev" data-a="wa.reveal">REVEAL<br>ANSWER</button>
+    </div>
+    <div class="lab mono" id="tlab">Tables</div>
+    <div id="picker"></div>
+    <div class="row4">
+      <button data-a="wa.view" data-v="rules">Rules</button><button data-a="wa.view" data-v="scores">Scores</button><button id="b-undo" data-a="core.undo">Undo</button><button class="dk" id="b-set">Settings</button>
+    </div>
+    <div class="foot mono" id="foot"></div>
+  </section>
+
+  <div class="sheet" id="sheet" hidden>
+    <div class="in">
+      <h2 class="wide">Settings <button id="b-done">Done</button></h2>
+      <div class="sr"><div class="n">Rounds</div><div class="h">Characters per game, then final scores.</div>
+        <div class="seg" id="s-rounds"><button data-v="5">5</button><button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button></div></div>
+      <div class="sr"><div class="n">Clues per character</div><div class="h">Fewer clues uses the easier ones. Starts with the next character.</div>
+        <div class="seg" id="s-clues"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button></div></div>
+      <div class="sr"><div class="n">Points</div><div class="h" id="s-ladhint">50 / 40 / 30 / 20 / 10</div>
+        <div class="seg" id="s-ladder"><button data-v="tens">Tens</button><button data-v="hundreds">Hundreds</button><button data-v="steep">Steep</button></div></div>
+      <div class="sr"><div class="n">Characters from</div>
+        <div class="seg" id="s-filter"><button data-v="all">Whole Bible</button><button data-v="OT">Old Test.</button><button data-v="NT">New Test.</button></div></div>
+      <div id="coresheet"></div>
+    </div>
+  </div>
+
+  <div class="sheet" id="rsheet" hidden>
+    <div class="in">
+      <h2 class="wide">Name requests <button id="r-done">Done</button></h2>
+      <div class="h" style="font-size:13px;color:#4D5874">Names a table sends show on the screen only after you approve them. Edit before approving if you like (up to 20 characters).</div>
+      <div id="rlist"></div>
+      <div class="tjoin" id="tjoin"></div>
+    </div>
+  </div>
+
+<script src="../../shared/vendor/peerjs.min.js"></script>
+<script src="../../shared/charge-core.js"></script>
+<script>
+(function () {
+  "use strict";
+  var GAME = "whoami", RKEY = Charge.NS + ":whoami:room";
+  var $ = function (id) { return document.getElementById(id); }, esc = Charge.esc;
+  var st = null;
+  var R = Charge.remote({
+    game: GAME,
+    onState: function (s) { st = s; $("foot").textContent = ""; render(); },
+    onStatus: function (k, txt) { $("pill").className = "pill mono " + (k === "on" ? "on" : k === "backup" ? "bk" : k === "off" ? "off" : ""); $("pill").textContent = txt; },
+    onNotFound: function () { $("foot").textContent = "Screen not found yet. Check the code on the screen."; },
+    onLeave: leave
+  });
+  var picker = Charge.picker($("picker"), { onPick: function (t) { if (st && st.round && st.round.status === "live") R.send("core.buzz", { team: t }); } });
+  var buzzP = Charge.buzzPanel($("buzz"), R);
+  var coreS = Charge.coreSheet($("coresheet"), R, { onLeave: leave, onReset: function () { $("sheet").hidden = true; }, onRelease: function () { $("sheet").hidden = true; } });
+
+  function join(code) {
+    localStorage.setItem(RKEY, code); $("room").textContent = "Room " + code;
+    $("v-join").hidden = true; $("v-main").hidden = false; $("b-req").hidden = false;
+    st = null; render(); R.join(code); Charge.wake();
+  }
+  function leave() {
+    localStorage.removeItem(RKEY); R.leave(); st = null;
+    $("v-main").hidden = true; $("v-join").hidden = false; $("sheet").hidden = true; $("rsheet").hidden = true; $("b-req").hidden = true; $("room").textContent = "Leader remote";
+  }
+  function label(i) { return Charge.label(st.core, i); }
+  function openKey(r) { return r && r.status === "live" ? r.id + ":" + r.shown : null; }
+
+  /* ---------- render ---------- */
+  function render() {
+    var ok = !!st && R.ok(), r = st && st.round, T = st && st.core, live = r && r.status === "live";
+    if (!st) { $("nk").textContent = "Room " + R.room(); $("nname").textContent = "Waiting for the screen…"; $("nref").textContent = ""; $("ncl").hidden = true; $("npt").textContent = ""; }
+    else if (!r) { $("nk").textContent = st.rounds + " rounds · " + st.clues + " clues · " + st.ladder; $("nname").textContent = "Ready"; $("nref").textContent = ""; $("ncl").hidden = true; $("npt").textContent = "Tap NEXT CHARACTER to start."; }
+    else {
+      $("nk").textContent = "Round " + r.n + " of " + st.rounds + " · clue " + r.shown + " of " + r.nclue + (r.t ? " · " + r.t : "");
+      $("nname").textContent = r.name || "?"; $("nref").textContent = r.ref ? r.ref + " (CSB)" : "";
+      var c = (r.all || r.clues)[r.shown - 1];
+      $("ncl").innerHTML = "<small>On screen · clue " + r.shown + "</small>" + esc(c || "") + (live && r.shown < r.nclue ? '<small style="margin:6px 0 0;color:#9AA6BF;text-transform:none;letter-spacing:0;font-size:12px">Next: ' + esc((r.all || [])[r.shown] || "") + "</small>" : "");
+      $("ncl").hidden = false;
+      $("npt").textContent = live ? r.ladder[r.shown - 1] + " points now" + (r.shown < r.nclue ? " · " + r.ladder[r.shown] + " after the next clue" : " · last clue") :
+        r.to !== null ? label(r.to) + " got it · +" + r.got + (st.finished ? " · last round" : "") : "Nobody got it" + (st.finished ? " · last round" : "");
+    }
+    var q = openKey(r), B = T ? T.buzz : null, pending = q && B && B.team !== null && B.q === q;
+    if (T) {
+      buzzP.render(T, { open: ok ? q : null, pts: live ? r.ladder[r.shown - 1] : 0, what: live ? "clue " + r.shown : "" });
+      picker.render(T, { disabled: !ok || !q, locked: q ? (T.locked[q] || []) : [], buzz: pending ? B.team : null });
+      coreS.render(T, ok);
+      renderReq(T);
+    }
+    $("tlab").textContent = !st ? "Tables" : pending ? "Wrong table? Tap the one that buzzed in" : q ? "Tap the table that buzzed in first · +" + r.ladder[r.shown - 1] : r && !live ? "Round over. Undo to change it." : "Tables";
+    var go = $("b-go");
+    if (live) { go.innerHTML = r.shown < r.nclue ? "NEXT CLUE<br><small style=\"font-size:14px\">" + (r.shown + 1) + " of " + r.nclue + " · " + r.ladder[r.shown] + " pts</small>" : "LAST CLUE<br><small style=\"font-size:14px\">reveal when ready</small>"; go.disabled = !ok || r.shown >= r.nclue; go.setAttribute("data-a", "wa.clue"); }
+    else { go.innerHTML = st && st.finished ? "FINAL SCORES" : r ? "NEXT CHARACTER" : "FIRST CHARACTER"; go.disabled = !ok || (st.finished && st.view === "scores"); go.setAttribute("data-a", "wa.next"); }
+    if (!st) go.disabled = true;
+    $("b-rev").disabled = !ok || !live;
+    $("b-undo").disabled = !ok || !T.canUndo;
+    [].forEach.call(document.querySelectorAll(".row4 [data-a]"), function (b) { if (b.id !== "b-undo") b.disabled = !ok; });
+    if (st) { segSel("s-rounds", String(st.rounds)); segSel("s-clues", String(st.clues)); segSel("s-ladder", st.ladder); segSel("s-filter", st.filter); $("s-ladhint").textContent = ladder(st.clues, st.ladder).join(" / ") + " · " + st.count + " characters"; }
+  }
+  function ladder(n, kind) { var a = []; for (var k = 1; k <= n; k++) a.push(kind === "steep" ? 10 * Math.pow(2, n - k) : (kind === "hundreds" ? 100 : 10) * (n - k + 1)); return a; }
+  function renderReq(T) {
+    var rq = T.requests || [], n = rq.length;
+    $("reqn").hidden = !n; $("reqn").textContent = n;
+    $("b-req").setAttribute("aria-label", n ? n + " name request" + (n > 1 ? "s" : "") : "Name requests");
+    var h = rq.length ? "" : '<div class="empty">No name requests right now.</div>';
+    rq.forEach(function (r) { h += '<div class="rq" data-id="' + esc(r.id) + '"><div class="who">' + esc(Charge.label({ names: [], word: T.word }, r.team)) + (T.names[r.team] ? " (now “" + esc(T.names[r.team]) + "”)" : "") + " wants:</div>" +
+      '<input maxlength="' + Charge.NAME_MAX + '" value="' + esc(r.name) + '" aria-label="Name for ' + esc(Charge.label({ names: [], word: T.word }, r.team)) + '" autocomplete="off"><div class="bt"><button class="ap" data-r="ap">Approve</button><button class="rj" data-r="rj">Reject</button></div></div>'; });
+    var key = rq.map(function (r) { return r.id; }).join(",");
+    if ($("rlist").getAttribute("data-k") !== key) { $("rlist").innerHTML = h; $("rlist").setAttribute("data-k", key); }   // keep edits while typing
+    $("tjoin").innerHTML = "Tables can send a name and buzz in from <b>" + esc(new URL("../table/", location.href).href.replace(/^https?:\/\//, "")) + "</b> with room code <b>" + esc(R.room()) + "</b>.";
+  }
+  function segSel(id, v) { [].forEach.call($(id).children, function (b) { b.classList.toggle("sel", b.getAttribute("data-v") === v); b.disabled = !R.ok(); }); }
+
+  /* ---------- input ---------- */
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b || b.disabled || !b.isConnected) return;
+    if (b.closest("#coresheet") || b.closest("#picker") || b.closest("#buzz") || b.closest(".cg-gate")) return;   // shared pieces handle their own taps
+    var a = b.getAttribute("data-a");
+    if (a) { R.send(a, a === "wa.view" ? { v: b.getAttribute("data-v") } : null); return; }
+    if (b.hasAttribute("data-r")) {
+      var row = b.closest(".rq"), id = row.getAttribute("data-id");
+      if (b.getAttribute("data-r") === "ap") R.send("core.approve", { id: id, name: Charge.cleanName(row.querySelector("input").value) });
+      else R.send("core.reject", { id: id });
+      b.disabled = true; return;
+    }
+    var g = b.parentNode.id, v = b.getAttribute("data-v");
+    if (g === "s-rounds" || g === "s-clues") R.send("wa.set", { k: g.slice(2), v: +v }); else if (g === "s-ladder" || g === "s-filter") R.send("wa.set", { k: g.slice(2), v: v });
+    else if (b.id === "b-set") $("sheet").hidden = false; else if (b.id === "b-done") $("sheet").hidden = true;
+    else if (b.id === "b-req") $("rsheet").hidden = false; else if (b.id === "r-done") $("rsheet").hidden = true;
+  });
+  ["sheet", "rsheet"].forEach(function (id) { $(id).addEventListener("click", function (e) { if (e.target === $(id)) $(id).hidden = true; }); });
+  $("jf").addEventListener("submit", function (e) {
+    e.preventDefault(); var c = Charge.normCode($("ci").value);
+    if (!c) { $("jerr").textContent = "Enter the 4 letters shown on the screen."; return; }
+    $("jerr").textContent = ""; $("ci").blur(); join(c);
+  });
+  document.addEventListener("touchend", Charge.wake, { passive: true });
+  setInterval(render, 3000);
+
+  window.WACtrl = { state: function () { return st; }, ok: R.ok, via: R.via, remote: R };  // for tests
+  var q = Charge.normCode(new URLSearchParams(location.search).get("room")), saved = Charge.normCode(localStorage.getItem(RKEY));
+  if (q || saved) join(q || saved);
+})();
+</script>
+</body>
+</html>

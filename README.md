@@ -10,6 +10,8 @@ Live site: https://pastorontherun.github.io/charge-games/
 | `sword-drills/` | Sword Drills, big-screen (host) |
 | `sword-drills/controller/` | Leader remote (phone) |
 | `sword-drills/table/` | Optional table buzzer (any phone or tablet, one per table) |
+| `who-am-i/` | Who Am I?, big-screen (host); `controller/` leader remote; `table/` table buzzer |
+| `who-am-i/characters.js` | Who Am I? characters (5 clues each, hard to easy, CSB reference); review list in `who-am-i/CHARACTERS.md` |
 | `shared/charge-core.js`, `shared/charge-core.css` | Shared core every game uses |
 | `shared/charge-embed.js` | Runs a game page on another site under that site's skin (see Skins) |
 | `shared/vendor/` | PeerJS (MIT, `LICENSE-peerjs.txt`) and qrcode-generator (MIT) |

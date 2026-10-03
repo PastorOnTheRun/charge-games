@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Who Am I? · Charge! Games</title>
+  <meta name="description" content="Who Am I?: a big-screen Bible character guessing game for youth groups. Clues reveal one at a time; fewer clues, more points.">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <link rel="stylesheet" href="../shared/charge-core.css">
+  <!-- Who Am I? team game, TV/projector screen, built on ../shared/charge-core.js. The screen holds the game state (localStorage);
+       the leader remote (./controller/) and optional table buzzers (./table/) join by room code / QR.
+       Characters: ./characters.js (clues are paraphrases; answers show a CSB reference only, no verse text). -->
+  <style>
+    html { font-size: 1vw; }
+    @supports (width: min(1vw, 1vh)) { html { font-size: min(1vw, 1.7778vh); } }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: var(--cg-deep); }
+    body { color: #fff; font-family: Inter, Roboto, "Segoe UI", Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; }
+    body.idle, body.idle * { cursor: none !important; }
+    .mono { font-family: "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace; }
+    .wide { font-family: var(--cg-disp); } .wide, .wide * { font-synthesis: none; }
+    .stage {
+      position: relative; overflow: hidden; width: 100rem; height: 56.25rem; flex: 0 0 auto; padding: 1.8rem 2.4rem 2rem;
+      background-color: var(--cg-ink); background-image: radial-gradient(circle, rgba(255,255,255,.07) 0.075rem, transparent 0.1rem); background-size: 1.3rem 1.3rem;
+      display: flex; flex-direction: column;
+    }
+    /* Header */
+    .top { flex: 0 0 5.6rem; display: flex; align-items: center; }
+    .top .mark { height: 5.2rem; width: 5.2rem; display: block; flex: 0 0 auto; }
+    .top .t { margin-left: 1.8rem; padding-left: 1.8rem; border-left: 0.2rem solid var(--cg-acc); }
+    .top h1 { margin: 0; font-weight: 900; font-size: 3.1rem; line-height: 1; letter-spacing: .01em; }
+    .top .sub { margin-top: .45rem; font-weight: 700; font-size: 1.15rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cg-acc); }
+    .top .sp { flex: 1; }
+    .chip { font-weight: 700; font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-mute); border: 0.12rem solid var(--cg-line); border-radius: 0.4rem; padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
+    .join { display: flex; align-items: center; background: var(--cg-panel); border: 0.12rem solid var(--cg-line); border-radius: 0.6rem; padding: .5rem .6rem .5rem 1.1rem; }
+    .join .l { font-weight: 700; font-size: 1.05rem; letter-spacing: .1em; color: var(--cg-mute2); text-transform: uppercase; line-height: 1.25; margin-right: 1rem; }
+    .join .c { font-weight: 900; font-size: 3rem; letter-spacing: .06em; color: var(--cg-acc); line-height: 1; }
+    .dot { display: inline-block; width: 1rem; height: 1rem; border-radius: 50%; background: var(--cg-mute3); margin-left: 1rem; }
+    .dot.on { background: #4ade80; box-shadow: 0 0 0.8rem rgba(74,222,128,.7); }
+    .dot.wait { background: var(--cg-acc); }
+    .main { position: relative; flex: 1 1 0; min-height: 0; margin-top: 1.4rem; }
+    .view { position: absolute; inset: 0; display: none; flex-direction: column; }
+    .view.on { display: flex; }
+
+    /* Rules */
+    .rules { flex-direction: row !important; }
+    .rules .lft { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+    .rules h2 { margin: .2rem 0 1.2rem; font-weight: 900; font-size: 5.2rem; line-height: .95; color: var(--cg-acc); }
+    .rules ol { margin: 0; padding: 0; list-style: none; }
+    .rules li { display: flex; align-items: center; font-weight: 850; font-size: 2.5rem; line-height: 1.15; margin-bottom: 1.05rem; }
+    .rules li b { flex: 0 0 3.8rem; height: 3.8rem; margin-right: 1.6rem; background: var(--cg-acc); color: var(--cg-ink); border-radius: .4rem; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900; }
+    .rules li.wild b { background: var(--cg-gold); }
+    .rules .pline { margin-top: auto; padding-bottom: .2rem; font-weight: 700; font-size: 1.45rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-soft); line-height: 1.6; }
+    .rules .pline span { color: var(--cg-acc); }
+    .rules .home { align-self: flex-start; margin-top: .9rem; font-weight: 800; font-size: 1.15rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-gold); text-decoration: none; border: .12rem solid var(--cg-line); border-radius: .45rem; padding: .45rem .8rem; }
+    .rules .home:hover { border-color: var(--cg-gold); }
+    .rules .rgt { flex: 0 0 27rem; margin-left: 3rem; display: flex; flex-direction: column; justify-content: center; }
+    .qrcard { background: #fff; color: var(--cg-ink); border-radius: .8rem; padding: 1.6rem 1.6rem 1.4rem; text-align: center; }
+    .qrcard .qr { width: 84%; margin: 0 auto; }
+    .qrcard .qr svg, .qrcard .qr img { display: block; width: 100%; height: auto; }
+    .qrcard .k { margin-top: .9rem; font-weight: 800; font-size: 1.3rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-acc-dk); }
+    .qrcard .code { font-weight: 900; font-size: 6rem; line-height: 1; letter-spacing: .06em; margin-top: .3rem; }
+    .tline { margin-top: .7rem; padding-top: .6rem; border-top: 1px solid var(--cg-soft); font-weight: 700; font-size: .85rem; line-height: 1.4; color: var(--cg-slate); letter-spacing: .02em; word-break: break-all; } .tline b { color: var(--cg-ink); }
+    .qrcard .u { margin-top: .7rem; font-size: 1rem; font-weight: 700; color: var(--cg-slate); word-break: break-all; }
+
+
+    [hidden] { display: none !important; }
+    /* Clues */
+    .gwrap { flex: 1 1 0; min-height: 0; display: flex; }
+    .clues { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+    .clue { flex: 1 1 0; min-height: 0; display: flex; align-items: center; background: var(--cg-panel); border: .2rem solid var(--cg-line); border-radius: 1rem; padding: .6rem 1.4rem .6rem .8rem; margin-bottom: .8rem; overflow: hidden; }
+    .clue:last-child { margin-bottom: 0; }
+    .clue b { flex: 0 0 4.4rem; height: 4.4rem; border-radius: .6rem; background: var(--cg-panel2); color: var(--cg-mute); display: flex; align-items: center; justify-content: center; font-family: var(--cg-disp); font-weight: 400; font-size: 2.6rem; margin-right: 1.4rem; }
+    .clue span { flex: 1 1 auto; min-width: 0; font-weight: 800; font-size: 2.5rem; line-height: 1.18; color: #fff; }
+    .clue i { flex: 0 0 auto; margin-left: 1.2rem; font-style: normal; font-family: var(--cg-disp); font-size: 2.2rem; color: var(--cg-mute); }
+    .clue.off { border-style: dashed; background: transparent; } .clue.off span { color: var(--cg-mute3); font-size: 2rem; letter-spacing: .12em; text-transform: uppercase; font-family: "SF Mono", "Roboto Mono", monospace; }
+    .clue.on b { background: var(--cg-acc); color: var(--cg-ink); } .clue.on i { color: var(--cg-acc); }
+    .clue.new { border-color: var(--cg-acc); box-shadow: 0 0 2.4rem rgba(var(--cg-acc-rgb),.28); animation: cin .5s cubic-bezier(.2,1.2,.4,1) both; }
+    .clue.late { opacity: .55; } .clue.late b { background: var(--cg-panel2); color: var(--cg-soft); }
+    /* 13+ tables: the scoreboard takes 2-3 rows, so the clue cards get shorter */
+    .game.dense .clue { margin-bottom: .45rem; padding: .25rem 1.2rem .25rem .5rem; border-width: .15rem; }
+    .game.dense .clue b { flex-basis: 3.3rem; height: 3.3rem; font-size: 2rem; margin-right: 1rem; }
+    .game.dense .clue span { font-size: 2.1rem; line-height: 1.12; } .game.dense .clue.off span { font-size: 1.6rem; }
+    .game.dense .clue i { font-size: 1.9rem; }
+    .game.dense .pbox .pv { font-size: 7rem; } .game.dense .ans .nm { font-size: 4.2rem; } .game.dense .ans .wh { font-size: 2.2rem; margin-top: .8rem; padding-top: .7rem; }
+    @keyframes cin { from { transform: translateX(-2rem); opacity: 0; } to { transform: none; opacity: 1; } }
+    .side { flex: 0 0 30rem; margin-left: 1.6rem; display: flex; flex-direction: column; min-height: 0; }
+    .pbox { flex: 0 0 auto; background: var(--cg-panel); border: .35rem solid var(--cg-acc); border-radius: 1.2rem; padding: 1.2rem 1.4rem 1.3rem; text-align: center; box-shadow: 0 0 3rem rgba(var(--cg-acc-rgb),.18); }
+    .lab2 { font-weight: 800; font-size: 1.2rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cg-acc); }
+    .pbox .pv { font-family: var(--cg-disp); font-size: 9rem; line-height: 1; margin-top: .4rem; }
+    .lad { display: flex; justify-content: center; margin-top: .8rem; }
+    .lad span { flex: 1 1 0; margin: 0 .2rem; padding: .35rem 0; border-radius: .4rem; background: var(--cg-panel2); color: var(--cg-mute); font-weight: 800; font-size: 1.15rem; }
+    .lad span.now { background: var(--cg-acc); color: var(--cg-ink); } .lad span.gone { opacity: .35; text-decoration: line-through; }
+    .say { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 900; font-size: 3.6rem; line-height: 1.1; color: var(--cg-mute); padding: 0 .4rem; }
+    .say.go { color: var(--cg-acc); font-size: 4.4rem; animation: pulse .7s ease-in-out infinite alternate; }
+    .say .cg-banner { flex-direction: column; font-size: 2.8rem; padding: 1rem 1.4rem; } .say .cg-banner small { margin: .5rem 0 0; }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
+    .ans { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; background: var(--cg-gold); color: var(--cg-ink); border-radius: 1.2rem; padding: 1.4rem; animation: cin .5s both; }
+    .ans .lab2 { color: var(--cg-ink); }
+    .ans .nm { font-family: var(--cg-disp); font-size: 5.2rem; line-height: 1.02; margin: .5rem 0 .7rem; overflow-wrap: anywhere; }
+    .ans .rf { font-weight: 800; font-size: 1.6rem; letter-spacing: .04em; }
+    .ans .wh { margin-top: 1.2rem; padding-top: 1rem; border-top: .15rem solid rgba(var(--cg-ink-rgb),.25); font-family: var(--cg-disp); font-size: 2.6rem; line-height: 1.1; }
+    .ans .wh small { display: block; font: 800 1.2rem "SF Mono", "Roboto Mono", monospace; letter-spacing: .1em; text-transform: uppercase; margin-top: .4rem; }
+    .ready { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border: .2rem dashed var(--cg-line); border-radius: 1rem; text-align: center; }
+    .ready div { font-family: var(--cg-disp); font-size: 6rem; color: var(--cg-acc); }
+    .ready p { margin: 1rem 0 0; font-weight: 800; font-size: 2rem; color: var(--cg-mute); }
+    /* Scoreboard (shared: ../shared/charge-core.css) */
+    .game .board { margin-top: 1rem; flex: 0 0 auto; }
+    .scores h2 { margin: 0 0 1.4rem; font-weight: 900; font-size: 4.6rem; line-height: 1; } .scores h2 span { color: var(--cg-acc); }
+    .scores .board { flex: 1 1 0; min-height: 0; }
+    .say .cg-banner { animation: none; }
+    .reqchip { font-weight: 800; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-ink); background: var(--cg-gold); border-radius: .4rem; padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
+    .toast { position: absolute; z-index: 10; left: 50%; top: 42%; transform: translate(-50%,-50%) scale(.6); opacity: 0; pointer-events: none; transition: transform .25s cubic-bezier(.2,1.4,.4,1), opacity .2s;
+      background: var(--cg-ink); border: .4rem solid var(--cg-acc); border-radius: 1.4rem; padding: 1.6rem 3.6rem; text-align: center; box-shadow: 0 1rem 4rem rgba(0,0,0,.6); }
+    .toast.on { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    .toast b { display: block; font-weight: 900; font-size: 9rem; line-height: 1; color: var(--cg-acc); } .toast span { display: block; margin-top: .6rem; font-weight: 900; font-size: 3.6rem; }
+
+    /* Controls bar + settings (mouse/keyboard backup) */
+    .bar { position: absolute; z-index: 30; left: 50%; bottom: .8rem; transform: translateX(-50%); display: flex; align-items: center; background: rgba(var(--cg-deep-rgb),.94); border: .12rem solid var(--cg-line); border-radius: .8rem; padding: .5rem; transition: opacity .3s; white-space: nowrap; }
+    body.idle .bar { opacity: 0; pointer-events: none; }
+    button { font: inherit; cursor: pointer; }
+    .bar button, .set button { font-family: "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, monospace; font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--cg-panel2); border: 0; border-radius: .45rem; padding: .7rem 1rem; margin: 0 .25rem; }
+    .bar button.o, .set button.o { background: var(--cg-acc); color: var(--cg-ink); }
+    .bar button.w { background: var(--cg-gold); color: var(--cg-ink); }
+    .set { position: absolute; z-index: 40; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52rem; background: var(--cg-ink); border: .3rem solid var(--cg-acc); border-radius: 1.2rem; padding: 2rem 2.4rem; display: none; box-shadow: 0 2rem 6rem rgba(0,0,0,.7); }
+    .set.on { display: block; }
+    .set h3 { margin: 0 0 1.2rem; font-weight: 900; font-size: 2.8rem; }
+    .set .row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-top: .1rem solid var(--cg-line); }
+    .set .row > span { font-weight: 700; font-size: 1.5rem; } .set .row > span small { display: block; color: var(--cg-mute); font-size: 1.05rem; font-weight: 600; margin-top: .2rem; }
+    .set .seg button { padding: .8rem 1.3rem; font-size: 1.2rem; } .set .seg button.sel { background: var(--cg-acc); color: var(--cg-ink); }
+    .set .seg.off { opacity: .35; }
+    .set .num { display: inline-block; min-width: 4rem; text-align: center; font-weight: 900; font-size: 2.2rem; vertical-align: middle; }
+    .set .keys { margin-top: 1rem; color: var(--cg-mute); font-size: 1rem; line-height: 1.6; }
+    .set .danger { background: var(--cg-danger-bg) !important; color: #FF6B81 !important; } .set .danger.arm { background: #FF6B81 !important; color: var(--cg-ink) !important; }
+  </style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="top">
+    <svg class="mark" data-cg-logo="dark" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect width="64" height="64" rx="14" fill="#19D3FF"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#0B1020" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg>
+    <div class="t"><h1 class="wide">WHO AM I?</h1><div class="sub mono"><span data-cg-brand>Charge! Games</span> · Bible character game</div></div>
+    <div class="sp"></div>
+    <div class="reqchip mono" id="reqchip" hidden></div>
+    <div class="chip mono" id="roundchip">10 rounds</div>
+    <div class="join"><div class="l mono">Phone<br>code</div><div class="c wide" id="code">····</div><span class="dot" id="dot" title="Phone link"></span></div>
+  </div>
+  <div class="main">
+    <section class="view rules" id="v-rules">
+      <div class="lft">
+        <h2 class="wide">How to play</h2>
+        <ol>
+          <li class="wide"><b>1</b>A Bible character is hiding. Clues appear one at a time.</li>
+          <li class="wide"><b>2</b>Know who it is? Buzz in and say the name.</li>
+          <li class="wide"><b>3</b>Right: points. Fewer clues, more points.</li>
+          <li class="wide"><b>4</b>Wrong: buzzers reopen. The next clue comes when the leader is ready.</li>
+        </ol>
+        <div class="pline mono" id="ptsline"></div>
+        <a class="home mono" href="../" data-cg-home>⚡ Charge! Games · more games</a>
+      </div>
+      <div class="rgt">
+        <div class="qrcard">
+          <div class="qr" id="qr"></div>
+          <div class="k mono">Leader phone: scan or enter code</div>
+          <div class="code wide" id="code2">····</div>
+          <div class="u mono" id="url"></div>
+          <div class="tline mono" id="tline"></div>
+        </div>
+      </div>
+    </section>
+    <section class="view game" id="v-game">
+      <div class="gwrap">
+        <div class="clues" id="clues"></div>
+        <div class="side">
+          <div class="pbox" id="pbox"><div class="lab2 mono" id="plab">Points now</div><div class="pv" id="pnow">50</div><div class="lad mono" id="lad"></div></div>
+          <div class="say wide" id="say"></div>
+          <div class="ans" id="ans" hidden><div class="lab2 mono">I am</div><div class="nm" id="ansname"></div><div class="rf mono" id="ansref"></div><div class="wh" id="answho"></div></div>
+        </div>
+      </div>
+      <div class="board" id="b-game"></div>
+    </section>
+    <section class="view scores" id="v-scores">
+      <h2 class="wide" id="scoretitle">Scoreboard</h2>
+      <div class="board" id="b-scores"></div>
+    </section>
+    <div class="toast" id="toast"><b class="wide" id="toastpts">+30</b><span class="wide" id="toastt">TABLE 4</span></div>
+  </div>
+  <div class="bar" id="bar">
+    <button data-k="rules">Rules</button><button class="o" data-k="next">Next ␣</button><button data-k="reveal">Answer A</button>
+    <button data-k="ok">Correct Y</button><button data-k="no">Wrong N</button><button data-k="scores">Scores B</button><button data-k="undo">Undo U</button><button data-k="settings">Settings O</button><button data-k="fs">Full screen F</button>
+  </div>
+  <div class="set" id="set" role="dialog" aria-label="Settings">
+    <h3 class="wide">Settings</h3>
+    <div class="row"><span>Rounds<small>Characters per game, then final scores.</small></span><span class="seg" id="s-rounds"><button data-v="5">5</button><button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button></span></div>
+    <div class="row"><span>Clues per character<small>Fewer clues: the easier ones only. From the next character.</small></span><span class="seg" id="s-clues"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button></span></div>
+    <div class="row"><span>Points<small id="s-ladhint"></small></span><span class="seg" id="s-ladder"><button data-v="tens">Tens</button><button data-v="hundreds">Hundreds</button><button data-v="steep">Steep</button></span></div>
+    <div class="row"><span>Characters from</span><span class="seg" id="s-filter"><button data-v="all">Whole Bible</button><button data-v="OT">Old Test.</button><button data-v="NT">New Test.</button></span></div>
+    <div class="row"><span>Tables<small>2 to 50</small></span><span><button data-k="tminus">−</button><span class="num wide" id="s-tables">6</span><button data-k="tplus">+</button></span></div>
+    <div class="row"><span>Wrong answer locks that table out<small>Until the next clue.</small></span><span class="seg" id="s-lock"><button data-v="1">On</button><button data-v="0">Off</button></span></div>
+    <div class="row"><span>Reset scores<small>Clears scores and starts over. Press twice.</small></span><button class="danger" id="s-reset" data-k="reset">Reset</button></div>
+    <div class="row"><span>Host lock<small id="s-host">No leader remote yet. The first one to open becomes host.</small></span><button data-k="unlock" id="s-unlock">Release</button></div>
+    <div class="keys mono">Keys: Space next clue / next character · A reveal answer · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · [ ] tables · F full screen</div>
+    <div style="text-align:right;margin-top:1rem"><button class="o" data-k="settings">Done</button></div>
+  </div>
+</div>
+<script src="characters.js"></script>
+<script src="../shared/vendor/qrcode.js"></script>
+<script src="../shared/vendor/peerjs.min.js"></script>
+<script src="../shared/charge-core.js"></script>
+<script>
+(function () {
+  "use strict";
+  var GAME = "whoami", KEY = Charge.NS + ":whoami:v1";
+  var CH = window.WA_CHARACTERS || [];
+  var $ = function (id) { return document.getElementById(id); }, esc = Charge.esc;
+  var rnd = function (n) { return Math.floor(Math.random() * n); };
+  var ROUNDS = [5, 10, 15, 20], LADDERS = ["tens", "hundreds", "steep"], FILTERS = ["all", "OT", "NT"];
+  // points for a correct answer after k clues (k = 1..n): tens 50/40/30/20/10, hundreds 500/400/..., steep halves each clue
+  function ladder(n, kind) { var a = []; for (var k = 1; k <= n; k++) a.push(kind === "steep" ? 10 * Math.pow(2, n - k) : (kind === "hundreds" ? 100 : 10) * (n - k + 1)); return a; }
+
+  function fresh() { return { v: 1, code: "", core: Charge.core.fresh(6), view: "rules", rounds: 10, clues: 5, ladder: "tens", filter: "all", round: null, n: 0, used: [] }; }
+  var S;
+  try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  if (!S || S.v !== 1) S = fresh();
+  var F = fresh(); for (var k in F) if (!(k in S)) S[k] = F[k];
+  S.core = Charge.core.upgrade(S.core, 6);
+  if (!S.code) S.code = Charge.newCode();
+  if (S.round && !CH[S.round.c]) S.round = null;
+  var hitT = null, fresh1 = -1;
+
+  /* ---------- shared core: teams, buzz-in, undo ---------- */
+  // one question per clue: a wrong answer locks a table out until the next clue
+  function question() { var r = S.round; return r && r.status === "live" ? r.id + ":" + r.shown : null; }
+  function cluesOf(r) { return CH[r.c].clues.slice(CH[r.c].clues.length - r.nclue); }
+  function ptsAt(r, k) { return ladder(r.nclue, S.ladder)[Math.max(1, Math.min(r.nclue, k)) - 1]; }
+  var core = Charge.core(S.core, {
+    word: "Table",
+    question: question,
+    isOpen: function (q) { return !!q && question() === q; },
+    onCorrect: function (team, slot, snap) {          // the buzzed table gets the points; the round ends with the reveal
+      var r = S.round, pts = ptsAt(r, +String(snap.q).split(":")[1]);
+      r.status = "done"; r.to = team; r.got = pts;
+      setTimeout(function () { toast("+" + pts, core.label(team)); hitT = team; render(); hitT = null; }, 0);
+      return pts;
+    },
+    onUndo: function (h) {
+      var r = S.round; if (!r || h.k !== "award" || !h.buzz || String(h.buzz.q).split(":")[0] !== r.id) return;
+      r.status = "live"; r.to = null; r.got = 0;
+      if (S.view === "scores") S.view = "game";
+    },
+    onChange: function () { save(); render(); }
+  });
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} if (link) link.broadcast(); }
+
+  /* ---------- actions ---------- */
+  function pool() { var a = []; CH.forEach(function (c, i) { if (S.filter === "all" || c.t === S.filter) a.push(i); }); return a.length ? a : CH.map(function (_, i) { return i; }); }
+  function draw() {
+    var p = pool(), free = p.filter(function (i) { return S.used.indexOf(i) < 0; });
+    if (!free.length) { S.used = S.used.filter(function (i) { return p.indexOf(i) < 0; }); free = p.slice(); }
+    var i = free[rnd(free.length)]; S.used.push(i); return i;
+  }
+  function finished() { return !!(S.round && S.round.status === "done" && S.n >= S.rounds); }
+  function nextChar() {
+    var r = S.round; if (r && r.status === "live") return;
+    if (finished()) { S.view = "scores"; save(); render(); return; }
+    S.n++; S.round = { id: Charge.uid(), c: draw(), n: S.n, nclue: S.clues, shown: 1, status: "live", to: null, got: 0 };
+    core.newQuestionSet(); S.view = "game"; fresh1 = 1; save(); render();
+  }
+  function nextClue() {
+    var r = S.round; if (!r || r.status !== "live") { nextChar(); return; }
+    if (r.shown >= r.nclue) return;
+    r.shown++; fresh1 = r.shown; core.clearBuzz(); S.view = "game"; save(); render();
+  }
+  function reveal() { var r = S.round; if (!r || r.status !== "live") return; r.status = "done"; r.to = null; r.got = 0; core.clearBuzz(); S.view = "game"; save(); render(); }
+  function buzz(t, src) { if (core.buzz(t, null, src || "remote")) board.game.show(t); }
+  function judge(ok) { var B = S.core.buzz; if (B.team === null) return; if (ok) core.correct(B.q, B.team); else { var t = B.team; if (core.wrong(B.q, t)) toast("✕", core.label(t) + (S.core.lockout ? " sits out" : "")); } }
+  function undo() { var h = core.undo(); if (!h) return; toast("Undo", h.k === "award" ? "−" + h.pts + " · " + core.label(h.t) : core.label(h.t) + " back in"); }
+  function reset() { core.reset(); S.round = null; S.n = 0; S.used = []; S.view = "rules"; save(); render(); }
+  function setOpt(k, v) {
+    if (k === "rounds" && ROUNDS.indexOf(v | 0) >= 0) S.rounds = v | 0;
+    else if (k === "clues" && [3, 4, 5].indexOf(v | 0) >= 0) S.clues = v | 0;
+    else if (k === "ladder" && LADDERS.indexOf(v) >= 0) S.ladder = v;
+    else if (k === "filter" && FILTERS.indexOf(v) >= 0) S.filter = v;
+    else return;
+    save(); render();
+  }
+  function view(v) { if (["rules", "game", "scores"].indexOf(v) < 0) return; S.view = v; save(); render(); }
+
+  /* ---------- render ---------- */
+  var board = { game: Charge.board($("b-game"), { mode: "strip" }), scores: Charge.board($("b-scores"), { mode: "full" }) };
+  function lastWrong(q) { var h = S.core.history[S.core.history.length - 1]; return h && h.k === "wrong" && h.buzz && h.buzz.q === q ? h : null; }
+  function fitClues() {   // long clues on a short screen: shrink the text until every card fits
+    var cs = [].slice.call(document.querySelectorAll("#clues .clue span"));
+    cs.forEach(function (s) { s.style.fontSize = ""; });
+    for (var i = 0; i < 8; i++) {
+      var over = cs.some(function (s) { var c = s.parentNode; return c.scrollHeight > c.clientHeight + 1; }); if (!over) break;
+      cs.forEach(function (s) { s.style.fontSize = (parseFloat(getComputedStyle(s).fontSize) * 0.93) + "px"; });
+    }
+  }
+  var lastClueKey = "";
+  function render() {
+    $("code").textContent = $("code2").textContent = S.code;
+    var r = S.round, L = ladder(S.clues, S.ladder);
+    $("roundchip").textContent = r ? "Round " + r.n + " of " + S.rounds : S.rounds + " rounds";
+    $("ptsline").innerHTML = "Points <span>" + L.join(" · ") + "</span> · " + S.clues + " clues<br><span>" + S.rounds + " characters</span> · " + (S.filter === "OT" ? "Old Testament" : S.filter === "NT" ? "New Testament" : "Whole Bible");
+    ["rules", "game", "scores"].forEach(function (v) { $("v-" + v).classList.toggle("on", S.view === v); });
+    var B = S.core.buzz, q = question(), buzzT = q && B.team !== null && B.q === q ? B.team : null;
+    // clue cards
+    var h = "", key;
+    if (!r) { h = '<div class="ready"><div>Who am I?</div><p>Press NEXT for the first character</p></div>'; key = "ready"; }
+    else {
+      var cl = cluesOf(r), lad = ladder(r.nclue, S.ladder), done = r.status === "done";
+      cl.forEach(function (c, i) {
+        var shown = i < r.shown, cls = shown ? "on" + (i + 1 === fresh1 ? " new" : "") : done ? "on late" : "off";
+        h += '<div class="clue ' + cls + '"><b>' + (i + 1) + "</b><span>" + (shown || done ? esc(c) : "Clue " + (i + 1)) + "</span><i>" + lad[i] + "</i></div>";
+      });
+      key = r.id + ":" + r.shown + ":" + done + ":" + S.ladder;
+    }
+    if (key !== lastClueKey) { $("clues").innerHTML = h; lastClueKey = key; fresh1 = -1; }
+    // side: points now / status / answer
+    var live = r && r.status === "live";
+    $("pbox").hidden = !!(r && !live);
+    $("ans").hidden = !(r && !live); $("say").hidden = !!(r && !live);
+    if (r) {
+      var ld = ladder(r.nclue, S.ladder);
+      $("pnow").textContent = ld[r.shown - 1];
+      $("plab").textContent = "Points now · clue " + r.shown + " of " + r.nclue;
+      $("lad").innerHTML = ld.map(function (p, i) { return '<span class="' + (i + 1 === r.shown ? "now" : i + 1 < r.shown ? "gone" : "") + '">' + p + "</span>"; }).join("");
+    } else { $("pnow").textContent = L[0]; $("plab").textContent = "Points"; $("lad").innerHTML = L.map(function (p, i) { return '<span class="' + (i ? "" : "now") + '">' + p + "</span>"; }).join(""); }
+    var say = $("say"), lw = q ? lastWrong(q) : null;
+    if (!r) { say.className = "say wide"; say.textContent = "Ready?"; }
+    else if (live && buzzT !== null) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner">' + esc(core.label(buzzT)) + " buzzed in!<small>Who is it?</small></span>"; }
+    else if (live && lw) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner no">✕ ' + esc(core.label(lw.t)) + "<small>" + (S.core.lockout ? "sits out · buzzers open" : "buzzers open") + "</small></span>"; }
+    else if (live) { say.className = "say wide go"; say.textContent = "WHO AM I?"; }
+    if (r && !live) {
+      var c = CH[r.c];
+      $("ansname").textContent = c.name; $("ansref").textContent = c.ref + " (CSB)";
+      $("answho").innerHTML = r.to !== null ? esc(core.label(r.to)) + " +" + r.got + "<small>after " + (r.shown) + " clue" + (r.shown > 1 ? "s" : "") + "</small>" : "Nobody got it<small>" + (finished() ? "last round · final scores next" : "next character coming") + "</small>";
+      if (r.to !== null && finished()) $("answho").innerHTML += "<small>last round · final scores next</small>";
+    }
+    var T = core.pub("screen");
+    $("v-game").classList.toggle("dense", T.n > 12);
+    var X = { buzz: buzzT, locked: q ? core.lockedFor(q) : [], finished: finished() && S.view === "scores", hit: hitT };
+    board.game.render(T, X); board.scores.render(T, X);
+    fitClues();
+    $("scoretitle").innerHTML = finished() ? 'Final <span>scores</span>' : 'Score<span>board</span>';
+    sel("s-rounds", String(S.rounds)); sel("s-clues", String(S.clues)); sel("s-ladder", S.ladder); sel("s-filter", S.filter); sel("s-lock", S.core.lockout ? "1" : "0");
+    $("s-ladhint").textContent = ladder(S.clues, S.ladder).join(" / ") + " for clue 1 to " + S.clues;
+    $("s-tables").textContent = S.core.n;
+    var nreq = S.core.requests.length; $("reqchip").hidden = !nreq; $("reqchip").textContent = nreq + " name request" + (nreq > 1 ? "s" : "") + " · approve on the phone";
+  }
+  function sel(id, v) { [].forEach.call($(id).children, function (b) { b.classList.toggle("sel", b.getAttribute("data-v") === v); }); }
+  var tt;
+  function toast(a, b) { $("toastpts").textContent = a; $("toastt").textContent = b; $("toast").classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { $("toast").classList.remove("on"); }, 2200); }
+
+  /* ---------- link (shared core) ---------- */
+  // tables never get the answer before the reveal; the leader remote (host) does
+  function pub(role) {
+    var r = S.round, p = null;
+    if (r) {
+      var done = r.status === "done", cl = cluesOf(r);
+      p = { id: r.id, n: r.n, nclue: r.nclue, shown: r.shown, status: r.status, to: r.to, got: r.got, ladder: ladder(r.nclue, S.ladder), clues: done ? cl : cl.slice(0, r.shown) };
+      if (done || role === "remote") { p.name = CH[r.c].name; p.ref = CH[r.c].ref; }
+      if (role === "remote") { p.all = cl; p.t = CH[r.c].t; }
+    }
+    return { core: core.pub(role), view: S.view, rounds: S.rounds, clues: S.clues, ladder: S.ladder, filter: S.filter, played: S.n, round: p, finished: finished(), count: pool().length };
+  }
+  function run(a, m) {
+    m = m || {};
+    if (a === "core.reset") { reset(); return; }
+    if (a === "core.buzz") { buzz(m.team | 0, "remote"); return; }
+    if (a === "core.correct" || a === "core.wrong") { var B = S.core.buzz; if (B.team === null || B.q !== m.q || B.team !== (m.team | 0)) return; judge(a === "core.correct"); return; }
+    if (a === "core.undo") { undo(); return; }
+    if (core.command(a, m)) return;
+    if (a === "wa.next") nextChar(); else if (a === "wa.clue") nextClue(); else if (a === "wa.reveal") reveal();
+    else if (a === "wa.set") setOpt(String(m.k), m.v); else if (a === "wa.view") view(m.v);
+  }
+  var link = null;
+  link = Charge.host({
+    game: GAME, code: S.code,
+    getState: pub,
+    onCommand: run,
+    onInput: function (kind, m) {    // table devices: name requests and buzzes only
+      if (kind === "buzz") { var B = S.core.buzz; if (B.team !== null) return; buzz(m.team | 0, "player"); }
+      else core.input(kind, m);
+    },
+    onCode: function (c) { S.code = c; save(); drawQR(); render(); },
+    onLock: drawLock,
+    onLink: function (st) { $("dot").className = "dot" + (st === "on" ? " on" : st === "wait" ? "" : " wait"); $("dot").title = st === "on" ? "Phone connected" : st === "wait" ? "Waiting for phone" : "Connecting to relay"; }
+  });
+  function drawLock(L) {
+    L = L || (link && link.lock()); if (!L || !$("s-host")) return;
+    var co = L.hosts.length - 1;
+    $("s-host").textContent = !L.claimed ? "No leader remote yet. The first one to open becomes host." : "A leader remote is host" + (co > 0 ? " (+" + co + " co-leader" + (co > 1 ? "s" : "") + ")" : "") + ". Release if that phone is lost.";
+    $("s-unlock").disabled = !L.claimed;
+  }
+
+  /* ---------- QR ---------- */
+  function drawQR() { var u = link.remoteUrl("controller/"); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
+    $("tline").innerHTML = "Table buzzers (optional)<br><b>" + esc(new URL("table/", location.href.split("#")[0].split("?")[0]).href.replace(/^https?:\/\//, "")) + "</b>"; }
+
+  /* ---------- keyboard + mouse backup ---------- */
+  var armT;
+  function armReset(btn) {
+    if (btn.classList.contains("arm")) { btn.classList.remove("arm"); btn.textContent = "Reset"; reset(); return; }
+    btn.classList.add("arm"); btn.textContent = "Press again"; clearTimeout(armT); armT = setTimeout(function () { btn.classList.remove("arm"); btn.textContent = "Reset"; }, 3000);
+  }
+  function settings(on) { $("set").classList.toggle("on", on == null ? !$("set").classList.contains("on") : on); }
+  function key(k, btn) {
+    if (k === "rules") view("rules"); else if (k === "next") nextClue(); else if (k === "reveal") reveal(); else if (k === "scores") view("scores");
+    else if (k === "undo") undo(); else if (k === "settings") settings(); else if (k === "tminus") core.setCount(S.core.n - 1); else if (k === "tplus") core.setCount(S.core.n + 1);
+    else if (k === "ok") judge(true); else if (k === "no") judge(false);
+    else if (k === "reset") armReset(btn || $("s-reset"));
+    else if (k === "unlock") link.releaseLock();
+    else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); }
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("button"), tb = e.target.closest(".cg-tb");
+    if (b) { var sg = b.parentNode.id, v = b.getAttribute("data-v");
+      if (sg === "s-rounds") setOpt("rounds", +v); else if (sg === "s-clues") setOpt("clues", +v); else if (sg === "s-ladder") setOpt("ladder", v); else if (sg === "s-filter") setOpt("filter", v);
+      else if (sg === "s-lock") core.setLockout(v === "1"); else key(b.getAttribute("data-k"), b);
+      b.blur(); return; }
+    if (tb && !$("set").classList.contains("on")) buzz(+tb.getAttribute("data-t"), "remote");
+  });
+  var TK = { "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5, "7": 6, "8": 7, "9": 8, "0": 9, "-": 10, "=": 11 };
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key, setOn = $("set").classList.contains("on");
+    if (k === " " || k === "Enter") { e.preventDefault(); if (!setOn) nextClue(); }
+    else if (k === "a" || k === "A") reveal();
+    else if (k in TK) buzz(TK[k], "remote");
+    else if (k === "y" || k === "Y" || k === "c" || k === "C") judge(true);
+    else if (k === "n" || k === "N" || k === "x" || k === "X") judge(false);
+    else if (k === "u" || k === "U" || k === "Backspace") undo();
+    else if (k === "r" || k === "R") view("rules"); else if (k === "g" || k === "G") view("game"); else if (k === "b" || k === "B" || k === "s" || k === "S") view("scores");
+    else if (k === "o" || k === "O") settings(); else if (k === "Escape") settings(false);
+    else if (k === "[") core.setCount(S.core.n - 1); else if (k === "]") core.setCount(S.core.n + 1);
+    else if (k === "f" || k === "F") key("fs");
+    poke();
+  });
+  var idleT;
+  function poke() { document.body.classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(function () { if (!$("set").classList.contains("on")) document.body.classList.add("idle"); }, 3500); }
+  document.addEventListener("mousemove", poke); poke();
+  window.addEventListener("resize", function () { render(); });
+  function wake() { try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(function () {}); } catch (e) {} }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) wake(); }); wake();
+
+  window.WAScreen = { state: function () { return S; }, run: run, core: core, ladder: ladder, chars: CH };   // for tests
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+  drawQR(); render(); drawLock();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { render(); });
+})();
+</script>
+</body>
+</html>
