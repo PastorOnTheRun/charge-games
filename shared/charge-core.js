@@ -45,6 +45,23 @@
   C.newCode = function () { var s = "", a = new Uint32Array(4); crypto.getRandomValues(a); for (var i = 0; i < 4; i++) s += C.ALPHA[a[i] % C.ALPHA.length]; return s; };
   C.normCode = function (s) { s = String(s || "").toUpperCase().replace(/[^A-Z]/g, "").replace(/[OI]/g, ""); return s.length === 4 ? s : ""; };
   C.uid = function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); };
+  C.secret = function () { var a = new Uint32Array(4); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return x.toString(36); }).join(""); };
+  // passcodes travel only as a hash bound to the room code (never in a URL, QR code or state)
+  C.passHash = function (room, pass) {
+    var t = "cg-pass:" + String(room).toUpperCase() + ":" + String(pass).trim().toUpperCase();
+    if (window.crypto && crypto.subtle && window.TextEncoder) return crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)).then(function (b) { return Array.prototype.map.call(new Uint8Array(b), function (x) { return (x < 16 ? "0" : "") + x.toString(16); }).join(""); });
+    var h = 2166136261; for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); }    // no WebCrypto (very old browser)
+    return Promise.resolve("f" + (h >>> 0).toString(16));
+  };
+  C.PASS_RE = /^[A-Za-z0-9]{4,8}$/;
+  C.newPass = function () { var a = new Uint32Array(1); crypto.getRandomValues(a); return String(1000 + a[0] % 9000); };
+  // this phone's leader-remote identity (kept so a refresh keeps host)
+  C.device = function () {
+    var k = C.NS + ":remote-id", v = null;
+    try { v = JSON.parse(localStorage.getItem(k)); } catch (e) {}
+    if (!v || typeof v.dev !== "string" || typeof v.key !== "string" || v.key.length < 16) { v = { dev: "d" + C.secret().slice(0, 12), key: C.secret() + C.secret() }; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    return v;
+  };
   C.NAME_MAX = 20;
   // team names: strip tags/control characters, collapse spaces, cap the length (they are always escaped on output too)
   C.cleanName = function (s) { return String(s == null ? "" : s).replace(/<(script|style)\b[^>]*>[\s\S]*?(<\/\1\s*>|$)/gi, "").replace(/<[^>]*>?/g, "").replace(/[\u0000-\u001f\u007f<>]/g, "").replace(/\s+/g, " ").trim().slice(0, C.NAME_MAX).trim(); };
@@ -115,13 +132,45 @@
   /* ---------------- host (screen) ---------------- */
   // opts: { game, code, getState() -> public state object, onCommand(a, msg), onCode(newCode), onInput(msg) [future players], onLink() }
   C.host = function (opts) {
-    var code = opts.code || C.newCode(), peer = null, conns = [], tries = 0, relayUntil = 0, relayPUntil = 0, relaySeen = 0, seen = [], relay = null, bt = null, rev = 0;
+    var code = opts.code || C.newCode(), lock = null, peer = null, conns = [], tries = 0, relayUntil = 0, relayPUntil = 0, relaySeen = 0, seen = [], relay = null, bt = null, rev = 0;
     // Each role gets its own view of the state: the leader remote sees everything (e.g. pending name requests),
     // table/player devices only see public state. Relay channels: h = to remotes, t = to tables/players.
-    function state(role) { rev++; var m = C.msg("state", "host", { game: opts.game, code: code, rev: rev, to: role }); m.s = opts.getState(role); return m; }
+    function state(role) { rev++; var m = C.msg("state", "host", { game: opts.game, code: code, rev: rev, to: role }); m.s = opts.getState(role); if (role === "remote") m.lock = lockPub(); return m; }
+    /* Host lock. The first leader remote to connect claims host (its device id + secret key, kept on that phone).
+       Other remotes must send the passcode (as a hash) to become co-hosts. Only host/co-host commands are obeyed;
+       table devices can only buzz and ask for a name. Kept on the screen, per room code. */
+    var LKEY = C.NS + ":" + opts.game + ":lock";
+    function freshLock() { return { code: code, owner: null, hosts: {}, hash: "", passv: 0, bad: {} }; }
+    function loadLock() { try { var l = JSON.parse(localStorage.getItem(LKEY)); if (l && l.code === code && l.hosts) return l; } catch (e) {} return freshLock(); }
+    function saveLock() { try { localStorage.setItem(LKEY, JSON.stringify(lock)); } catch (e) {} if (opts.onLock) opts.onLock(lockPub()); }
+    function lockPub() { return { claimed: !!lock.owner, owner: lock.owner, hosts: Object.keys(lock.hosts), passv: lock.passv, bad: lock.bad }; }
+    function authed(m) { return !!(lock.owner && typeof m.dev === "string" && lock.hosts.hasOwnProperty(m.dev) && lock.hosts[m.dev] === m.key); }
+    function idOk(m) { return typeof m.dev === "string" && m.dev.length <= 40 && typeof m.key === "string" && m.key.length >= 16 && m.key.length <= 80; }
+    function lockMsg(m) {
+      if (!idOk(m)) return;
+      if (m.t === "claim") { if (!lock.owner) { lock = freshLock(); lock.owner = m.dev; lock.hosts[m.dev] = m.key; lock.hash = String(m.hash || "").slice(0, 80); lock.passv = 1; saveLock(); } return; }
+      // auth: passcode hash from another remote; 5 wrong tries -> that device waits a minute
+      var b = lock.bad[m.dev] || { n: 0, until: 0 };
+      if (!lock.owner || Date.now() < b.until) return;
+      if (lock.hash && m.hash === lock.hash) { lock.hosts[m.dev] = m.key; delete lock.bad[m.dev]; }
+      else { b.n++; b.at = Date.now(); if (b.n >= 5) { b.n = 0; b.until = Date.now() + 60000; } lock.bad[m.dev] = b; var ks = Object.keys(lock.bad); if (ks.length > 40) delete lock.bad[ks[0]]; }
+      saveLock();
+    }
+    function lockCmd(m) {
+      if (m.a === "lock.pass") { lock.hash = String(m.hash || "").slice(0, 80); lock.passv++; }
+      else if (m.a === "lock.cohosts") { var k = {}; k[m.dev] = m.key; lock.hosts = k; lock.owner = m.dev; lock.passv++; lock.hash = String(m.hash || lock.hash).slice(0, 80); }
+      else if (m.a === "lock.release") lock = freshLock();
+      else return false;
+      saveLock(); return true;
+    }
     function sendState() {
-      var full = state("remote"), pub = state("player");
-      conns.forEach(function (c) { if (c.open && c.role) try { c.send(c.role === "remote" ? full : pub); } catch (e) {} });
+      var full = state("remote"), pub = state("player"), gate = null;
+      conns.forEach(function (c) {
+        if (!c.open || !c.role) return;
+        var out = pub;
+        if (c.role === "remote") { if (authed(c)) out = full; else { if (!gate) { gate = state("remote"); gate.s = null; } out = gate; } }   // locked-out remotes get the lock info only
+        try { c.send(out); } catch (e) {}
+      });
       if (relay && Date.now() < relayUntil) {   // backup relay only while some device uses it
         var liveR = conns.some(function (c) { return c.open && c.role === "remote" && Date.now() - c.lastSeen < 10000; });
         if (!liveR) relay.pub(C.topic(opts.game, code, "h"), full);
@@ -136,10 +185,16 @@
       if (m.t === "ping") return "pong";
       if (c && (m.role === "remote" || m.role === "player")) c.role = m.role;
       if (via === "relay") { relayUntil = Date.now() + 3 * 3600e3; if (m.role === "player") relayPUntil = relayUntil; else relaySeen = Date.now(); }
-      if (m.t === "hello") { if (c) try { c.send(state(c.role || "player")); } catch (e) {} broadcast(); return; }
+      if (c && m.role === "remote" && idOk(m)) { c.dev = m.dev; c.key = m.key; }
+      if (m.t === "hello") { if (c) { var h1 = state(c.role || "player"); if (c.role === "remote" && !authed(c)) h1.s = null; try { c.send(h1); } catch (e) {} } broadcast(); return; }
       if (!m.id || seen.indexOf(m.id) >= 0) return;
       seen.push(m.id); if (seen.length > 500) seen.shift();
-      if (m.t === "cmd" && m.role === "remote") { opts.onCommand(m.a, m); broadcast(); }
+      if ((m.t === "claim" || m.t === "auth") && m.role === "remote") { lockMsg(m); broadcast(); return; }
+      if (m.t === "cmd") {
+        if (m.role !== "remote" || !authed(m)) { if (C.debug) console.log("[cg host] ignored: not the host", m.a); return; }   // host lock
+        if (!lockCmd(m)) opts.onCommand(m.a, m);
+        broadcast();
+      }
       else if (m.t === "input" && m.role === "player" && opts.onInput) { opts.onInput(m.kind, m); broadcast(); }   // table devices now; player phones later
     }
     function startPeer() {
@@ -169,13 +224,17 @@
     }, 5000);
     var api = {
       code: function () { return code; },
-      setCode: function (c) { code = c; startPeer(); restartRelay(); if (opts.onCode) opts.onCode(c); broadcast(); },
+      setCode: function (c) { code = c; lock = freshLock(); saveLock(); startPeer(); restartRelay(); if (opts.onCode) opts.onCode(c); broadcast(); },
       broadcast: broadcast,
       remoteUrl: function (path) { return new URL((path || "controller/") + "?room=" + code, location.href.split("#")[0].split("?")[0]).href; },
       // "on" = a phone is connected, "wait" = ready for a phone, "off" = still connecting
       status: function () { return conns.some(function (c) { return c.open && c.role === "remote"; }) || Date.now() - relaySeen < 90000 ? "on" : peer && peer.open ? "wait" : "off"; },
-      tables: function () { return conns.filter(function (c) { return c.open && c.role === "player"; }).length; }
+      tables: function () { return conns.filter(function (c) { return c.open && c.role === "player"; }).length; },
+      lock: function () { return lockPub(); },
+      // from the screen itself (trusted): free the host seat, e.g. the host phone is gone
+      releaseLock: function () { lock = freshLock(); saveLock(); broadcast(); }
     };
+    lock = loadLock();
     startPeer(); restartRelay();
     return api;
   };
@@ -184,6 +243,7 @@
   // opts: { game, role: "remote" (leader phone, default) | "player" (table device), onState(state, msg), onStatus(kind, text), onNotFound() }
   C.remote = function (opts) {
     var ROLE = opts.role || "remote", IN = ROLE === "remote" ? "h" : "t", OUT = ROLE === "remote" ? "r" : "p";
+    var ME = ROLE === "remote" ? C.device() : null, lk = null, claimAt = 0, gate = null;
     var room = "", peer = null, conn = null, lastSeen = 0, openAt = 0, dialT = null, lastDial = 0, startAt = 0, relay = null, viaRelay = false, relaySeen = 0, rev = -1, hostFrom = null, st = null;
     // "fresh" = the screen has actually sent us something over WebRTC lately. An open channel alone is not enough:
     // a half-open WebRTC link (open here, nothing arriving) must not hold back the relay backup.
@@ -200,7 +260,58 @@
       if (!m || m.t !== "state" || m.role !== "host" || (m.to && m.to !== ROLE)) return;
       if (m.from !== hostFrom) { hostFrom = m.from; rev = -1; }        // screen reloaded: accept its new numbering
       if (m.rev <= rev) return;
-      rev = m.rev; st = m.s; status(); opts.onState(st, m);
+      rev = m.rev;
+      if (ME) { lk = m.lock || null; lockTick(); if (!isHost()) { st = null; status(); drawGate(); return; } drawGate(); }
+      st = m.s; status(); if (st) opts.onState(st, m);
+    }
+    /* ---- host lock (leader remotes) ---- */
+    function hello() { return C.msg("hello", ROLE, ME ? { dev: ME.dev, key: ME.key } : {}); }
+    function K(x) { return C.NS + ":" + x + ":" + room; }
+    function getL(x) { try { return localStorage.getItem(K(x)); } catch (e) { return null; } }
+    function setL(x, v) { try { if (v == null) localStorage.removeItem(K(x)); else localStorage.setItem(K(x), v); } catch (e) {} }
+    function isHost() { return !!(lk && lk.claimed && lk.hosts && lk.hosts.indexOf(ME.dev) >= 0); }
+    function raw(t, x) {
+      var m = C.msg(t, ROLE, { dev: ME.dev, key: ME.key }); for (var k in x || {}) m[k] = x[k];
+      if (conn && conn.open) try { conn.send(m); } catch (e) {}
+      if (!fresh() && relay) relay.pub(C.topic(opts.game, room, OUT), m);
+      return m;
+    }
+    function lockTick() {   // first remote in claims host (unless this phone just released it)
+      if (!lk || lk.claimed || getL("released") || Date.now() - claimAt < 4000) return;
+      claimAt = Date.now();
+      var pass = getL("pass"); if (!pass || !C.PASS_RE.test(pass)) { pass = C.newPass(); setL("pass", pass); }
+      setL("passv", "1");
+      C.passHash(room, pass).then(function (h) { raw("claim", { hash: h }); });
+    }
+    function drawGate() {
+      if (opts.gate === false || !document.body) return;
+      var show = !!(room && lk && !isHost());
+      if (!show) { if (gate) { gate.remove(); gate = null; } return; }
+      if (!gate) {
+        gate = document.createElement("div"); gate.className = "cg-gate";
+        gate.innerHTML = '<div class="cg-gate-in"><div class="cg-gate-t"></div><div class="cg-gate-h"></div>' +
+          '<form class="cg-gate-f"><input class="cg-gate-pin" autocomplete="off" autocapitalize="characters" maxlength="8" placeholder="Passcode" aria-label="Host passcode"><button type="submit">Unlock</button></form>' +
+          '<div class="cg-gate-err" role="status"></div><button type="button" class="cg-gate-take">Become host</button><button type="button" class="cg-gate-leave">Leave room</button></div>';
+        document.body.appendChild(gate);
+        gate.querySelector("form").onsubmit = function (e) {
+          e.preventDefault(); var inp = gate.querySelector(".cg-gate-pin"), v = inp.value.trim();
+          if (!C.PASS_RE.test(v)) { gate.querySelector(".cg-gate-err").textContent = "Passcodes are 4–8 letters or numbers."; return; }
+          api.auth(v); inp.value = ""; gate.querySelector(".cg-gate-err").textContent = "Checking…";
+        };
+        gate.querySelector(".cg-gate-take").onclick = function () { api.takeHost(); };
+        gate.querySelector(".cg-gate-leave").onclick = function () { if (opts.onLeave) opts.onLeave(); else api.leave(); };
+      }
+      var claimed = lk.claimed, b = (lk.bad || {})[ME.dev], wait = b && b.until > Date.now();
+      gate.classList.toggle("free", !claimed);
+      gate.querySelector(".cg-gate-f").style.display = claimed ? "" : "none";
+      gate.querySelector(".cg-gate-take").style.display = !claimed && getL("released") ? "" : "none";
+      gate.querySelector(".cg-gate-t").textContent = claimed ? "Host passcode" : getL("released") ? "You released host" : "Becoming host…";
+      gate.querySelector(".cg-gate-h").textContent = claimed ? "Another leader is running this game. Ask them for the passcode (Settings on their remote) to help run it."
+        : getL("released") ? "Nobody is host right now. The next leader remote that opens becomes host." : "Connecting to the screen.";
+      var err = gate.querySelector(".cg-gate-err");
+      if (wait) err.textContent = "Too many tries. Wait a minute and try again.";
+      else if (b && b.n && b.at > (gate.tried || 0)) { err.textContent = "That passcode didn't work."; gate.tried = b.at; }
+      else if (!claimed) err.textContent = "";
     }
     function startPeer() {
       if (peer) try { peer.destroy(); } catch (e) {}
@@ -217,7 +328,7 @@
       if (!peer || !peer.open || !room) return;
       if (conn) try { conn.close(); } catch (e) {}
       var c = conn = peer.connect(C.peerId(opts.game, room), { reliable: true, serialization: "json" });
-      c.on("open", function () { openAt = Date.now(); c.send(C.msg("hello", ROLE)); status(); });
+      c.on("open", function () { openAt = Date.now(); c.send(hello()); status(); });
       c.on("data", function (m) { if (c !== conn) return; lastSeen = Date.now(); onMsg(m); });
       c.on("close", function () { if (c === conn) { status(); redial(1500); } });
       c.on("error", function () { if (c === conn) redial(2000); });
@@ -226,37 +337,57 @@
     function startRelay() {
       if (relay || !room) return;
       var r = relay = C.link.relay(C.topic(opts.game, room, IN), function (m) { if (r !== relay) return; viaRelay = true; relaySeen = Date.now(); onMsg(m); },
-        function () { r.pub(C.topic(opts.game, room, OUT), C.msg("hello", ROLE)); });
+        function () { r.pub(C.topic(opts.game, room, OUT), hello()); });
     }
     function stopAll() { clearTimeout(dialT); if (conn) try { conn.close(); } catch (e) {} conn = null; if (peer) try { peer.destroy(); } catch (e) {} peer = null; if (relay) relay.close(); relay = null; viaRelay = false; }
     setInterval(function () {
       if (!room) return;
+      if (ME) lockTick();     // retry a claim that got lost
       if (conn && conn.open) { try { conn.send({ p: C.PROTOCOL, t: "ping" }); } catch (e) {} if (Date.now() - Math.max(lastSeen, openAt) > 10000) { try { conn.close(); } catch (e) {} redial(200); } }
       else if (!dialT && peer && peer.open && Date.now() - lastDial > 12000) redial(100);
       if (!fresh() && Date.now() - startAt > 6000) startRelay();                                   // WebRTC not getting through: add the backup relay
-      if (relay && !fresh() && Date.now() - relaySeen > 45000) relay.pub(C.topic(opts.game, room, OUT), C.msg("hello", ROLE));
+      if (relay && !fresh() && Date.now() - relaySeen > 45000) relay.pub(C.topic(opts.game, room, OUT), hello());
       if (fresh() && relay && Date.now() - startAt > 60000) { relay.close(); relay = null; viaRelay = false; }   // WebRTC healthy: drop the backup
       status();
     }, 3000);
-    document.addEventListener("visibilitychange", function () { if (!document.hidden && room) { if (!(conn && conn.open)) redial(100); else try { conn.send(C.msg("hello", ROLE)); } catch (e) {} } });
+    document.addEventListener("visibilitychange", function () { if (!document.hidden && room) { if (!(conn && conn.open)) redial(100); else try { conn.send(hello()); } catch (e) {} } });
     window.addEventListener("online", function () { if (room) redial(100); });
-    return {
-      join: function (code) { room = code; st = null; rev = -1; hostFrom = null; startAt = Date.now(); stopAll(); if (C.hasPeer()) startPeer(); else startRelay(); status(); },
-      leave: function () { room = ""; stopAll(); st = null; status(); },
+    var api = {
+      join: function (code) { room = code; st = null; lk = null; rev = -1; hostFrom = null; claimAt = 0; startAt = Date.now(); stopAll(); if (C.hasPeer()) startPeer(); else startRelay(); status(); },
+      leave: function () { room = ""; stopAll(); st = null; lk = null; drawGate(); status(); },
       room: function () { return room; },
       state: function () { return st; },
       ok: ok,
       via: function () { return fresh() ? "peer" : viaRelay ? "mqtt" : "none"; },
       // send a command: a = "core.*" for shared features, "<game>.*" for game features
       send: function (a, x) {
-        var m = ROLE === "remote" ? C.msg("cmd", "remote", { a: a }) : C.msg("input", "player", { kind: a }); for (var k in x || {}) m[k] = x[k];
+        var m = ROLE === "remote" ? C.msg("cmd", "remote", { a: a, dev: ME.dev, key: ME.key }) : C.msg("input", "player", { kind: a }); for (var k in x || {}) m[k] = x[k];
         if (conn && conn.open) try { conn.send(m); } catch (e) {}
         var sent = !fresh() && relay ? relay.pub(C.topic(opts.game, room, OUT), m) : null;   // the host ignores duplicates by id
         if (C.debug) console.log("[cg " + ROLE + "] send", a, m.id, "peer:" + fresh(), "relay:" + sent);
         if (navigator.vibrate) navigator.vibrate(15);
         return m.id;
-      }
+      },
+      // host lock (leader remotes only)
+      lock: function () { return lk; },
+      isHost: function () { return !!ME && isHost(); },
+      isOwner: function () { return !!(ME && lk && lk.owner === ME.dev); },
+      device: function () { return ME && ME.dev; },
+      pass: function () { var p = getL("pass"), v = getL("passv"); return { pass: p, stale: !!(lk && p && v && +v !== lk.passv) }; },
+      auth: function (pass) { pass = String(pass).trim().toUpperCase(); return C.passHash(room, pass).then(function (h) { setL("pass", pass); setL("passv", lk ? lk.passv : ""); raw("auth", { hash: h }); }); },
+      setPass: function (pass) {
+        pass = String(pass || C.newPass()).trim().toUpperCase(); if (!C.PASS_RE.test(pass)) return Promise.resolve(false);
+        return C.passHash(room, pass).then(function (h) { setL("pass", pass); setL("passv", lk ? lk.passv + 1 : ""); api.send("lock.pass", { hash: h }); return pass; });
+      },
+      // keep only this phone as host (also changes the passcode so the old one stops working)
+      signOutOthers: function () {
+        var pass = C.newPass();
+        return C.passHash(room, pass).then(function (h) { setL("pass", pass); setL("passv", lk ? lk.passv + 1 : ""); api.send("lock.cohosts", { hash: h }); return pass; });
+      },
+      release: function () { setL("released", "1"); setL("pass", null); api.send("lock.release"); },
+      takeHost: function () { setL("released", null); claimAt = 0; lockTick(); }
     };
+    return api;
   };
 
   /* ---------------- core model: teams, buzz-in, undo (runs on the host) ---------------- */
@@ -471,6 +602,11 @@
   // Charge.coreSheet(el, remote, { onLeave }) -> { render(T) }
   C.coreSheet = function (el, R, o) {
     el.innerHTML =
+      '<div class="sr cg-hl"><div class="n">Host lock</div><div class="h">Only this phone runs the game. Tables can still buzz and send names. A co-leader can open the remote on their phone and enter this passcode.</div>' +
+      '<div class="cg-hl-pass"><span>Passcode</span><b class="cg-hl-pv">····</b></div><div class="h cg-hl-stale" hidden>Changed on another leader’s phone. Set a new one to see it here.</div>' +
+      '<form class="cg-hl-set"><input class="cg-hl-in" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="Your own (4–8)" aria-label="New passcode"><button type="submit">Set</button><button type="button" class="cg-hl-new">New random</button></form>' +
+      '<div class="h cg-hl-co">No co-leaders signed in.</div><button type="button" class="cg-hl-out" hidden>Sign out co-leaders</button>' +
+      '<button type="button" class="danger cg-hl-rel">Release host / hand off</button><div class="h">After releasing, the next leader remote to open (or a co-leader already signed in) becomes host.</div></div>' +
       '<div class="sr"><div class="n">Tables</div><div class="h">2 to ' + C.MAX_TEAMS + '. Big group? Jump by 5.</div>' +
       '<div class="cg-step"><button type="button" data-d="-5" aria-label="5 fewer">−5</button><button type="button" data-d="-1" aria-label="One fewer">−</button><b class="cg-n">6</b><button type="button" data-d="1" aria-label="One more">+</button><button type="button" data-d="5" aria-label="5 more">+5</button></div></div>' +
       '<div class="sr"><div class="n">Table names</div><div class="h">Optional. Leave blank to keep “Table 7”.</div><button type="button" class="cg-names-btn">Rename tables</button><div class="cg-names" hidden></div></div>' +
@@ -487,7 +623,28 @@
         if (b.classList.contains("arm")) { R.send("core.reset"); b.classList.remove("arm"); b.textContent = "Reset scores"; if (o.onReset) o.onReset(); return; }
         b.classList.add("arm"); b.textContent = "Tap again to reset"; clearTimeout(armT); armT = setTimeout(function () { b.classList.remove("arm"); b.textContent = "Reset scores"; }, 3500);
       } else if (b.classList.contains("cg-leave")) o.onLeave();
+      else if (b.classList.contains("cg-hl-new")) R.setPass().then(redraw);
+      else if (b.classList.contains("cg-hl-out")) R.signOutOthers().then(redraw);
+      else if (b.classList.contains("cg-hl-rel")) {
+        if (b.classList.contains("arm")) { b.classList.remove("arm"); b.textContent = "Release host / hand off"; R.release(); if (o.onRelease) o.onRelease(); return; }
+        b.classList.add("arm"); b.textContent = "Tap again to release host"; clearTimeout(relT); relT = setTimeout(function () { b.classList.remove("arm"); b.textContent = "Release host / hand off"; }, 3500);
+      }
     });
+    var relT, hlMsg = el.querySelector(".cg-hl-stale");
+    el.querySelector(".cg-hl-set").onsubmit = function (e) {
+      e.preventDefault(); var inp = el.querySelector(".cg-hl-in"), v = inp.value.trim();
+      if (!C.PASS_RE.test(v)) { inp.setCustomValidity && inp.setCustomValidity("4–8 letters or numbers"); inp.reportValidity && inp.reportValidity(); inp.setCustomValidity && inp.setCustomValidity(""); return; }
+      R.setPass(v).then(function () { inp.value = ""; inp.blur(); redraw(); });
+    };
+    function redraw() {
+      var lk = R.lock && R.lock(); if (!lk) return;
+      var p = R.pass(), co = (lk.hosts || []).length - 1;
+      el.querySelector(".cg-hl-pv").textContent = p.pass && !p.stale ? p.pass : "····";
+      hlMsg.hidden = !(p.stale || !p.pass);
+      hlMsg.textContent = p.pass ? "Changed on another leader’s phone. Set a new one to see it here." : "Set a passcode so a co-leader can help.";
+      el.querySelector(".cg-hl-co").textContent = co > 0 ? co + " co-leader" + (co > 1 ? "s" : "") + " signed in." : "No co-leaders signed in.";
+      el.querySelector(".cg-hl-out").hidden = co < 1;
+    }
     function commit(inp) { var i = +inp.getAttribute("data-i"), v = inp.value.replace(/\s+/g, " ").trim(); if (last && v === ((last.names[i] || "").trim())) return; R.send("core.rename", { i: i, name: v }); }
     names.addEventListener("change", function (e) { if (e.target.matches("input")) commit(e.target); });
     names.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.matches("input")) { e.preventDefault(); commit(e.target); var nx = names.querySelector('input[data-i="' + (+e.target.getAttribute("data-i") + 1) + '"]'); if (nx) nx.focus(); else e.target.blur(); } });
@@ -499,7 +656,7 @@
     }
     return {
       render: function (T, linkOk) {
-        last = T;
+        last = T; redraw();
         el.querySelector(".cg-n").textContent = T.n;
         [].forEach.call(el.querySelectorAll("[data-d]"), function (b) { var d = +b.getAttribute("data-d"); b.disabled = !linkOk || (d < 0 ? T.n <= C.MIN_TEAMS : T.n >= C.MAX_TEAMS); });
         [].forEach.call(el.querySelectorAll(".cg-lock button"), function (b) { b.classList.toggle("sel", (b.getAttribute("data-v") === "1") === !!T.lockout); b.disabled = !linkOk; });

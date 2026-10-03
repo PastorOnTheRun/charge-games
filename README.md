@@ -30,21 +30,38 @@ const link = Charge.host({
   game: "sworddrills",                 // namespace part: rooms are chargegames-<game>-<code>
   code: savedCode,                     // optional; a new 4-letter code is made if missing
   getState: role => publicState(role), // "remote" gets everything, "player" gets public state only
-  onCommand: (a, msg) => run(a, msg),  // from the leader remote only
+  onCommand: (a, msg) => run(a, msg),  // from the host / co-host leader remotes only (host lock)
   onInput: (kind, msg) => input(kind, msg), // from table/player devices only
   onCode: code => {},                  // the code changed (e.g. it was taken)
-  onLink: status => {}                 // "on" (remote connected) | "wait" | "off"
+  onLink: status => {},                // "on" (remote connected) | "wait" | "off"
+  onLock: lock => {}                   // host lock changed: { claimed, owner, hosts: [deviceIds], passv }
 });
 link.broadcast();                      // push state after any change (debounced 30 ms)
 link.remoteUrl("controller/");         // URL with ?room=CODE for the QR code
 link.code(); link.setCode(c); link.status(); link.tables();
+link.lock(); link.releaseLock();       // e.g. a "Release host lock" row in the screen's Settings
 
 // Phone (remote or table device)
 const R = Charge.remote({ game: "sworddrills", role: "remote" /* or "player" */,
   onState: (s, msg) => render(s), onStatus: (kind, text) => {}, onNotFound: () => {} });
 R.join("ABCD"); R.leave(); R.room(); R.state(); R.ok(); R.via(); // "peer" | "mqtt" | "none"
 R.send("core.correct", { q, team });   // remote: a command; player: R.send("buzz", { team }) becomes input kind "buzz"
+// leader remotes only (host lock)
+R.isHost(); R.isOwner(); R.lock(); R.pass();   // pass() -> { pass, stale }
+R.auth("1234"); R.setPass("ABCD" /* or nothing for a random 4-digit one */); R.signOutOthers(); R.release(); R.takeHost();
 ```
+
+### Host lock
+
+Every game gets this from the core; game pages need nothing beyond `Charge.remote({ role: "remote", onLeave })` and `Charge.coreSheet`.
+
+- The first leader remote to connect to a room **claims host**. Each phone keeps a random device id + secret key in `localStorage` (`<ns>:remote-id`), so a refresh keeps host.
+- The host phone makes a 4-digit passcode (shown in its Settings, where it can be changed). Only `SHA-256("cg-pass:" + ROOM + ":" + PASS)` is sent; the passcode is never in a URL, QR code or state message.
+- Any other remote that opens gets a passcode prompt (`.cg-gate`) instead of controls, and the screen sends it no game state. The right passcode makes it a co-host. Five wrong tries lock that phone out for a minute.
+- The screen obeys `cmd` messages only from a host or co-host (`dev` + `key` must match). Table devices can only send `input` `name` and `buzz`; everything else is ignored.
+- Settings on the host remote: passcode, co-leader count, **Sign out co-leaders** (also changes the passcode), **Release host / hand off** (tap twice; a co-leader already signed in, or the next remote to open, becomes host). The screen's Settings has **Release host lock** for when the host phone is lost.
+- The lock is saved on the screen per room code (`<ns>:<game>:lock`), so a screen reload keeps it; a new room code starts unlocked.
+- Limits: this stops students who scan or type the remote link. It is not strong security: the public relay is unencrypted, so someone sniffing the relay could copy a key. Use a private relay (see `docs/ROADMAP.md`) for that.
 
 ### Core model (runs on the host)
 
@@ -162,11 +179,15 @@ Every message is JSON: `{ p: 1, t, role, from, id, at, ...body }`.
 
 | `t` | Sender | Body |
 | --- | --- | --- |
-| `hello` | remote / player | (none); the host replies with state for that role |
-| `state` | host | `{ game, code, rev, to: "remote" \| "player", s }` |
-| `cmd` | remote | `{ a, ...args }`; the host accepts commands only from role `remote` |
+| `hello` | remote / player | remote: `{ dev, key }`; the host replies with state for that role |
+| `state` | host | `{ game, code, rev, to: "remote" \| "player", s, lock? }`; `lock` (remotes only) is `{ claimed, owner, hosts, passv, bad }`; `s` is `null` for a remote that is not host |
+| `claim` | remote | `{ dev, key, hash }`; takes host only if nobody holds it |
+| `auth` | remote | `{ dev, key, hash }`; the passcode hash, to become a co-host |
+| `cmd` | remote | `{ a, dev, key, ...args }`; obeyed only from a host or co-host |
 | `input` | player | `{ kind: "name" \| "buzz", team, name? }`; accepted only from role `player` |
 | `ping` / `pong` | any / host | keep-alive on the direct link |
+
+Lock commands: `lock.pass {hash}`, `lock.cohosts {hash}` (sign out everyone else, new passcode), `lock.release`.
 
 Core commands: `core.teams {n | d}`, `core.rename {i, name}`, `core.approve {id, name?}`, `core.reject {id}`, `core.buzz {team, slot}`, `core.correct {q, team}`, `core.wrong {q, team}`, `core.clearbuzz`, `core.lockout {on}`, `core.undo`, `core.reset`. Games add their own, prefixed (`sd.spin`, `sd.wild`, `sd.mode {mode}`, `sd.per {n}`, `sd.final {on}`, `sd.view {v}`).
 

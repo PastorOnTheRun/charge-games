@@ -161,14 +161,15 @@
     game: GAME,
     onState: function (s) { st = s; $("foot").textContent = ""; render(); },
     onStatus: function (k, txt) { $("pill").className = "pill mono " + (k === "on" ? "on" : k === "backup" ? "bk" : k === "off" ? "off" : ""); $("pill").textContent = txt; },
-    onNotFound: function () { $("foot").textContent = "Screen not found yet. Check the code on the screen."; }
+    onNotFound: function () { $("foot").textContent = "Screen not found yet. Check the code on the screen."; },
+    onLeave: leave
   });
   var picker = Charge.picker($("picker"), { onPick: function (t) {
     var sp = st && st.spin; if (!sp) return;
     R.send("core.buzz", { team: t, slot: sp.kind === "wild" ? sel : null }); $("wnote").hidden = true;
   } });
   var buzzP = Charge.buzzPanel($("buzz"), R);
-  var coreS = Charge.coreSheet($("coresheet"), R, { onLeave: leave, onReset: function () { $("sheet").hidden = true; } });
+  var coreS = Charge.coreSheet($("coresheet"), R, { onLeave: leave, onReset: function () { $("sheet").hidden = true; }, onRelease: function () { $("sheet").hidden = true; } });
 
   function join(code) {
     localStorage.setItem(RKEY, code); $("room").textContent = "Room " + code;
@@ -273,7 +274,7 @@
   document.addEventListener("touchend", Charge.wake, { passive: true });
   setInterval(render, 3000);
 
-  window.SDCtrl = { state: function () { return st; }, ok: R.ok, via: R.via };  // for tests
+  window.SDCtrl = { state: function () { return st; }, ok: R.ok, via: R.via, remote: R };  // for tests
   var q = Charge.normCode(new URLSearchParams(location.search).get("room")), saved = Charge.normCode(localStorage.getItem(RKEY));
   if (q || saved) join(q || saved);
 })();
