@@ -132,7 +132,7 @@
   /* ---------------- host (screen) ---------------- */
   // opts: { game, code, getState() -> public state object, onCommand(a, msg), onCode(newCode), onInput(msg) [future players], onLink() }
   C.host = function (opts) {
-    var code = opts.code || C.newCode(), lock = null, peer = null, conns = [], tries = 0, relayUntil = 0, relayPUntil = 0, relaySeen = 0, seen = [], relay = null, bt = null, rev = 0;
+    var code = opts.code || C.newCode(), lock = null, peer = null, conns = [], tries = 0, relayUntil = 0, relayPUntil = 0, relayRUntil = 0, relaySeen = 0, seen = [], relay = null, bt = null, rev = 0;
     // Each role gets its own view of the state: the leader remote sees everything (e.g. pending name requests),
     // table/player devices only see public state. Relay channels: h = to remotes, t = to tables/players.
     function state(role) { rev++; var m = C.msg("state", "host", { game: opts.game, code: code, rev: rev, to: role }); m.s = opts.getState(role); if (role === "remote") m.lock = lockPub(); return m; }
@@ -173,7 +173,7 @@
       });
       if (relay && Date.now() < relayUntil) {   // backup relay only while some device uses it
         var liveR = conns.some(function (c) { return c.open && c.role === "remote" && Date.now() - c.lastSeen < 10000; });
-        if (!liveR) relay.pub(C.topic(opts.game, code, "h"), full);
+        if (!liveR || Date.now() < relayRUntil) relay.pub(C.topic(opts.game, code, "h"), full);   // a co-host phone may be on the relay while the host is direct
         if (Date.now() < relayPUntil) relay.pub(C.topic(opts.game, code, "t"), pub);
       }
       if (opts.onLink) opts.onLink(api.status());
@@ -184,7 +184,7 @@
       if (C.debug) console.log("[cg host]", via, m.t, m.a || m.kind || "", m.id || "", Date.now() - (m.at || 0) + "ms");
       if (m.t === "ping") return "pong";
       if (c && (m.role === "remote" || m.role === "player")) c.role = m.role;
-      if (via === "relay") { relayUntil = Date.now() + 3 * 3600e3; if (m.role === "player") relayPUntil = relayUntil; else relaySeen = Date.now(); }
+      if (via === "relay") { relayUntil = Date.now() + 3 * 3600e3; if (m.role === "player") relayPUntil = relayUntil; else { relaySeen = Date.now(); relayRUntil = relayUntil; } }
       if (c && m.role === "remote" && idOk(m)) { c.dev = m.dev; c.key = m.key; }
       if (m.t === "hello") { if (c) { var h1 = state(c.role || "player"); if (c.role === "remote" && !authed(c)) h1.s = null; try { c.send(h1); } catch (e) {} } broadcast(); return; }
       if (!m.id || seen.indexOf(m.id) >= 0) return;
