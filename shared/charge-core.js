@@ -184,7 +184,9 @@
   // opts: { game, role: "remote" (leader phone, default) | "player" (table device), onState(state, msg), onStatus(kind, text), onNotFound() }
   C.remote = function (opts) {
     var ROLE = opts.role || "remote", IN = ROLE === "remote" ? "h" : "t", OUT = ROLE === "remote" ? "r" : "p";
-    var room = "", peer = null, conn = null, lastSeen = 0, dialT = null, lastDial = 0, startAt = 0, relay = null, viaRelay = false, relaySeen = 0, rev = -1, hostFrom = null, st = null;
+    var room = "", peer = null, conn = null, lastSeen = 0, openAt = 0, dialT = null, lastDial = 0, startAt = 0, relay = null, viaRelay = false, relaySeen = 0, rev = -1, hostFrom = null, st = null;
+    // "fresh" = the screen has actually sent us something over WebRTC lately. An open channel alone is not enough:
+    // a half-open WebRTC link (open here, nothing arriving) must not hold back the relay backup.
     function fresh() { return !!(conn && conn.open && Date.now() - lastSeen < 10000); }
     function ok() { return fresh() || (viaRelay && !!relay && relay.up() && Date.now() - relaySeen < 120000); }
     function status() {
@@ -215,7 +217,7 @@
       if (!peer || !peer.open || !room) return;
       if (conn) try { conn.close(); } catch (e) {}
       var c = conn = peer.connect(C.peerId(opts.game, room), { reliable: true, serialization: "json" });
-      c.on("open", function () { lastSeen = Date.now(); c.send(C.msg("hello", ROLE)); status(); });
+      c.on("open", function () { openAt = Date.now(); c.send(C.msg("hello", ROLE)); status(); });
       c.on("data", function (m) { if (c !== conn) return; lastSeen = Date.now(); onMsg(m); });
       c.on("close", function () { if (c === conn) { status(); redial(1500); } });
       c.on("error", function () { if (c === conn) redial(2000); });
@@ -229,7 +231,7 @@
     function stopAll() { clearTimeout(dialT); if (conn) try { conn.close(); } catch (e) {} conn = null; if (peer) try { peer.destroy(); } catch (e) {} peer = null; if (relay) relay.close(); relay = null; viaRelay = false; }
     setInterval(function () {
       if (!room) return;
-      if (conn && conn.open) { try { conn.send({ p: C.PROTOCOL, t: "ping" }); } catch (e) {} if (Date.now() - lastSeen > 10000) { try { conn.close(); } catch (e) {} redial(200); } }
+      if (conn && conn.open) { try { conn.send({ p: C.PROTOCOL, t: "ping" }); } catch (e) {} if (Date.now() - Math.max(lastSeen, openAt) > 10000) { try { conn.close(); } catch (e) {} redial(200); } }
       else if (!dialT && peer && peer.open && Date.now() - lastDial > 12000) redial(100);
       if (!fresh() && Date.now() - startAt > 6000) startRelay();                                   // WebRTC not getting through: add the backup relay
       if (relay && !fresh() && Date.now() - relaySeen > 45000) relay.pub(C.topic(opts.game, room, OUT), C.msg("hello", ROLE));
