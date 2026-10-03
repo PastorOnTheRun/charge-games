@@ -14,6 +14,32 @@
 (function () {
   "use strict";
   var C = window.Charge = { PROTOCOL: 1, NS: "chargegames", MAX_TEAMS: 50, MIN_TEAMS: 2 };
+
+  /* ---------------- skins ----------------
+     Another site can run these exact game pages under its own brand (see README "Skins" and shared/charge-embed.js).
+     window.ChargeSkin = { id, ns, brand, css, logo: { dark, light }, home: { href, label } }, set before this file loads.
+     ns also names the rooms (peer ids, relay topics) and the saved-state keys, so a skinned site never shares rooms or saves. */
+  var SK = C.skin = window.ChargeSkin || null;
+  if (SK && /^[a-z][a-z0-9]{1,23}$/.test(SK.ns || "")) C.NS = SK.ns;
+  C.applySkin = function () {
+    if (!SK) return;
+    var html = document.documentElement;
+    if (SK.id) html.setAttribute("data-cg-skin", SK.id);
+    if (SK.css && !document.querySelector("link[data-cg-skin-css]")) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = SK.css; l.setAttribute("data-cg-skin-css", ""); document.head.appendChild(l); }
+    [].forEach.call(document.querySelectorAll("[data-cg-logo]"), function (el) {
+      var v = el.getAttribute("data-cg-logo"), src = SK.logo && SK.logo[v]; if (!src || el.tagName === "IMG") return;
+      var img = document.createElement("img"); img.src = src; img.alt = SK.brand || ""; img.setAttribute("data-cg-logo", v);
+      img.className = (el.getAttribute("class") || "") + " cg-skin-logo"; el.parentNode.replaceChild(img, el);
+    });
+    if (SK.brand) [].forEach.call(document.querySelectorAll("[data-cg-brand]"), function (el) { el.textContent = SK.brand; });
+    [].forEach.call(document.querySelectorAll("[data-cg-home], [data-cg-home-mark]"), function (el) {
+      if (!SK.home) { if (el.hasAttribute("data-cg-home")) el.hidden = true; else el.removeAttribute("href"); return; }
+      el.href = SK.home.href;
+      if (el.hasAttribute("data-cg-home")) el.textContent = SK.home.label || SK.brand; else el.setAttribute("aria-label", (SK.brand || "") + " home");
+    });
+    if (SK.brand) document.title = document.title.replace("Charge! Games", SK.brand);
+  };
+  if (document.body) C.applySkin(); else document.addEventListener("DOMContentLoaded", C.applySkin);
   C.BROKERS = ["wss://broker.emqx.io:8084/mqtt", "wss://broker.hivemq.com:8884/mqtt"];
   C.ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ";            // no I / O
   C.newCode = function () { var s = "", a = new Uint32Array(4); crypto.getRandomValues(a); for (var i = 0; i < 4; i++) s += C.ALPHA[a[i] % C.ALPHA.length]; return s; };
