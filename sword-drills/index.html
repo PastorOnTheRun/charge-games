@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
   <link rel="stylesheet" href="../shared/charge-core.css">
   <!-- Sword Drills team game, TV/projector screen. The screen holds the game state
        (localStorage) and the phone controller (./controller/) joins by room code / QR via ./link.js.
@@ -19,13 +19,13 @@
     @supports (width: min(1vw, 1vh)) { html { font-size: min(1vw, 1.7778vh); } }
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; overflow: hidden; background: var(--cg-deep); }
-    body { color: #fff; font-family: Inter, Roboto, "Segoe UI", Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; }
+    body { color: #fff; font-family: var(--cg-font); display: flex; align-items: center; justify-content: center; }
     body.idle, body.idle * { cursor: none !important; }
-    .mono { font-family: "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace; }
+    .mono { font-family: var(--cg-label); }
     .wide { font-family: var(--cg-disp); } .wide, .wide * { font-synthesis: none; }
     .stage {
       position: relative; overflow: hidden; width: 100rem; height: 56.25rem; flex: 0 0 auto; padding: 1.8rem 2.4rem 2rem;
-      background-color: var(--cg-ink); background-image: radial-gradient(circle, rgba(255,255,255,.07) 0.075rem, transparent 0.1rem); background-size: 1.3rem 1.3rem;
+      background-color: var(--cg-ink); 
       display: flex; flex-direction: column;
     }
     /* Header */
@@ -35,12 +35,12 @@
     .top h1 { margin: 0; font-weight: 900; font-size: 3.1rem; line-height: 1; letter-spacing: .01em; }
     .top .sub { margin-top: .45rem; font-weight: 700; font-size: 1.15rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cg-acc); }
     .top .sp { flex: 1; }
-    .chip { font-weight: 700; font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-mute); border: 0.12rem solid var(--cg-line); border-radius: 0.4rem; padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
-    .join { display: flex; align-items: center; background: var(--cg-panel); border: 0.12rem solid var(--cg-line); border-radius: 0.6rem; padding: .5rem .6rem .5rem 1.1rem; }
+    .chip { font-weight: 700; font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-mute); border: 0.12rem solid var(--cg-line); border-radius: calc(0.4rem * var(--cg-round)); padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
+    .join { display: flex; align-items: center; background: var(--cg-panel); border: 0.12rem solid var(--cg-line); border-radius: calc(0.6rem * var(--cg-round)); padding: .5rem .6rem .5rem 1.1rem; }
     .join .l { font-weight: 700; font-size: 1.05rem; letter-spacing: .1em; color: var(--cg-mute2); text-transform: uppercase; line-height: 1.25; margin-right: 1rem; }
     .join .c { font-weight: 900; font-size: 3rem; letter-spacing: .06em; color: var(--cg-acc); line-height: 1; }
     .dot { display: inline-block; width: 1rem; height: 1rem; border-radius: 50%; background: var(--cg-mute3); margin-left: 1rem; }
-    .dot.on { background: #4ade80; box-shadow: 0 0 0.8rem rgba(74,222,128,.7); }
+    .dot.on { background: #4ade80; }
     .dot.wait { background: var(--cg-acc); }
     .main { position: relative; flex: 1 1 0; min-height: 0; margin-top: 1.4rem; }
     .view { position: absolute; inset: 0; display: none; flex-direction: column; }
@@ -52,14 +52,14 @@
     .rules h2 { margin: .2rem 0 1.2rem; font-weight: 900; font-size: 5.2rem; line-height: .95; color: var(--cg-acc); }
     .rules ol { margin: 0; padding: 0; list-style: none; }
     .rules li { display: flex; align-items: center; font-weight: 850; font-size: 2.5rem; line-height: 1.15; margin-bottom: 1.05rem; }
-    .rules li b { flex: 0 0 3.8rem; height: 3.8rem; margin-right: 1.6rem; background: var(--cg-acc); color: var(--cg-ink); border-radius: .4rem; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900; }
+    .rules li b { flex: 0 0 3.8rem; height: 3.8rem; margin-right: 1.6rem; background: var(--cg-acc); color: var(--cg-ink); border-radius: calc(.4rem * var(--cg-round)); display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900; }
     .rules li.wild b { background: var(--cg-gold); }
     .rules .pline { margin-top: auto; padding-bottom: .2rem; font-weight: 700; font-size: 1.45rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-soft); line-height: 1.6; }
     .rules .pline span { color: var(--cg-acc); }
-    .rules .home { align-self: flex-start; margin-top: .9rem; font-weight: 800; font-size: 1.15rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-gold); text-decoration: none; border: .12rem solid var(--cg-line); border-radius: .45rem; padding: .45rem .8rem; }
+    .rules .home { align-self: flex-start; margin-top: .9rem; font-weight: 800; font-size: 1.15rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-gold); text-decoration: none; border: .12rem solid var(--cg-line); border-radius: calc(.45rem * var(--cg-round)); padding: .45rem .8rem; }
     .rules .home:hover { border-color: var(--cg-gold); }
     .rules .rgt { flex: 0 0 27rem; margin-left: 3rem; display: flex; flex-direction: column; justify-content: center; }
-    .qrcard { background: #fff; color: var(--cg-ink); border-radius: .8rem; padding: 1.6rem 1.6rem 1.4rem; text-align: center; }
+    .qrcard { background: #fff; color: var(--cg-ink); border-radius: calc(.8rem * var(--cg-round)); padding: 1.6rem 1.6rem 1.4rem; text-align: center; }
     .qrcard .qr { width: 84%; margin: 0 auto; }
     .qrcard .qr svg, .qrcard .qr img { display: block; width: 100%; height: auto; }
     .qrcard .k { margin-top: .9rem; font-weight: 800; font-size: 1.3rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-acc-dk); }
@@ -68,14 +68,14 @@
     .qrcard .u { margin-top: .7rem; font-size: 1rem; font-weight: 700; color: var(--cg-slate); word-break: break-all; }
 
     /* Slot machine */
-    .slot { flex: 0 0 auto; display: flex; background: var(--cg-panel); border: 0.35rem solid var(--cg-acc); border-radius: 1.4rem; padding: 1rem 1.2rem 1.2rem; box-shadow: 0 0 3rem rgba(var(--cg-acc-rgb),.18); }
+    .slot { flex: 0 0 auto; display: flex; background: var(--cg-panel); border: 0.35rem solid var(--cg-acc); border-radius: calc(1.4rem * var(--cg-round)); padding: 1rem 1.2rem 1.2rem; }
     .col { display: flex; flex-direction: column; min-width: 0; }
     .col + .col { margin-left: 1.2rem; }
     .col .lab { font-weight: 800; font-size: 1.2rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cg-acc); margin: 0 0 .6rem .2rem; white-space: nowrap; }
     .col .lab span { color: var(--cg-mute); }
-    .win { position: relative; overflow: hidden; background: var(--cg-acc); color: var(--cg-ink); border-radius: .7rem; }
-    .win:after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: .7rem;
-      background: linear-gradient(rgba(var(--cg-ink-rgb),.55), rgba(var(--cg-ink-rgb),0) 22%, rgba(var(--cg-ink-rgb),0) 78%, rgba(var(--cg-ink-rgb),.55)); box-shadow: inset 0 0 0 0.2rem rgba(var(--cg-ink-rgb),.35); }
+    .win { position: relative; overflow: hidden; background: var(--cg-acc); color: var(--cg-ink); border-radius: calc(.7rem * var(--cg-round)); }
+    .win:after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: calc(.7rem * var(--cg-round));
+      background: none; box-shadow: inset 0 0 0 0.2rem rgba(var(--cg-ink-rgb),.35); }
     .strip { will-change: transform; }
     .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: hidden; padding: 0 1rem; }
     .cell .bk { font-weight: 900; text-transform: uppercase; white-space: nowrap; line-height: 1; }
@@ -87,12 +87,12 @@
     .pts .win, .pts .cell { height: 13rem; } .pts { flex: 0 0 22rem; }
     .pts .pv { font-size: 7rem; } .pts .tag { font-size: 1.5rem; margin-top: .5rem; }
     .win.bonus { background: var(--cg-gold); animation: glow .5s ease-in-out 6 alternate; }
-    @keyframes glow { to { box-shadow: 0 0 2.5rem var(--cg-gold); } }
+    @keyframes glow { to { box-shadow: 0 0 0 .5rem var(--cg-gold); } }
     .themeband { display: none; }
     body.themed .themeband { display: flex; }
     .themeband .win, .themeband .cell { height: 4.6rem; }
     .themeband .win { background: var(--cg-ink); color: var(--cg-acc); box-shadow: inset 0 0 0 .2rem var(--cg-acc); }
-    .themeband .win:after { background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(0,0,0,.6)); box-shadow: none; }
+    .themeband .win:after { background: none; box-shadow: none; }
     .themeband .bk { font-size: 2.8rem; }
     .themeband .rn { flex: 0 0 22rem; }
     .themeband .rn .win { background: var(--cg-ink); color: #fff; }
@@ -109,8 +109,8 @@
 
     /* Wildcard */
     .wildtop { flex: 0 0 auto; display: flex; align-items: stretch; }
-    .wildtitle { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; background: repeating-linear-gradient(-45deg, var(--cg-gold) 0 1.2rem, var(--cg-ink) 1.2rem 2.4rem); border-radius: 1rem; padding: .8rem; }
-    .wildtitle div { background: var(--cg-ink); border-radius: .6rem; padding: .6rem 1.4rem; font-weight: 900; font-size: 5rem; line-height: 1; color: var(--cg-gold); text-align: center; }
+    .wildtitle { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; background: repeating-linear-gradient(-45deg, var(--cg-gold) 0 1.2rem, var(--cg-ink) 1.2rem 2.4rem); border-radius: calc(1rem * var(--cg-round)); padding: .8rem; }
+    .wildtitle div { background: var(--cg-ink); border-radius: calc(.6rem * var(--cg-round)); padding: .6rem 1.4rem; font-weight: 900; font-size: 5rem; line-height: 1; color: var(--cg-gold); text-align: center; }
     .wildtitle small { display: block; margin-top: .4rem; font-size: 1.3rem; letter-spacing: .14em; color: #fff; font-weight: 700; }
     .wildtop .col { margin-left: 1.2rem; }
     .wildtop .win, .wildtop .cell { height: 8.4rem; }
@@ -124,7 +124,7 @@
     .wild.dense .wc { margin-bottom: .7rem; } .wild.dense .wc .win, .wild.dense .wc .cell { height: 6.9rem; } .wild.dense .wc .bk { font-size: 1.9rem; margin-bottom: .2rem; } .wild.dense .wc .cv { font-size: 3.5rem; }
     .wild.dense .cards { margin-top: .7rem; } .wild.dense .board { margin-top: .6rem; }
     .wc .n { position: absolute; z-index: 2; top: .5rem; left: .7rem; font-weight: 900; font-size: 1.3rem; color: var(--cg-ink); }
-    .wc .got { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 3rem; border-radius: 0 0 .7rem .7rem; background: var(--cg-ink); display: none; align-items: center; justify-content: center; }
+    .wc .got { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 3rem; border-radius: 0 0 calc(.7rem * var(--cg-round)) calc(.7rem * var(--cg-round)); background: var(--cg-ink); display: none; align-items: center; justify-content: center; }
     .wc.done .got { display: flex; } .wc.done .win { background: var(--cg-acc-dk2); }
     .wc.done .cell { justify-content: flex-start; padding-top: .9rem; } .wc.done .bk { font-size: 1.8rem !important; margin-bottom: .3rem; } .wc.done .cv { font-size: 2.6rem !important; }
     .wc .got b { font-weight: 900; font-size: 1.7rem; color: #fff; } .wc .got span { font-weight: 800; font-size: 1.4rem; color: var(--cg-acc); letter-spacing: .08em; margin-left: 1rem; }
@@ -143,20 +143,20 @@
     .say .cg-banner { animation: none; }
     /* .view is already position: absolute, so it anchors #wbanner */
     .wbanner { position: absolute; z-index: 5; left: 0; right: 0; top: 9.6rem; text-align: center; pointer-events: none; }
-    .reqchip { font-weight: 800; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-ink); background: var(--cg-gold); border-radius: .4rem; padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
+    .reqchip { font-weight: 800; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-ink); background: var(--cg-gold); border-radius: calc(.4rem * var(--cg-round)); padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
     .toast { position: absolute; z-index: 10; left: 50%; top: 42%; transform: translate(-50%,-50%) scale(.6); opacity: 0; pointer-events: none; transition: transform .25s cubic-bezier(.2,1.4,.4,1), opacity .2s;
-      background: var(--cg-ink); border: .4rem solid var(--cg-acc); border-radius: 1.4rem; padding: 1.6rem 3.6rem; text-align: center; box-shadow: 0 1rem 4rem rgba(0,0,0,.6); }
+      background: var(--cg-ink); border: .4rem solid var(--cg-acc); border-radius: calc(1.4rem * var(--cg-round)); padding: 1.6rem 3.6rem; text-align: center; box-shadow: .8rem .8rem 0 var(--cg-acc); transform-origin: center; }
     .toast.on { opacity: 1; transform: translate(-50%,-50%) scale(1); }
     .toast b { display: block; font-weight: 900; font-size: 9rem; line-height: 1; color: var(--cg-acc); } .toast span { display: block; margin-top: .6rem; font-weight: 900; font-size: 3.6rem; }
 
     /* Controls bar + settings (mouse/keyboard backup) */
-    .bar { position: absolute; z-index: 30; left: 50%; bottom: .8rem; transform: translateX(-50%); display: flex; align-items: center; background: rgba(var(--cg-deep-rgb),.94); border: .12rem solid var(--cg-line); border-radius: .8rem; padding: .5rem; transition: opacity .3s; white-space: nowrap; }
+    .bar { position: absolute; z-index: 30; left: 50%; bottom: .8rem; transform: translateX(-50%); display: flex; align-items: center; background: rgba(var(--cg-deep-rgb),.94); border: .12rem solid var(--cg-line); border-radius: calc(.8rem * var(--cg-round)); padding: .5rem; transition: opacity .3s; white-space: nowrap; }
     body.idle .bar { opacity: 0; pointer-events: none; }
     button { font: inherit; cursor: pointer; }
-    .bar button, .set button { font-family: "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, monospace; font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--cg-panel2); border: 0; border-radius: .45rem; padding: .7rem 1rem; margin: 0 .25rem; }
+    .bar button, .set button { font-family: var(--cg-label); font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--cg-panel2); border: 0; border-radius: calc(.45rem * var(--cg-round)); padding: .7rem 1rem; margin: 0 .25rem; }
     .bar button.o, .set button.o { background: var(--cg-acc); color: var(--cg-ink); }
     .bar button.w { background: var(--cg-gold); color: var(--cg-ink); }
-    .set { position: absolute; z-index: 40; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52rem; background: var(--cg-ink); border: .3rem solid var(--cg-acc); border-radius: 1.2rem; padding: 2rem 2.4rem; display: none; box-shadow: 0 2rem 6rem rgba(0,0,0,.7); }
+    .set { position: absolute; z-index: 40; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52rem; background: var(--cg-ink); border: .3rem solid var(--cg-acc); border-radius: calc(1.2rem * var(--cg-round)); padding: 2rem 2.4rem; display: none; box-shadow: .8rem .8rem 0 var(--cg-deep); }
     .set.on { display: block; }
     .set h3 { margin: 0 0 1.2rem; font-weight: 900; font-size: 2.8rem; }
     .set .row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-top: .1rem solid var(--cg-line); }
@@ -171,7 +171,7 @@
 <body>
 <div class="stage" id="stage">
   <div class="top">
-    <svg class="mark" data-cg-logo="dark" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect width="64" height="64" rx="14" fill="#19D3FF"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#0B1020" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg>
+    <svg class="mark" data-cg-logo="dark" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect x="3" y="3" width="58" height="58" rx="3" fill="#FFC629" stroke="#15130F" stroke-width="4"/><path d="M27 11h14l-4.5 30h-7z" fill="#15130F"/><rect x="28" y="45" width="10" height="9" fill="#15130F"/></svg>
     <div class="t"><h1 class="wide">SWORD DRILLS</h1><div class="sub mono"><span data-cg-brand>Charge! Games</span> · Bible team game</div></div>
     <div class="sp"></div>
     <div class="reqchip mono" id="reqchip" hidden></div>
@@ -190,7 +190,7 @@
           <li class="wide wild"><b>W</b>Wildcard: 1–6 verses, double points each.</li>
         </ol>
         <div class="pline mono" id="ptsline"></div>
-        <a class="home mono" href="../" data-cg-home>⚡ Charge! Games · more games</a>
+        <a class="home mono" href="../" data-cg-home>← More games at Charge! Games</a>
       </div>
       <div class="rgt">
         <div class="qrcard">

@@ -156,6 +156,9 @@ html[data-cg-skin="mysite"] {
   --cg-ink: #1A1A1A; --cg-ink-rgb: 26,26,26;       /* dark background and dark text */
   --cg-gold: #FFFFFF; --cg-gold-rgb: 255,255,255;  /* second accent: leader, wildcard, bonus */
   --cg-disp: "My Display Font", "Arial Black", sans-serif;
+  --cg-font: "My Text Font", system-ui, sans-serif;  /* body text (default Public Sans) */
+  --cg-label: "My Text Font", system-ui, sans-serif; /* small caps labels (default Public Sans) */
+  --cg-round: 1;                                     /* corner radius multiplier (default .2, 0 = square) */
 }
 html[data-cg-skin="mysite"][data-cg-page$="/controller/"] { /* one page only */ }
 html[data-cg-skin="mysite"] img.cg-skin-logo { width: auto !important; }
@@ -169,7 +172,7 @@ stays on the host, so the QR code, the leader remote and the table pages all sta
 get a `?v=` from the page's Last-Modified date, so a deploy here reaches skinned sites within minutes.
 
 Rules for game pages, so skins keep working:
-- Colors and the display font come only from the `--cg-*` variables (no hex values in page CSS, except fixed status greens and reds).
+- Colors, fonts and corner radii come only from the `--cg-*` variables (no hex values in page CSS, except fixed status greens and reds).
 - Brand spots are marked: `data-cg-logo="dark|light"` (logo), `data-cg-brand` (brand name text), `data-cg-home` (home link),
   `data-cg-home-mark` (logo link). Titles end in "Charge! Games".
 - Saved-state keys start with `Charge.NS` (`chargegames`, or the skin's `ns`).

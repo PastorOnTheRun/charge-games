@@ -10,17 +10,17 @@
   <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
   <link rel="stylesheet" href="../../shared/charge-core.css">
   <!-- Who Am I? table device (role "player"): one per table, optional. Sends a team name (the leader approves it) and buzzes in.
        Built on ../../shared/charge-core.js. No sign-in; nothing personal is sent. -->
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; background: var(--cg-ink); }
-    body { min-height: 100vh; min-height: 100dvh; color: var(--cg-text); font: 500 17px Inter, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    body { min-height: 100vh; min-height: 100dvh; color: var(--cg-text); font: 500 17px var(--cg-font);
       padding: calc(10px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); -webkit-user-select: none; user-select: none; }
     .wide { font-family: var(--cg-disp); font-weight: 400; font-synthesis: none; }
-    .mono { font-family: ui-monospace, "SF Mono", "Roboto Mono", Menlo, monospace; }
+    .mono { font-family: var(--cg-label); }
     button { font: inherit; color: inherit; border: 0; touch-action: manipulation; cursor: pointer; }
     button:disabled { opacity: .4; cursor: default; }
     [hidden] { display: none !important; }
@@ -31,38 +31,38 @@
     .hd .r { font-weight: 700; font-size: 11px; letter-spacing: .1em; color: var(--cg-acc); text-transform: uppercase; margin-top: 3px; }
     .pill { flex: 0 0 auto; font-weight: 800; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; border-radius: 999px; padding: 6px 10px; background: var(--cg-panel2); color: var(--cg-mute2); }
     .pill.on { color: #4ade80; } .pill.bk { color: var(--cg-gold); } .pill.off { background: var(--cg-gold); color: var(--cg-ink); }
-    .card { background: var(--cg-panel); border: 1px solid var(--cg-line); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+    .card { background: var(--cg-panel); border: 1px solid var(--cg-line); border-radius: calc(14px * var(--cg-round)); padding: 16px; margin-bottom: 12px; }
     h2 { margin: 0 0 6px; font-size: 22px; }
     p { margin: 0 0 12px; color: var(--cg-mute2); line-height: 1.4; font-size: 15px; }
-    input { width: 100%; min-height: 54px; font: 700 20px Inter, -apple-system, sans-serif; padding: 0 14px; border: 2px solid var(--cg-line); border-radius: 12px; background: #fff; color: var(--cg-ink); }
+    input { width: 100%; min-height: 54px; font: 700 20px var(--cg-font); padding: 0 14px; border: 2px solid var(--cg-line); border-radius: calc(12px * var(--cg-round)); background: #fff; color: var(--cg-ink); }
     input.code { font: 400 40px var(--cg-disp); text-align: center; letter-spacing: .12em; text-transform: uppercase; }
     input:focus { outline: 3px solid var(--cg-acc); outline-offset: 2px; }
-    .big { display: block; width: 100%; min-height: 58px; margin-top: 12px; border-radius: 12px; background: var(--cg-acc); color: var(--cg-ink); font: 400 20px var(--cg-disp); }
+    .big { display: block; width: 100%; min-height: 58px; margin-top: 12px; border-radius: calc(12px * var(--cg-round)); background: var(--cg-acc); color: var(--cg-ink); font: 400 20px var(--cg-disp); }
     .err { color: #FF8FA3; font-weight: 700; margin-top: 10px; min-height: 22px; font-size: 15px; }
     .nums { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 50vh; overflow-y: auto; }
-    .nums button { min-height: 54px; border-radius: 10px; background: var(--cg-panel2); color: #fff; font: 400 20px var(--cg-disp); }
+    .nums button { min-height: 54px; border-radius: calc(10px * var(--cg-round)); background: var(--cg-panel2); color: #fff; font: 400 20px var(--cg-disp); }
     .me { display: flex; align-items: center; }
     .me .nm { flex: 1 1 auto; min-width: 0; }
     .me .nm b { display: block; font: 400 26px var(--cg-disp); line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .me .nm span { font-size: 13px; color: var(--cg-mute2); font-weight: 700; }
     .me .sc { font: 400 30px var(--cg-disp); color: var(--cg-gold); margin-left: 10px; }
     .chg { background: none; color: var(--cg-acc); font-weight: 800; font-size: 14px; text-decoration: underline; min-height: 44px; padding: 0; margin-top: 4px; }
-    .ns { margin-top: 10px; border-radius: 10px; padding: 10px 12px; font-weight: 700; font-size: 15px; line-height: 1.35; }
+    .ns { margin-top: 10px; border-radius: calc(10px * var(--cg-round)); padding: 10px 12px; font-weight: 700; font-size: 15px; line-height: 1.35; }
     .ns.wait { background: rgba(var(--cg-gold-rgb),.14); color: var(--cg-gold-lt); border: 1px solid rgba(var(--cg-gold-rgb),.4); }
     .ns.no { background: rgba(244,63,94,.14); color: #FF8FA3; border: 1px solid rgba(244,63,94,.45); }
     .ns.ok { background: rgba(34,197,94,.14); color: #86EFAC; border: 1px solid rgba(34,197,94,.4); }
-    .row { display: flex; } .row input { border-radius: 12px 0 0 12px; } .row button { flex: 0 0 auto; min-height: 54px; padding: 0 16px; border-radius: 0 12px 12px 0; background: var(--cg-acc); color: var(--cg-ink); font-weight: 900; }
-    .bz { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 220px; border-radius: 26px; background: var(--cg-acc); color: var(--cg-ink); font: 400 54px var(--cg-disp); box-shadow: 0 10px 0 var(--cg-acc-dk), 0 0 40px rgba(var(--cg-acc-rgb),.35); }
-    .bz small { font: 800 15px Inter, -apple-system, sans-serif; margin-top: 6px; }
+    .row { display: flex; } .row input { border-radius: calc(12px * var(--cg-round)) 0 0 calc(12px * var(--cg-round)); } .row button { flex: 0 0 auto; min-height: 54px; padding: 0 16px; border-radius: 0 calc(12px * var(--cg-round)) calc(12px * var(--cg-round)) 0; background: var(--cg-acc); color: var(--cg-ink); font-weight: 900; }
+    .bz { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 220px; border-radius: calc(26px * var(--cg-round)); background: var(--cg-acc); color: var(--cg-ink); font: 400 54px var(--cg-disp); box-shadow: 0 10px 0 var(--cg-acc-dk); }
+    .bz small { font: 800 15px var(--cg-font); margin-top: 6px; }
     .bz:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 4px 0 var(--cg-acc-dk); }
-    .bz.mine, .bz.mine:disabled { color: var(--cg-ink); background: var(--cg-gold); box-shadow: 0 10px 0 var(--cg-gold-dk), 0 0 50px rgba(var(--cg-gold-rgb),.5); }
+    .bz.mine, .bz.mine:disabled { color: var(--cg-ink); background: var(--cg-gold); box-shadow: 0 10px 0 var(--cg-gold-dk); }
     .bz:disabled { opacity: 1; background: var(--cg-panel2); color: var(--cg-mute); box-shadow: none; }
     .q { text-align: center; margin: 12px 0 4px; font-weight: 800; color: var(--cg-mute2); }
   </style>
 </head>
 <body>
   <div class="hd">
-    <svg class="mark" data-cg-logo="dark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#19D3FF"/><path d="M38 5 14 37h15l-5 22 26-34H35z" fill="#0B1020" stroke="#FFC53D" stroke-width="3" stroke-linejoin="round"/></svg>
+    <svg class="mark" data-cg-logo="dark" viewBox="0 0 64 64" aria-hidden="true"><rect x="3" y="3" width="58" height="58" rx="3" fill="#FFC629" stroke="#15130F" stroke-width="4"/><path d="M27 11h14l-4.5 30h-7z" fill="#15130F"/><rect x="28" y="45" width="10" height="9" fill="#15130F"/></svg>
     <div class="t"><h1 class="wide">WHO AM I?</h1><div class="r mono" id="room">Table</div></div>
     <div class="pill mono" id="pill">Not joined</div>
   </div>
