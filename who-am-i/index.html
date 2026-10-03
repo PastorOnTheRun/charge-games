@@ -96,12 +96,12 @@
     .lad span { flex: 1 1 0; margin: 0 .2rem; padding: .35rem 0; border-radius: .4rem; background: var(--cg-panel2); color: var(--cg-mute); font-weight: 800; font-size: 1.15rem; }
     .lad span.now { background: var(--cg-acc); color: var(--cg-ink); } .lad span.gone { opacity: .35; text-decoration: line-through; }
     .say { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 900; font-size: 3.6rem; line-height: 1.1; color: var(--cg-mute); padding: 0 .4rem; }
-    .say.go { color: var(--cg-acc); font-size: 4.4rem; animation: pulse .7s ease-in-out infinite alternate; }
+    .say.go { color: var(--cg-acc); font-size: 4.4rem; white-space: nowrap; animation: pulse .7s ease-in-out infinite alternate; }
     .say .cg-banner { flex-direction: column; font-size: 2.8rem; padding: 1rem 1.4rem; } .say .cg-banner small { margin: .5rem 0 0; }
     @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
     .ans { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; background: var(--cg-gold); color: var(--cg-ink); border-radius: 1.2rem; padding: 1.4rem; animation: cin .5s both; }
     .ans .lab2 { color: var(--cg-ink); }
-    .ans .nm { font-family: var(--cg-disp); font-size: 5.2rem; line-height: 1.02; margin: .5rem 0 .7rem; overflow-wrap: anywhere; }
+    .ans .nm { font-family: var(--cg-disp); font-size: 5.2rem; line-height: 1.02; margin: .5rem 0 .7rem; }
     .ans .rf { font-weight: 800; font-size: 1.6rem; letter-spacing: .04em; }
     .ans .wh { margin-top: 1.2rem; padding-top: 1rem; border-top: .15rem solid rgba(var(--cg-ink-rgb),.25); font-family: var(--cg-disp); font-size: 2.6rem; line-height: 1.1; }
     .ans .wh small { display: block; font: 800 1.2rem "SF Mono", "Roboto Mono", monospace; letter-spacing: .1em; text-transform: uppercase; margin-top: .4rem; }
@@ -335,9 +335,11 @@
     else if (live && buzzT !== null) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner">' + esc(core.label(buzzT)) + " buzzed in!<small>Who is it?</small></span>"; }
     else if (live && lw) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner no">✕ ' + esc(core.label(lw.t)) + "<small>" + (S.core.lockout ? "sits out · buzzers open" : "buzzers open") + "</small></span>"; }
     else if (live) { say.className = "say wide go"; say.textContent = "WHO AM I?"; }
+    say.style.fontSize = "";
+    if (live && say.classList.contains("go")) for (var f = 0; f < 10 && say.scrollWidth > say.clientWidth; f++) say.style.fontSize = (parseFloat(getComputedStyle(say).fontSize) * 0.92) + "px";   // wide display fonts (skins)
     if (r && !live) {
       var c = CH[r.c];
-      $("ansname").textContent = c.name; $("ansref").textContent = c.ref + " (CSB)";
+      var nm = $("ansname"); nm.textContent = c.name; nm.style.fontSize = ""; $("ansref").textContent = c.ref + " (CSB)";
       $("answho").innerHTML = r.to !== null ? esc(core.label(r.to)) + " +" + r.got + "<small>after " + (r.shown) + " clue" + (r.shown > 1 ? "s" : "") + "</small>" : "Nobody got it<small>" + (finished() ? "last round · final scores next" : "next character coming") + "</small>";
       if (r.to !== null && finished()) $("answho").innerHTML += "<small>last round · final scores next</small>";
     }
@@ -346,6 +348,7 @@
     var X = { buzz: buzzT, locked: q ? core.lockedFor(q) : [], finished: finished() && S.view === "scores", hit: hitT };
     board.game.render(T, X); board.scores.render(T, X);
     fitClues();
+    var nm2 = $("ansname"); if (!$("ans").hidden) for (var g = 0; g < 14 && (nm2.scrollWidth > nm2.clientWidth + 1 || nm2.getBoundingClientRect().height > parseFloat(getComputedStyle(nm2).fontSize) * 2.2); g++) nm2.style.fontSize = (parseFloat(getComputedStyle(nm2).fontSize) * 0.92) + "px";   // whole words, at most 2 lines
     $("scoretitle").innerHTML = finished() ? 'Final <span>scores</span>' : 'Score<span>board</span>';
     sel("s-rounds", String(S.rounds)); sel("s-clues", String(S.clues)); sel("s-ladder", S.ladder); sel("s-filter", S.filter); sel("s-lock", S.core.lockout ? "1" : "0");
     $("s-ladhint").textContent = ladder(S.clues, S.ladder).join(" / ") + " for clue 1 to " + S.clues;
