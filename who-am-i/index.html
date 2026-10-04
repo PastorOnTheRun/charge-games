@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@500;700;800&family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&family=Bagel+Fat+One&family=Big+Shoulders:opsz,wght@10..72,600..900&display=swap">
   <link rel="stylesheet" href="../shared/charge-core.css">
   <!-- Who Am I? team game, TV/projector screen, built on ../shared/charge-core.js. The screen holds the game state (localStorage);
        the leader remote (./controller/) and optional table buzzers (./table/) join by room code / QR.
@@ -19,13 +19,14 @@
     @supports (width: min(1vw, 1vh)) { html { font-size: min(1vw, 1.7778vh); } }
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; overflow: hidden; background: var(--cg-deep); }
-    body { color: #fff; font-family: var(--cg-font); display: flex; align-items: center; justify-content: center; }
+    body { color: var(--cg-fg); font-family: var(--cg-font); display: flex; align-items: center; justify-content: center; }
     body.idle, body.idle * { cursor: none !important; }
     .mono { font-family: var(--cg-label); }
+    :root { --cg-game: #A78BFF; --cg-game-dk: #5B3FD1; }   /* Who Am I? game color (6.8:1 with ink); skins fall back to their accent */
     .wide { font-family: var(--cg-disp); } .wide, .wide * { font-synthesis: none; }
     .stage {
       position: relative; overflow: hidden; width: 100rem; height: 56.25rem; flex: 0 0 auto; padding: 1.8rem 2.4rem 2rem;
-      background-color: var(--cg-ink); 
+      background-color: var(--cg-bg);
       display: flex; flex-direction: column;
     }
     /* Header */
@@ -33,14 +34,14 @@
     .top .mark { height: 5.2rem; width: 5.2rem; display: block; flex: 0 0 auto; }
     .top .t { margin-left: 1.8rem; padding-left: 1.8rem; border-left: 0.2rem solid var(--cg-acc); }
     .top h1 { margin: 0; font-weight: 900; font-size: 3.1rem; line-height: 1; letter-spacing: .01em; }
-    .top .sub { margin-top: .45rem; font-weight: 700; font-size: 1.15rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cg-acc); }
+    .top .sub { margin-top: .45rem; font-weight: 700; font-size: 1.15rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cg-game-tx); }
     .top .sp { flex: 1; }
     .chip { font-weight: 700; font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-mute); border: 0.12rem solid var(--cg-line); border-radius: calc(0.4rem * var(--cg-round)); padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
     .join { display: flex; align-items: center; background: var(--cg-panel); border: 0.12rem solid var(--cg-line); border-radius: calc(0.6rem * var(--cg-round)); padding: .5rem .6rem .5rem 1.1rem; }
     .join .l { font-weight: 700; font-size: 1.05rem; letter-spacing: .1em; color: var(--cg-mute2); text-transform: uppercase; line-height: 1.25; margin-right: 1rem; }
-    .join .c { font-weight: 900; font-size: 3rem; letter-spacing: .06em; color: var(--cg-acc); line-height: 1; }
+    .join .c { font-weight: 900; font-size: 3rem; letter-spacing: .06em; color: var(--cg-acc-tx); line-height: 1; }
     .dot { display: inline-block; width: 1rem; height: 1rem; border-radius: 50%; background: var(--cg-mute3); margin-left: 1rem; }
-    .dot.on { background: #4ade80; }
+    .dot.on { background: var(--cg-ok); }
     .dot.wait { background: var(--cg-acc); }
     .main { position: relative; flex: 1 1 0; min-height: 0; margin-top: 1.4rem; }
     .view { position: absolute; inset: 0; display: none; flex-direction: column; }
@@ -49,13 +50,13 @@
     /* Rules */
     .rules { flex-direction: row !important; }
     .rules .lft { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
-    .rules h2 { margin: .2rem 0 1.2rem; font-weight: 900; font-size: 5.2rem; line-height: .95; color: var(--cg-acc); }
+    .rules h2 { margin: .2rem 0 1.2rem; font-weight: 900; font-size: 5.2rem; line-height: .95; color: var(--cg-acc-tx); }
     .rules ol { margin: 0; padding: 0; list-style: none; }
     .rules li { display: flex; align-items: center; font-weight: 850; font-size: 2.5rem; line-height: 1.15; margin-bottom: 1.05rem; }
     .rules li b { flex: 0 0 3.8rem; height: 3.8rem; margin-right: 1.6rem; background: var(--cg-acc); color: var(--cg-ink); border-radius: calc(.4rem * var(--cg-round)); display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900; }
     .rules li.wild b { background: var(--cg-gold); }
     .rules .pline { margin-top: auto; padding-bottom: .2rem; font-weight: 700; font-size: 1.45rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-soft); line-height: 1.6; }
-    .rules .pline span { color: var(--cg-acc); }
+    .rules .pline span { color: var(--cg-acc-tx); }
     .rules .home { align-self: flex-start; margin-top: .9rem; font-weight: 800; font-size: 1.15rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-gold); text-decoration: none; border: .12rem solid var(--cg-line); border-radius: calc(.45rem * var(--cg-round)); padding: .45rem .8rem; }
     .rules .home:hover { border-color: var(--cg-gold); }
     .rules .rgt { flex: 0 0 27rem; margin-left: 3rem; display: flex; flex-direction: column; justify-content: center; }
@@ -75,11 +76,11 @@
     .clue { flex: 1 1 0; min-height: 0; display: flex; align-items: center; background: var(--cg-panel); border: .2rem solid var(--cg-line); border-radius: calc(1rem * var(--cg-round)); padding: .6rem 1.4rem .6rem .8rem; margin-bottom: .8rem; overflow: hidden; }
     .clue:last-child { margin-bottom: 0; }
     .clue b { flex: 0 0 4.4rem; height: 4.4rem; border-radius: calc(.6rem * var(--cg-round)); background: var(--cg-panel2); color: var(--cg-mute); display: flex; align-items: center; justify-content: center; font-family: var(--cg-disp); font-weight: 400; font-size: 2.6rem; margin-right: 1.4rem; }
-    .clue span { flex: 1 1 auto; min-width: 0; font-weight: 800; font-size: 2.5rem; line-height: 1.18; color: #fff; }
+    .clue span { flex: 1 1 auto; min-width: 0; font-weight: 800; font-size: 2.5rem; line-height: 1.18; color: var(--cg-fg); }
     .clue i { flex: 0 0 auto; margin-left: 1.2rem; font-style: normal; font-family: var(--cg-disp); font-size: 2.2rem; color: var(--cg-mute); }
     .clue.off { border-style: dashed; background: transparent; } .clue.off span { color: var(--cg-mute3); font-size: 2rem; letter-spacing: .12em; text-transform: uppercase; font-family: var(--cg-label); }
-    .clue.on b { background: var(--cg-acc); color: var(--cg-ink); } .clue.on i { color: var(--cg-acc); }
-    .clue.new { border-color: var(--cg-acc); animation: cin .5s cubic-bezier(.2,1.2,.4,1) both; }
+    .clue.on b { background: var(--cg-game); color: var(--cg-on-game); } .clue.on i { color: var(--cg-game-tx); }
+    .clue.new { border-color: var(--cg-game); animation: cin .5s cubic-bezier(.2,1.2,.4,1) both; }
     .clue.late { opacity: .55; } .clue.late b { background: var(--cg-panel2); color: var(--cg-soft); }
     /* 13+ tables: the scoreboard takes 2-3 rows, so the clue cards get shorter */
     .game.dense .clue { margin-bottom: .45rem; padding: .25rem 1.2rem .25rem .5rem; border-width: .15rem; }
@@ -90,13 +91,13 @@
     @keyframes cin { from { transform: translateX(-2rem); opacity: 0; } to { transform: none; opacity: 1; } }
     .side { flex: 0 0 30rem; width: 30rem; min-width: 0; margin-left: 1.6rem; display: flex; flex-direction: column; min-height: 0; }
     .pbox { flex: 0 0 auto; background: var(--cg-panel); border: .35rem solid var(--cg-acc); border-radius: calc(1.2rem * var(--cg-round)); padding: 1.2rem 1.4rem 1.3rem; text-align: center; }
-    .lab2 { font-weight: 800; font-size: 1.2rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cg-acc); }
+    .lab2 { font-weight: 800; font-size: 1.2rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cg-game-tx); }
     .pbox .pv { font-family: var(--cg-disp); font-size: 9rem; line-height: 1; margin-top: .4rem; }
     .lad { display: flex; justify-content: center; margin-top: .8rem; }
     .lad span { flex: 1 1 0; margin: 0 .2rem; padding: .35rem 0; border-radius: calc(.4rem * var(--cg-round)); background: var(--cg-panel2); color: var(--cg-mute); font-weight: 800; font-size: 1.15rem; }
     .lad span.now { background: var(--cg-acc); color: var(--cg-ink); } .lad span.gone { opacity: .35; text-decoration: line-through; }
     .say { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 900; font-size: 3.6rem; line-height: 1.1; color: var(--cg-mute); padding: 0 .4rem; }
-    .say.go { color: var(--cg-acc); font-size: 4.4rem; white-space: nowrap; animation: pulse .7s ease-in-out infinite alternate; }
+    .say.go { color: var(--cg-game-tx); font-size: 4.4rem; white-space: nowrap; animation: pulse .7s ease-in-out infinite alternate; }
     .say .cg-banner { flex-direction: column; font-size: 2.8rem; padding: 1rem 1.4rem; } .say .cg-banner small { margin: .5rem 0 0; }
     @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
     .ans { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; background: var(--cg-gold); color: var(--cg-ink); border-radius: calc(1.2rem * var(--cg-round)); padding: 1.4rem; animation: cin .5s both; }
@@ -106,27 +107,27 @@
     .ans .wh { margin-top: 1.2rem; padding-top: 1rem; border-top: .15rem solid rgba(var(--cg-ink-rgb),.25); font-family: var(--cg-disp); font-size: 2.6rem; line-height: 1.1; }
     .ans .wh small { display: block; font: 800 1.2rem var(--cg-label); letter-spacing: .1em; text-transform: uppercase; margin-top: .4rem; }
     .ready { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border: .2rem dashed var(--cg-line); border-radius: calc(1rem * var(--cg-round)); text-align: center; }
-    .ready div { font-family: var(--cg-disp); font-size: 6rem; color: var(--cg-acc); }
+    .ready div { font-family: var(--cg-disp); font-size: 6rem; color: var(--cg-game-tx); }
     .ready p { margin: 1rem 0 0; font-weight: 800; font-size: 2rem; color: var(--cg-mute); }
     /* Scoreboard (shared: ../shared/charge-core.css) */
     .game .board { margin-top: 1rem; flex: 0 0 auto; }
-    .scores h2 { margin: 0 0 1.4rem; font-weight: 900; font-size: 4.6rem; line-height: 1; } .scores h2 span { color: var(--cg-acc); }
+    .scores h2 { margin: 0 0 1.4rem; font-weight: 900; font-size: 4.6rem; line-height: 1; } .scores h2 span { color: var(--cg-acc-tx); }
     .scores .board { flex: 1 1 0; min-height: 0; }
     .say .cg-banner { animation: none; }
     .reqchip { font-weight: 800; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-ink); background: var(--cg-gold); border-radius: calc(.4rem * var(--cg-round)); padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
     .toast { position: absolute; z-index: 10; left: 50%; top: 42%; transform: translate(-50%,-50%) scale(.6); opacity: 0; pointer-events: none; transition: transform .25s cubic-bezier(.2,1.4,.4,1), opacity .2s;
-      background: var(--cg-ink); border: .4rem solid var(--cg-acc); border-radius: calc(1.4rem * var(--cg-round)); padding: 1.6rem 3.6rem; text-align: center; box-shadow: .8rem .8rem 0 var(--cg-acc); transform-origin: center; }
+      background: var(--cg-panel); color: var(--cg-fg); border: .4rem solid var(--cg-acc); border-radius: calc(1.4rem * var(--cg-round)); padding: 1.6rem 3.6rem; text-align: center; box-shadow: .8rem .8rem 0 var(--cg-acc); transform-origin: center; }
     .toast.on { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-    .toast b { display: block; font-weight: 900; font-size: 9rem; line-height: 1; color: var(--cg-acc); } .toast span { display: block; margin-top: .6rem; font-weight: 900; font-size: 3.6rem; }
+    .toast b { display: block; font-weight: 900; font-size: 9rem; line-height: 1; color: var(--cg-acc-tx); } .toast span { display: block; margin-top: .6rem; font-weight: 900; font-size: 3.6rem; }
 
     /* Controls bar + settings (mouse/keyboard backup) */
     .bar { position: absolute; z-index: 30; left: 50%; bottom: .8rem; transform: translateX(-50%); display: flex; align-items: center; background: rgba(var(--cg-deep-rgb),.94); border: .12rem solid var(--cg-line); border-radius: calc(.8rem * var(--cg-round)); padding: .5rem; transition: opacity .3s; white-space: nowrap; }
     body.idle .bar { opacity: 0; pointer-events: none; }
     button { font: inherit; cursor: pointer; }
-    .bar button, .set button { font-family: var(--cg-label); font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--cg-panel2); border: 0; border-radius: calc(.45rem * var(--cg-round)); padding: .7rem 1rem; margin: 0 .25rem; }
+    .bar button, .set button { font-family: var(--cg-label); font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: var(--cg-fg); background: var(--cg-panel2); border: 0; border-radius: calc(.45rem * var(--cg-round)); padding: .7rem 1rem; margin: 0 .25rem; }
     .bar button.o, .set button.o { background: var(--cg-acc); color: var(--cg-ink); }
     .bar button.w { background: var(--cg-gold); color: var(--cg-ink); }
-    .set { position: absolute; z-index: 40; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52rem; background: var(--cg-ink); border: .3rem solid var(--cg-acc); border-radius: calc(1.2rem * var(--cg-round)); padding: 2rem 2.4rem; display: none; box-shadow: .8rem .8rem 0 var(--cg-deep); }
+    .set { position: absolute; z-index: 40; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52rem; background: var(--cg-bg); border: .3rem solid var(--cg-acc); border-radius: calc(1.2rem * var(--cg-round)); padding: 2rem 2.4rem; display: none; box-shadow: .8rem .8rem 0 var(--cg-deep); }
     .set.on { display: block; }
     .set h3 { margin: 0 0 1.2rem; font-weight: 900; font-size: 2.8rem; }
     .set .row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-top: .1rem solid var(--cg-line); }
@@ -136,13 +137,52 @@
     .set .num { display: inline-block; min-width: 4rem; text-align: center; font-weight: 900; font-size: 2.2rem; vertical-align: middle; }
     .set .keys { margin-top: 1rem; color: var(--cg-mute); font-size: 1rem; line-height: 1.6; }
     .set .danger { background: var(--cg-danger-bg) !important; color: #FF6B81 !important; } .set .danger.arm { background: #FF6B81 !important; color: var(--cg-ink) !important; }
+
+    /* ---------- brand 2026 (Charge default only; skins keep the look above) ---------- */
+    html:not([data-cg-skin]) .clue { border: .2rem solid var(--cg-rule); }
+    html:not([data-cg-skin]) .clue b { font-weight: 900; border: .2rem solid transparent; }
+    html:not([data-cg-skin]) .clue span { font-weight: 700; }
+    html:not([data-cg-skin]) .clue i { font-family: var(--cg-label); font-weight: 800; font-size: 1.5rem; letter-spacing: .06em; }
+    html:not([data-cg-skin]) .clue.on { background: var(--cg-paper); border-color: var(--cg-paper); }
+    html:not([data-cg-skin]) .clue.on span { color: var(--cg-ink); }
+    html:not([data-cg-skin]) .clue.on b { background: var(--cg-ink); color: var(--cg-game); }
+    html:not([data-cg-skin]) .clue.on i { color: var(--cg-slate); text-decoration: line-through; }
+    html:not([data-cg-skin]) .clue.on.new { background: var(--cg-game); border-color: var(--cg-ink); box-shadow: 0 0 0 .3rem var(--cg-game); }
+    html:not([data-cg-skin]) .clue.on.new i { color: var(--cg-ink); text-decoration: none; }
+    html:not([data-cg-skin]) .clue.on.new i:after { content: " pts"; }
+    html:not([data-cg-skin]) .clue.off { border-color: var(--cg-rule); }
+    html:not([data-cg-skin]) .clue.off b { background: transparent; border-color: var(--cg-rule); color: var(--cg-mute); }
+    html:not([data-cg-skin]) .clue.off span { color: var(--cg-mute); font-size: 1.7rem; letter-spacing: .08em; }
+    html:not([data-cg-skin]) .clue.late { opacity: .7; } html:not([data-cg-skin]) .clue.late i { text-decoration: none; }
+    :root[data-cg-lights="on"]:not([data-cg-skin]) .clue.on:not(.new) { background: var(--cg-panel); border-color: var(--cg-ink); }
+    html:not([data-cg-skin]) .pbox { position: relative; overflow: hidden; background: var(--cg-game); color: var(--cg-on-game); border: .3rem solid var(--cg-ink); text-align: left; padding: 1.3rem 1.6rem 1.4rem;
+      background-image: radial-gradient(rgba(22,20,15,.16) 28%, transparent 31%); background-size: .9rem .9rem; }
+    html:not([data-cg-skin]) .pbox:after { content: "?"; position: absolute; right: .6rem; top: -1.6rem; font: 400 15rem/1 var(--cg-shout); color: var(--cg-ink); pointer-events: none; }
+    html:not([data-cg-skin]) .pbox .lab2 { position: relative; z-index: 1; color: var(--cg-ink); max-width: 60%; line-height: 1.3; }
+    html:not([data-cg-skin]) .pbox .pv { position: relative; z-index: 1; font-weight: 900; font-size: 11rem; line-height: .9; margin-top: .6rem; }
+    html:not([data-cg-skin]) .lad { position: relative; z-index: 1; margin-top: 1rem; }
+    html:not([data-cg-skin]) .lad span { background: rgba(22,20,15,.14); color: var(--cg-ink); border: .15rem solid var(--cg-ink); text-align: center; }
+    html:not([data-cg-skin]) .lad span.now { background: var(--cg-ink); color: var(--cg-game); }
+    html:not([data-cg-skin]) .lad span.gone { opacity: .45; }
+    html:not([data-cg-skin]) .say { font-size: 3rem; }
+    html:not([data-cg-skin]) .say.go { font-size: 4.6rem; }
+    html:not([data-cg-skin]) .say .cg-banner { font-size: 2.9rem; }
+    html:not([data-cg-skin]) .say .cg-banner small { margin: .6rem 0 0; padding: .5rem 0 0; border-left: 0; border-top: .2rem solid currentColor; }
+    html:not([data-cg-skin]) .ans { border: .3rem solid var(--cg-ink); box-shadow: 0 0 0 .3rem var(--cg-game); }
+    html:not([data-cg-skin]) .ans .lab2 { color: var(--cg-ink); }
+    html:not([data-cg-skin]) .ans .nm { font-family: var(--cg-shout); font-weight: 400; letter-spacing: -.01em; }
+    html:not([data-cg-skin]) .ans .wh { font-weight: 900; text-transform: uppercase; }
+    html:not([data-cg-skin]) .ready { border-color: var(--cg-rule); }
+    html:not([data-cg-skin]) .ready div { font-family: var(--cg-shout); font-weight: 400; font-size: 8rem; }
+    html:not([data-cg-skin]) .ready p { font-family: var(--cg-label); font-size: 1.6rem; letter-spacing: .08em; text-transform: uppercase; }
   </style>
+  <link rel="stylesheet" href="../shared/charge-screen.css">
 </head>
 <body>
 <div class="stage" id="stage">
   <div class="top">
     <svg class="mark" data-cg-logo="dark" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect x="3" y="3" width="58" height="58" rx="3" fill="#FFC629" stroke="#15130F" stroke-width="4"/><path d="M27 11h14l-4.5 30h-7z" fill="#15130F"/><rect x="28" y="45" width="10" height="9" fill="#15130F"/></svg>
-    <div class="t"><h1 class="wide">WHO AM I?</h1><div class="sub mono"><span data-cg-brand>Charge! Games</span> · Bible character game</div></div>
+    <div class="t"><h1 class="wide">Who Am I?</h1><div class="sub mono"><span data-cg-brand>Charge! Games</span> · Bible character game</div></div>
     <div class="sp"></div>
     <div class="reqchip mono" id="reqchip" hidden></div>
     <div class="chip mono" id="roundchip">10 rounds</div>
@@ -190,7 +230,7 @@
   </div>
   <div class="bar" id="bar">
     <button data-k="rules">Rules</button><button class="o" data-k="next">Next ␣</button><button data-k="reveal">Answer A</button>
-    <button data-k="ok">Correct Y</button><button data-k="no">Wrong N</button><button data-k="scores">Scores B</button><button data-k="undo">Undo U</button><button data-k="settings">Settings O</button><button data-k="fs">Full screen F</button>
+    <button data-k="ok">Correct Y</button><button data-k="no">Wrong N</button><button data-k="scores">Scores B</button><button data-k="undo">Undo U</button><button data-k="lights">Lights L</button><button data-k="settings">Settings O</button><button data-k="fs">Full screen F</button>
   </div>
   <div class="set" id="set" role="dialog" aria-label="Settings">
     <h3 class="wide">Settings</h3>
@@ -200,9 +240,10 @@
     <div class="row"><span>Characters from</span><span class="seg" id="s-filter"><button data-v="all">Whole Bible</button><button data-v="OT">Old Test.</button><button data-v="NT">New Test.</button></span></div>
     <div class="row"><span>Tables<small>2 to 50</small></span><span><button data-k="tminus">−</button><span class="num wide" id="s-tables">6</span><button data-k="tplus">+</button></span></div>
     <div class="row"><span>Wrong answer locks that table out<small>Until the next clue.</small></span><span class="seg" id="s-lock"><button data-v="1">On</button><button data-v="0">Off</button></span></div>
+    <div class="row"><span>Room lights<small>Lights on: a light screen for bright rooms and weak projectors. Key L.</small></span><span class="seg" id="s-lights"><button data-v="0">Dark room</button><button data-v="1">Lights on</button></span></div>
     <div class="row"><span>Reset scores<small>Clears scores and starts over. Press twice.</small></span><button class="danger" id="s-reset" data-k="reset">Reset</button></div>
     <div class="row"><span>Host lock<small id="s-host">No leader remote yet. The first one to open becomes host.</small></span><button data-k="unlock" id="s-unlock">Release</button></div>
-    <div class="keys mono">Keys: Space next clue / next character · A reveal answer · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · [ ] tables · F full screen</div>
+    <div class="keys mono">Keys: Space next clue / next character · A reveal answer · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · L lights · [ ] tables · F full screen</div>
     <div style="text-align:right;margin-top:1rem"><button class="o" data-k="settings">Done</button></div>
   </div>
 </div>
@@ -334,7 +375,7 @@
     if (!r) { say.className = "say wide"; say.textContent = "Ready?"; }
     else if (live && buzzT !== null) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner">' + esc(core.label(buzzT)) + " buzzed in!<small>Who is it?</small></span>"; }
     else if (live && lw) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner no">✕ ' + esc(core.label(lw.t)) + "<small>" + (S.core.lockout ? "sits out · buzzers open" : "buzzers open") + "</small></span>"; }
-    else if (live) { say.className = "say wide go"; say.textContent = "WHO AM I?"; }
+    else if (live) { say.className = "say wide go"; say.textContent = "Who am I?"; }
     say.style.fontSize = "";
     if (live && say.classList.contains("go")) for (var f = 0; f < 10 && say.scrollWidth > say.clientWidth; f++) say.style.fontSize = (parseFloat(getComputedStyle(say).fontSize) * 0.92) + "px";   // wide display fonts (skins)
     if (r && !live) {
@@ -350,7 +391,7 @@
     fitClues();
     var nm2 = $("ansname"); if (!$("ans").hidden) for (var g = 0; g < 14 && (nm2.scrollWidth > nm2.clientWidth + 1 || nm2.getBoundingClientRect().height > parseFloat(getComputedStyle(nm2).fontSize) * 2.2); g++) nm2.style.fontSize = (parseFloat(getComputedStyle(nm2).fontSize) * 0.92) + "px";   // whole words, at most 2 lines
     $("scoretitle").innerHTML = finished() ? 'Final <span>scores</span>' : 'Score<span>board</span>';
-    sel("s-rounds", String(S.rounds)); sel("s-clues", String(S.clues)); sel("s-ladder", S.ladder); sel("s-filter", S.filter); sel("s-lock", S.core.lockout ? "1" : "0");
+    sel("s-rounds", String(S.rounds)); sel("s-clues", String(S.clues)); sel("s-ladder", S.ladder); sel("s-filter", S.filter); sel("s-lock", S.core.lockout ? "1" : "0"); sel("s-lights", S.core.lights ? "1" : "0");
     $("s-ladhint").textContent = ladder(S.clues, S.ladder).join(" / ") + " for clue 1 to " + S.clues;
     $("s-tables").textContent = S.core.n;
     var nreq = S.core.requests.length; $("reqchip").hidden = !nreq; $("reqchip").textContent = nreq + " name request" + (nreq > 1 ? "s" : "") + " · approve on the phone";
@@ -418,13 +459,14 @@
     else if (k === "ok") judge(true); else if (k === "no") judge(false);
     else if (k === "reset") armReset(btn || $("s-reset"));
     else if (k === "unlock") link.releaseLock();
+    else if (k === "lights") core.setLights(!S.core.lights);
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); }
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest("button"), tb = e.target.closest(".cg-tb");
     if (b) { var sg = b.parentNode.id, v = b.getAttribute("data-v");
       if (sg === "s-rounds") setOpt("rounds", +v); else if (sg === "s-clues") setOpt("clues", +v); else if (sg === "s-ladder") setOpt("ladder", v); else if (sg === "s-filter") setOpt("filter", v);
-      else if (sg === "s-lock") core.setLockout(v === "1"); else key(b.getAttribute("data-k"), b);
+      else if (sg === "s-lock") core.setLockout(v === "1"); else if (sg === "s-lights") core.setLights(v === "1"); else key(b.getAttribute("data-k"), b);
       b.blur(); return; }
     if (tb && !$("set").classList.contains("on")) buzz(+tb.getAttribute("data-t"), "remote");
   });
@@ -440,6 +482,7 @@
     else if (k === "u" || k === "U" || k === "Backspace") undo();
     else if (k === "r" || k === "R") view("rules"); else if (k === "g" || k === "G") view("game"); else if (k === "b" || k === "B" || k === "s" || k === "S") view("scores");
     else if (k === "o" || k === "O") settings(); else if (k === "Escape") settings(false);
+    else if (k === "l" || k === "L") core.setLights(!S.core.lights);
     else if (k === "[") core.setCount(S.core.n - 1); else if (k === "]") core.setCount(S.core.n + 1);
     else if (k === "f" || k === "F") key("fs");
     poke();

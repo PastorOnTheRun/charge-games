@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@500;700;800&family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&family=Bagel+Fat+One&family=Big+Shoulders:opsz,wght@10..72,600..900&display=swap">
   <link rel="stylesheet" href="../shared/charge-core.css">
   <!-- Sword Drills team game, TV/projector screen. The screen holds the game state
        (localStorage) and the phone controller (./controller/) joins by room code / QR via ./link.js.
@@ -19,13 +19,13 @@
     @supports (width: min(1vw, 1vh)) { html { font-size: min(1vw, 1.7778vh); } }
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; overflow: hidden; background: var(--cg-deep); }
-    body { color: #fff; font-family: var(--cg-font); display: flex; align-items: center; justify-content: center; }
+    body { color: var(--cg-fg); font-family: var(--cg-font); display: flex; align-items: center; justify-content: center; }
     body.idle, body.idle * { cursor: none !important; }
     .mono { font-family: var(--cg-label); }
     .wide { font-family: var(--cg-disp); } .wide, .wide * { font-synthesis: none; }
     .stage {
       position: relative; overflow: hidden; width: 100rem; height: 56.25rem; flex: 0 0 auto; padding: 1.8rem 2.4rem 2rem;
-      background-color: var(--cg-ink); 
+      background-color: var(--cg-bg);
       display: flex; flex-direction: column;
     }
     /* Header */
@@ -33,14 +33,14 @@
     .top .mark { height: 5.2rem; width: 5.2rem; display: block; flex: 0 0 auto; }
     .top .t { margin-left: 1.8rem; padding-left: 1.8rem; border-left: 0.2rem solid var(--cg-acc); }
     .top h1 { margin: 0; font-weight: 900; font-size: 3.1rem; line-height: 1; letter-spacing: .01em; }
-    .top .sub { margin-top: .45rem; font-weight: 700; font-size: 1.15rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cg-acc); }
+    .top .sub { margin-top: .45rem; font-weight: 700; font-size: 1.15rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cg-game-tx); }
     .top .sp { flex: 1; }
     .chip { font-weight: 700; font-size: 1.1rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-mute); border: 0.12rem solid var(--cg-line); border-radius: calc(0.4rem * var(--cg-round)); padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
     .join { display: flex; align-items: center; background: var(--cg-panel); border: 0.12rem solid var(--cg-line); border-radius: calc(0.6rem * var(--cg-round)); padding: .5rem .6rem .5rem 1.1rem; }
     .join .l { font-weight: 700; font-size: 1.05rem; letter-spacing: .1em; color: var(--cg-mute2); text-transform: uppercase; line-height: 1.25; margin-right: 1rem; }
-    .join .c { font-weight: 900; font-size: 3rem; letter-spacing: .06em; color: var(--cg-acc); line-height: 1; }
+    .join .c { font-weight: 900; font-size: 3rem; letter-spacing: .06em; color: var(--cg-acc-tx); line-height: 1; }
     .dot { display: inline-block; width: 1rem; height: 1rem; border-radius: 50%; background: var(--cg-mute3); margin-left: 1rem; }
-    .dot.on { background: #4ade80; }
+    .dot.on { background: var(--cg-ok); }
     .dot.wait { background: var(--cg-acc); }
     .main { position: relative; flex: 1 1 0; min-height: 0; margin-top: 1.4rem; }
     .view { position: absolute; inset: 0; display: none; flex-direction: column; }
@@ -49,13 +49,13 @@
     /* Rules */
     .rules { flex-direction: row !important; }
     .rules .lft { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
-    .rules h2 { margin: .2rem 0 1.2rem; font-weight: 900; font-size: 5.2rem; line-height: .95; color: var(--cg-acc); }
+    .rules h2 { margin: .2rem 0 1.2rem; font-weight: 900; font-size: 5.2rem; line-height: .95; color: var(--cg-acc-tx); }
     .rules ol { margin: 0; padding: 0; list-style: none; }
     .rules li { display: flex; align-items: center; font-weight: 850; font-size: 2.5rem; line-height: 1.15; margin-bottom: 1.05rem; }
     .rules li b { flex: 0 0 3.8rem; height: 3.8rem; margin-right: 1.6rem; background: var(--cg-acc); color: var(--cg-ink); border-radius: calc(.4rem * var(--cg-round)); display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900; }
     .rules li.wild b { background: var(--cg-gold); }
     .rules .pline { margin-top: auto; padding-bottom: .2rem; font-weight: 700; font-size: 1.45rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-soft); line-height: 1.6; }
-    .rules .pline span { color: var(--cg-acc); }
+    .rules .pline span { color: var(--cg-acc-tx); }
     .rules .home { align-self: flex-start; margin-top: .9rem; font-weight: 800; font-size: 1.15rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-gold); text-decoration: none; border: .12rem solid var(--cg-line); border-radius: calc(.45rem * var(--cg-round)); padding: .45rem .8rem; }
     .rules .home:hover { border-color: var(--cg-gold); }
     .rules .rgt { flex: 0 0 27rem; margin-left: 3rem; display: flex; flex-direction: column; justify-content: center; }
@@ -71,7 +71,7 @@
     .slot { flex: 0 0 auto; display: flex; background: var(--cg-panel); border: 0.35rem solid var(--cg-acc); border-radius: calc(1.4rem * var(--cg-round)); padding: 1rem 1.2rem 1.2rem; }
     .col { display: flex; flex-direction: column; min-width: 0; }
     .col + .col { margin-left: 1.2rem; }
-    .col .lab { font-weight: 800; font-size: 1.2rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cg-acc); margin: 0 0 .6rem .2rem; white-space: nowrap; }
+    .col .lab { font-weight: 800; font-size: 1.2rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cg-acc-tx); margin: 0 0 .6rem .2rem; white-space: nowrap; }
     .col .lab span { color: var(--cg-mute); }
     .win { position: relative; overflow: hidden; background: var(--cg-acc); color: var(--cg-ink); border-radius: calc(.7rem * var(--cg-round)); }
     .win:after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: calc(.7rem * var(--cg-round));
@@ -95,7 +95,7 @@
     .themeband .win:after { background: none; box-shadow: none; }
     .themeband .bk { font-size: 2.8rem; }
     .themeband .rn { flex: 0 0 22rem; }
-    .themeband .rn .win { background: var(--cg-ink); color: #fff; }
+    .themeband .rn .win { background: var(--cg-ink); color: var(--cg-paper); }
     .themeband .rn .pv { font-size: 2.6rem; }
     body.themed .ref .win, body.themed .ref .cell, body.themed .pts .win, body.themed .pts .cell { height: 10rem; }
     body.themed .say.go { font-size: 4.2rem; } body.themed .slot { padding-top: .8rem; padding-bottom: 1rem; }
@@ -103,15 +103,15 @@
     .slotwrap { flex: 0 0 auto; display: flex; flex-direction: column; }
     .slotwrap .themeband { margin-bottom: 1rem; }
     .say { flex: 1 1 0; min-height: 4.2rem; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 900; font-size: 3.4rem; letter-spacing: .02em; color: var(--cg-mute); }
-    .say.go { color: var(--cg-acc); font-size: 5.2rem; animation: pulse .7s ease-in-out infinite alternate; }
-    .say.up { color: #fff; }
+    .say.go { color: var(--cg-acc-tx); font-size: 5.2rem; animation: pulse .7s ease-in-out infinite alternate; }
+    .say.up { color: var(--cg-fg); }
     @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
 
     /* Wildcard */
     .wildtop { flex: 0 0 auto; display: flex; align-items: stretch; }
     .wildtitle { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; background: repeating-linear-gradient(-45deg, var(--cg-gold) 0 1.2rem, var(--cg-ink) 1.2rem 2.4rem); border-radius: calc(1rem * var(--cg-round)); padding: .8rem; }
     .wildtitle div { background: var(--cg-ink); border-radius: calc(.6rem * var(--cg-round)); padding: .6rem 1.4rem; font-weight: 900; font-size: 5rem; line-height: 1; color: var(--cg-gold); text-align: center; }
-    .wildtitle small { display: block; margin-top: .4rem; font-size: 1.3rem; letter-spacing: .14em; color: #fff; font-weight: 700; }
+    .wildtitle small { display: block; margin-top: .4rem; font-size: 1.3rem; letter-spacing: .14em; color: var(--cg-paper); font-weight: 700; }
     .wildtop .col { margin-left: 1.2rem; }
     .wildtop .win, .wildtop .cell { height: 8.4rem; }
     .wcount { flex: 0 0 15rem; } .wpts { flex: 0 0 19rem; }
@@ -127,8 +127,8 @@
     .wc .got { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 3rem; border-radius: 0 0 calc(.7rem * var(--cg-round)) calc(.7rem * var(--cg-round)); background: var(--cg-ink); display: none; align-items: center; justify-content: center; }
     .wc.done .got { display: flex; } .wc.done .win { background: var(--cg-acc-dk2); }
     .wc.done .cell { justify-content: flex-start; padding-top: .9rem; } .wc.done .bk { font-size: 1.8rem !important; margin-bottom: .3rem; } .wc.done .cv { font-size: 2.6rem !important; }
-    .wc .got b { font-weight: 900; font-size: 1.7rem; color: #fff; } .wc .got span { font-weight: 800; font-size: 1.4rem; color: var(--cg-acc); letter-spacing: .08em; margin-left: 1rem; }
-    .wc.next .win { box-shadow: 0 0 0 .35rem #fff; }
+    .wc .got b { font-weight: 900; font-size: 1.7rem; color: var(--cg-paper); } .wc .got span { font-weight: 800; font-size: 1.4rem; color: var(--cg-acc); letter-spacing: .08em; margin-left: 1rem; }
+    .wc.next .win { box-shadow: 0 0 0 .35rem var(--cg-fg); }
     .intro { position: absolute; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; flex-direction: column; background: var(--cg-ink); }
     .intro.on { display: flex; animation: introbg .6s steps(1) infinite; }   /* under 3 flashes per second */
     @keyframes introbg { 50% { background: var(--cg-gold); } }
@@ -138,25 +138,25 @@
 
     /* Scoreboard (shared: ../shared/charge-core.css) */
     .game .board, .wild .board { margin-top: 1rem; flex: 0 0 auto; }
-    .scores h2 { margin: 0 0 1.4rem; font-weight: 900; font-size: 4.6rem; line-height: 1; } .scores h2 span { color: var(--cg-acc); }
+    .scores h2 { margin: 0 0 1.4rem; font-weight: 900; font-size: 4.6rem; line-height: 1; } .scores h2 span { color: var(--cg-acc-tx); }
     .scores .board { flex: 1 1 0; min-height: 0; }
     .say .cg-banner { animation: none; }
     /* .view is already position: absolute, so it anchors #wbanner */
     .wbanner { position: absolute; z-index: 5; left: 0; right: 0; top: 9.6rem; text-align: center; pointer-events: none; }
     .reqchip { font-weight: 800; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cg-ink); background: var(--cg-gold); border-radius: calc(.4rem * var(--cg-round)); padding: .5rem .8rem; margin-right: 1.2rem; white-space: nowrap; }
     .toast { position: absolute; z-index: 10; left: 50%; top: 42%; transform: translate(-50%,-50%) scale(.6); opacity: 0; pointer-events: none; transition: transform .25s cubic-bezier(.2,1.4,.4,1), opacity .2s;
-      background: var(--cg-ink); border: .4rem solid var(--cg-acc); border-radius: calc(1.4rem * var(--cg-round)); padding: 1.6rem 3.6rem; text-align: center; box-shadow: .8rem .8rem 0 var(--cg-acc); transform-origin: center; }
+      background: var(--cg-panel); color: var(--cg-fg); border: .4rem solid var(--cg-acc); border-radius: calc(1.4rem * var(--cg-round)); padding: 1.6rem 3.6rem; text-align: center; box-shadow: .8rem .8rem 0 var(--cg-acc); transform-origin: center; }
     .toast.on { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-    .toast b { display: block; font-weight: 900; font-size: 9rem; line-height: 1; color: var(--cg-acc); } .toast span { display: block; margin-top: .6rem; font-weight: 900; font-size: 3.6rem; }
+    .toast b { display: block; font-weight: 900; font-size: 9rem; line-height: 1; color: var(--cg-acc-tx); } .toast span { display: block; margin-top: .6rem; font-weight: 900; font-size: 3.6rem; }
 
     /* Controls bar + settings (mouse/keyboard backup) */
     .bar { position: absolute; z-index: 30; left: 50%; bottom: .8rem; transform: translateX(-50%); display: flex; align-items: center; background: rgba(var(--cg-deep-rgb),.94); border: .12rem solid var(--cg-line); border-radius: calc(.8rem * var(--cg-round)); padding: .5rem; transition: opacity .3s; white-space: nowrap; }
     body.idle .bar { opacity: 0; pointer-events: none; }
     button { font: inherit; cursor: pointer; }
-    .bar button, .set button { font-family: var(--cg-label); font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--cg-panel2); border: 0; border-radius: calc(.45rem * var(--cg-round)); padding: .7rem 1rem; margin: 0 .25rem; }
+    .bar button, .set button { font-family: var(--cg-label); font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: var(--cg-fg); background: var(--cg-panel2); border: 0; border-radius: calc(.45rem * var(--cg-round)); padding: .7rem 1rem; margin: 0 .25rem; }
     .bar button.o, .set button.o { background: var(--cg-acc); color: var(--cg-ink); }
     .bar button.w { background: var(--cg-gold); color: var(--cg-ink); }
-    .set { position: absolute; z-index: 40; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52rem; background: var(--cg-ink); border: .3rem solid var(--cg-acc); border-radius: calc(1.2rem * var(--cg-round)); padding: 2rem 2.4rem; display: none; box-shadow: .8rem .8rem 0 var(--cg-deep); }
+    .set { position: absolute; z-index: 40; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 52rem; background: var(--cg-bg); border: .3rem solid var(--cg-acc); border-radius: calc(1.2rem * var(--cg-round)); padding: 2rem 2.4rem; display: none; box-shadow: .8rem .8rem 0 var(--cg-deep); }
     .set.on { display: block; }
     .set h3 { margin: 0 0 1.2rem; font-weight: 900; font-size: 2.8rem; }
     .set .row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-top: .1rem solid var(--cg-line); }
@@ -166,13 +166,48 @@
     .set .num { display: inline-block; min-width: 4rem; text-align: center; font-weight: 900; font-size: 2.2rem; vertical-align: middle; }
     .set .keys { margin-top: 1rem; color: var(--cg-mute); font-size: 1rem; line-height: 1.6; }
     .set .danger { background: var(--cg-danger-bg) !important; color: #FF6B81 !important; } .set .danger.arm { background: #FF6B81 !important; color: var(--cg-ink) !important; }
+
+    /* ---------- brand 2026 (Charge default only; skins keep the look above) ---------- */
+    html:not([data-cg-skin]) .slot { background: transparent; border: 0; padding: 0; }
+    html:not([data-cg-skin]) .col .lab { font-weight: 800; letter-spacing: .1em; color: var(--cg-mute); margin-bottom: .7rem; }
+    html:not([data-cg-skin]) .col .lab span { color: var(--cg-acc-tx); }
+    html:not([data-cg-skin]) .win { border: .3rem solid var(--cg-ink); border-radius: calc(1.2rem * var(--cg-round)); box-shadow: 0 0 0 .3rem var(--cg-acc); }
+    html:not([data-cg-skin]) .win:after { box-shadow: none; }
+    html:not([data-cg-skin]) .ref .win, html:not([data-cg-skin]) .ref .cell { height: 15.4rem; }
+    html:not([data-cg-skin]) .ref .bk { font-size: 4.4rem; margin-bottom: .2rem; letter-spacing: .01em; } html:not([data-cg-skin]) .ref .cv { font-size: 10rem; line-height: .9; }
+    html:not([data-cg-skin]) .pts .win, html:not([data-cg-skin]) .pts .cell { height: 15.4rem; }
+    html:not([data-cg-skin]) .pts .win { background: var(--cg-panel); color: var(--cg-fg); border-color: var(--cg-rule); box-shadow: none; }
+    html:not([data-cg-skin]) .pts .pv { font-size: 9.6rem; line-height: .9; } html:not([data-cg-skin]) .pts .tag { color: var(--cg-acc-tx); font-size: 1.5rem; }
+    html:not([data-cg-skin]) .pts .win.bonus { background: var(--cg-acc); color: var(--cg-ink); border-color: var(--cg-ink); box-shadow: 0 0 0 .3rem var(--cg-acc); }
+    html:not([data-cg-skin]) .pts .win.bonus .tag { color: var(--cg-ink); }
+    html:not([data-cg-skin]) .cell .bk, html:not([data-cg-skin]) .cell .cv, html:not([data-cg-skin]) .cell .pv { font-variant-numeric: lining-nums; }
+    html:not([data-cg-skin]) .themeband .win { border-color: var(--cg-acc); box-shadow: none; }
+    html:not([data-cg-skin]) .themeband .bk { font-size: 3rem; }
+    html:not([data-cg-skin]) body.themed .ref .win, html:not([data-cg-skin]) body.themed .ref .cell, html:not([data-cg-skin]) body.themed .pts .win, html:not([data-cg-skin]) body.themed .pts .cell { height: 11rem; }
+    html:not([data-cg-skin]) body.themed .ref .cv { font-size: 7rem; } html:not([data-cg-skin]) body.themed .ref .bk { font-size: 3.4rem; } html:not([data-cg-skin]) body.themed .pts .pv { font-size: 7rem; }
+    html:not([data-cg-skin]) .say { font-size: 3.2rem; }
+    html:not([data-cg-skin]) .say.go { font-size: 6rem; }
+    html:not([data-cg-skin]) body.themed .say.go { font-size: 4.6rem; }
+    html:not([data-cg-skin]) .wildtitle { background: repeating-linear-gradient(-45deg, var(--cg-acc) 0 1.2rem, var(--cg-ink) 1.2rem 2.4rem); border: .3rem solid var(--cg-ink); }
+    html:not([data-cg-skin]) .wildtitle div { font-family: var(--cg-shout); font-weight: 400; color: var(--cg-acc); letter-spacing: -.01em; }
+    html:not([data-cg-skin]) .wildtop .win, html:not([data-cg-skin]) .wc .win { box-shadow: none; }
+    html:not([data-cg-skin]) .wcount .win { background: var(--cg-paper); }
+    html:not([data-cg-skin]) .wc .n { font-family: var(--cg-label); }
+    html:not([data-cg-skin]) .wc.next .win { box-shadow: 0 0 0 .35rem var(--cg-fg); }
+    html:not([data-cg-skin]) .intro div { font-family: var(--cg-shout); font-weight: 400; color: var(--cg-acc); letter-spacing: -.01em; }
+    html:not([data-cg-skin]) .intro p { font-family: var(--cg-label); }
+    @keyframes introbg { 50% { background: var(--cg-acc); } }
+    html:not([data-cg-skin]) .intro.on div { animation-name: zoom, introfg; animation-duration: 2.2s, .6s; animation-timing-function: cubic-bezier(.2,.9,.3,1.2), steps(1); animation-iteration-count: 1, infinite; animation-fill-mode: both, none; }
+    @keyframes introfg { 50% { color: var(--cg-ink); text-shadow: .6rem .6rem 0 var(--cg-paper); } }
+    :root[data-cg-lights="on"] .wcount .win { border: .3rem solid var(--cg-ink); }
   </style>
+  <link rel="stylesheet" href="../shared/charge-screen.css">
 </head>
 <body>
 <div class="stage" id="stage">
   <div class="top">
     <svg class="mark" data-cg-logo="dark" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect x="3" y="3" width="58" height="58" rx="3" fill="#FFC629" stroke="#15130F" stroke-width="4"/><path d="M27 11h14l-4.5 30h-7z" fill="#15130F"/><rect x="28" y="45" width="10" height="9" fill="#15130F"/></svg>
-    <div class="t"><h1 class="wide">SWORD DRILLS</h1><div class="sub mono"><span data-cg-brand>Charge! Games</span> · Bible team game</div></div>
+    <div class="t"><h1 class="wide">Sword Drills</h1><div class="sub mono"><span data-cg-brand>Charge! Games</span> · Bible team game</div></div>
     <div class="sp"></div>
     <div class="reqchip mono" id="reqchip" hidden></div>
     <div class="chip mono" id="modechip">Classic</div>
@@ -235,7 +270,7 @@
   <div class="intro" id="intro"><div class="wide">WILDCARD</div><p class="mono" id="introsub">Double points</p></div>
   <div class="bar" id="bar">
     <button data-k="rules">Rules</button><button class="o" data-k="spin">Spin ␣</button><button class="w" data-k="wild">Wildcard W</button>
-    <button data-k="ok">Correct Y</button><button data-k="no">Wrong N</button><button data-k="scores">Scores B</button><button data-k="undo">Undo U</button><button data-k="settings">Settings O</button><button data-k="fs">Full screen F</button>
+    <button data-k="ok">Correct Y</button><button data-k="no">Wrong N</button><button data-k="scores">Scores B</button><button data-k="undo">Undo U</button><button data-k="lights">Lights L</button><button data-k="settings">Settings O</button><button data-k="fs">Full screen F</button>
   </div>
   <div class="set" id="set" role="dialog" aria-label="Settings">
     <h3 class="wide">Settings</h3>
@@ -244,9 +279,10 @@
     <div class="row"><span>Verses per themed round</span><span class="seg" id="s-per"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></span></div>
     <div class="row"><span>End with a Wildcard round<small>Wildcard becomes the final round, then final scores.</small></span><span class="seg" id="s-final"><button data-v="0">Off</button><button data-v="1">On</button></span></div>
     <div class="row"><span>Wrong answer locks that table out<small>For the rest of that question.</small></span><span class="seg" id="s-lock"><button data-v="1">On</button><button data-v="0">Off</button></span></div>
+    <div class="row"><span>Room lights<small>Lights on: a light screen for bright rooms and weak projectors. Key L.</small></span><span class="seg" id="s-lights"><button data-v="0">Dark room</button><button data-v="1">Lights on</button></span></div>
     <div class="row"><span>Reset scores<small>Clears scores and the current spin. Press twice.</small></span><button class="danger" id="s-reset" data-k="reset">Reset</button></div>
     <div class="row"><span>Host lock<small id="s-host">No leader remote yet. The first one to open becomes host.</small></span><button data-k="unlock" id="s-unlock">Release</button></div>
-    <div class="keys mono">Keys: Space spin · W wildcard · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · M mode · [ ] tables · F full screen</div>
+    <div class="keys mono">Keys: Space spin · W wildcard · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · M mode · L lights · [ ] tables · F full screen</div>
     <div style="text-align:right;margin-top:1rem"><button class="o" data-k="settings">Done</button></div>
   </div>
 </div>
@@ -451,7 +487,7 @@
         if (sp.to !== null) { say.className = "say wide up"; say.textContent = core.label(sp.to) + " +" + sp.pts; }
         else if (buzzT !== null) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner">' + esc(core.label(buzzT)) + ' buzzed in!<small>Is it right?</small></span>'; }
         else if (lw) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner no">✕ ' + esc(core.label(lw.t)) + '<small>' + (S.core.lockout ? "locked out · buzzers open" : "buzzers open") + '</small></span>'; }
-        else { say.className = "say wide go"; say.textContent = "CHARGE!"; }
+        else { say.className = "say wide go"; say.textContent = "Charge!"; }
         $("refnote").textContent = sp.theme ? "· " + sp.theme : "";
         $("w-pts").classList.toggle("bonus", !!sp.bonus);
       } else if (!sp || sp.kind !== "std") {
@@ -470,7 +506,7 @@
     board.game.render(T, X); board.wild.render(T, X); board.scores.render(T, X);
     $("v-wild").classList.toggle("dense", T.n > 12);   // 3-row scoreboard: shorter verse cards so both fit
     $("scoretitle").innerHTML = finished() ? 'Final <span>scores</span>' : 'Score<span>board</span>';
-    sel("s-mode", S.mode); sel("s-per", String(S.per)); sel("s-final", S.finalWild ? "1" : "0"); sel("s-lock", S.core.lockout ? "1" : "0");
+    sel("s-mode", S.mode); sel("s-per", String(S.per)); sel("s-final", S.finalWild ? "1" : "0"); sel("s-lock", S.core.lockout ? "1" : "0"); sel("s-lights", S.core.lights ? "1" : "0");
     $("s-per").classList.toggle("off", S.mode !== "themed"); $("s-tables").textContent = S.core.n;
     var nreq = S.core.requests.length; $("reqchip").hidden = !nreq; $("reqchip").textContent = nreq + " name request" + (nreq > 1 ? "s" : "") + " · approve on the phone";
   }
@@ -533,12 +569,13 @@
     else if (k === "ok") judge(true); else if (k === "no") judge(false);
     else if (k === "reset") armReset(btn || $("s-reset"));
     else if (k === "unlock") link.releaseLock();
+    else if (k === "lights") core.setLights(!S.core.lights);
     else if (k === "fs") { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {}); }
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest("button"), tb = e.target.closest(".cg-tb");
     if (b) { var sg = b.parentNode.id; var v = b.getAttribute("data-v");
-      if (sg === "s-mode") setMode(v); else if (sg === "s-per") setPer(+v); else if (sg === "s-final") setFinal(v === "1"); else if (sg === "s-lock") core.setLockout(v === "1"); else key(b.getAttribute("data-k"), b);
+      if (sg === "s-mode") setMode(v); else if (sg === "s-per") setPer(+v); else if (sg === "s-final") setFinal(v === "1"); else if (sg === "s-lock") core.setLockout(v === "1"); else if (sg === "s-lights") core.setLights(v === "1"); else key(b.getAttribute("data-k"), b);
       b.blur(); return; }
     if (tb && !$("set").classList.contains("on")) buzz(+tb.getAttribute("data-t"), null, "remote");
   });
@@ -555,6 +592,7 @@
     else if (k === "u" || k === "U" || k === "Backspace") undo();
     else if (k === "r" || k === "R") view("rules"); else if (k === "g" || k === "G") view("game"); else if (k === "b" || k === "B" || k === "s" || k === "S") view("scores");
     else if (k === "o" || k === "O") settings(); else if (k === "Escape") settings(false);
+    else if (k === "l" || k === "L") core.setLights(!S.core.lights);
     else if (k === "m" || k === "M") setMode(S.mode === "themed" ? "classic" : "themed");
     else if (k === "[") core.setCount(S.core.n - 1); else if (k === "]") core.setCount(S.core.n + 1);
     else if (k === "f" || k === "F") key("fs");

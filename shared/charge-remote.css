@@ -1,0 +1,65 @@
+/* Charge! Games phone look, brand 2026: the leader remote and the table buzzers. Loaded after each phone page's own <style>.
+   Newsprint + ink, hard edges, hard offset shadows; big targets (48 px and up). Brand rules are scoped to
+   html:not([data-cg-skin]) so a skinned site keeps its own look. Colors only come from --cg-* variables. */
+html[data-cg-skin] .hd h1 { text-transform: uppercase; }
+html:not([data-cg-skin]) .hd .mark { transform: rotate(-6deg); }
+html:not([data-cg-skin]) .hd .t { border-left: 0; padding-left: 0; }
+html:not([data-cg-skin]) .hd h1 { font-family: var(--cg-shout); font-weight: 400; font-size: 21px; line-height: 1; letter-spacing: -.01em; text-transform: none; }
+html:not([data-cg-skin]) .hd .r { letter-spacing: .08em; }
+html:not([data-cg-skin]) .pill { border-radius: 999px; }
+html:not([data-cg-skin]) .wide { font-weight: 900; }
+html:not([data-cg-skin]) button:focus-visible, html:not([data-cg-skin]) input:focus-visible { outline: 3px solid var(--cg-acc); outline-offset: 2px; box-shadow: 0 0 0 6px var(--cg-ink); }
+
+/* ---------- leader remote (light page) ---------- */
+html:not([data-cg-skin]) body.cg-remote { background-color: var(--cg-paper); background-image: radial-gradient(rgba(22,20,15,.11) 1px, transparent 1.4px); background-size: 20px 20px; }
+html:not([data-cg-skin]) .cg-remote .pill.on { color: var(--cg-ok); }
+html:not([data-cg-skin]) .cg-remote .card { border: 3px solid var(--cg-ink); box-shadow: 5px 5px 0 var(--cg-ink); }
+html:not([data-cg-skin]) .cg-remote .join h2 { text-transform: uppercase; font-size: 30px; }
+html:not([data-cg-skin]) .cg-remote .join p { color: var(--cg-slate); }
+html:not([data-cg-skin]) .cg-remote .join input { font-weight: 900; border-width: 3px; }
+html:not([data-cg-skin]) .cg-remote .big { border: 3px solid var(--cg-ink); box-shadow: 4px 4px 0 var(--cg-ink); text-transform: uppercase; }
+html:not([data-cg-skin]) .cg-remote .now { border: 3px solid var(--cg-ink); box-shadow: 4px 4px 0 var(--cg-game); }
+html:not([data-cg-skin]) .cg-remote .now .k { color: var(--cg-game); letter-spacing: .08em; }
+html:not([data-cg-skin]) .cg-remote .now .ref { text-transform: uppercase; font-size: 30px; line-height: 1.02; }
+html:not([data-cg-skin]) .cg-remote .now .ans b { font-weight: 900; font-size: 30px; text-transform: uppercase; }
+html:not([data-cg-skin]) .cg-remote .now .cl small { color: var(--cg-game); }
+html:not([data-cg-skin]) .cg-remote .chips button { border: 2px solid var(--cg-rule); }
+html:not([data-cg-skin]) .cg-remote .chips button.sel { border-color: var(--cg-acc); }
+/* the two big buttons: the game color for the main action, ink for the second */
+html:not([data-cg-skin]) .cg-remote .spin, html:not([data-cg-skin]) .cg-remote .go { background: var(--cg-game); color: var(--cg-on-game); border: 3px solid var(--cg-ink); box-shadow: 5px 5px 0 var(--cg-ink); text-transform: uppercase; }
+html:not([data-cg-skin]) .cg-remote .spin { font-size: 32px; }
+html:not([data-cg-skin]) .cg-remote .wildb, html:not([data-cg-skin]) .cg-remote .rev { border: 3px solid var(--cg-ink); box-shadow: 5px 5px 0 var(--cg-game); }
+html:not([data-cg-skin]) .cg-remote .spin:active:not(:disabled), html:not([data-cg-skin]) .cg-remote .go:active:not(:disabled),
+html:not([data-cg-skin]) .cg-remote .wildb:active:not(:disabled), html:not([data-cg-skin]) .cg-remote .rev:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--cg-ink); }
+html:not([data-cg-skin]) .cg-remote .lab { color: var(--cg-slate); letter-spacing: .1em; }
+html:not([data-cg-skin]) .cg-remote .row4 button { border: 2px solid var(--cg-ink); }
+html:not([data-cg-skin]) .cg-remote .row4 button.dk { box-shadow: 3px 3px 0 var(--cg-acc); }
+html:not([data-cg-skin]) .cg-remote .cg-tile { border-width: 2px; }
+html:not([data-cg-skin]) .cg-remote .sheet .in { border-top: 4px solid var(--cg-ink); }
+html:not([data-cg-skin]) .cg-remote .sheet h2 { font-family: var(--cg-shout); font-weight: 400; font-size: 28px; }
+html:not([data-cg-skin]) .cg-remote .seg { border-width: 2px; }
+html:not([data-cg-skin]) .cg-remote .seg button + button { border-left-width: 2px; }
+html:not([data-cg-skin]) .cg-remote .seg button.sel { background: var(--cg-acc); font-weight: 900; }
+html:not([data-cg-skin]) .cg-remote .danger { border-color: var(--cg-no-dk) !important; color: var(--cg-no-dk); }
+html:not([data-cg-skin]) .cg-remote .danger.arm { background: var(--cg-no); color: var(--cg-ink); }
+html:not([data-cg-skin]) .cg-remote .link, html:not([data-cg-skin]) .cg-remote .err { color: var(--cg-acc-dk); }
+html:not([data-cg-skin]) .cg-remote .rq .bt button { border: 2px solid var(--cg-ink); color: var(--cg-ink); }
+html:not([data-cg-skin]) .cg-remote .rq .ap { background: var(--cg-ok); } html:not([data-cg-skin]) .cg-remote .rq .rj { background: var(--cg-no); }
+
+/* ---------- table buzzer (dark page) ---------- */
+html:not([data-cg-skin]) body.cg-table { background-image: radial-gradient(rgba(243,236,221,.08) 1px, transparent 1.4px); background-size: 20px 20px; }
+html:not([data-cg-skin]) .cg-table .hd .r { color: var(--cg-game); }
+html:not([data-cg-skin]) .cg-table .pill.on { color: var(--cg-ok); }
+html:not([data-cg-skin]) .cg-table .card { border: 2px solid var(--cg-rule); }
+html:not([data-cg-skin]) .cg-table h2 { text-transform: uppercase; font-size: 26px; }
+html:not([data-cg-skin]) .cg-table .big { border: 3px solid var(--cg-ink); box-shadow: 0 0 0 2px var(--cg-acc); text-transform: uppercase; font-weight: 900; }
+html:not([data-cg-skin]) .cg-table .nums button { border: 2px solid var(--cg-rule); font-weight: 900; }
+html:not([data-cg-skin]) .cg-table .me .nm b, html:not([data-cg-skin]) .cg-table .me .sc { font-weight: 900; }
+html:not([data-cg-skin]) .cg-table .bz { font-family: var(--cg-shout); font-weight: 400; text-transform: none; letter-spacing: -.01em; background: var(--cg-game); color: var(--cg-on-game); border: 4px solid var(--cg-ink); box-shadow: 0 0 0 4px var(--cg-game), 0 12px 0 4px var(--cg-acc-dk); }
+html:not([data-cg-skin]) .cg-table .bz:active:not(:disabled) { transform: translateY(8px); box-shadow: 0 0 0 4px var(--cg-game), 0 4px 0 4px var(--cg-acc-dk); }
+html:not([data-cg-skin]) .cg-table .bz.mine, html:not([data-cg-skin]) .cg-table .bz.mine:disabled { background: var(--cg-paper); color: var(--cg-ink); box-shadow: 0 0 0 4px var(--cg-paper), 0 12px 0 4px var(--cg-gold-dk); }
+html:not([data-cg-skin]) .cg-table .bz:disabled { background: var(--cg-panel2); color: var(--cg-mute); border-color: var(--cg-rule); box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .spin:active, .go:active, .wildb:active, .rev:active, .bz:active { transform: none !important; }
+}

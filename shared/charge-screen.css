@@ -1,0 +1,77 @@
+/* Charge! Games big-screen look, brand 2026 ("Loud covers, clear calls"). Loaded by every screen page after its own <style>.
+   The live screen is a calm, high-contrast scoreboard: one shout (Bagel Fat One) for the game title and the buzz call,
+   Big Shoulders for references and numbers, hard edges and hard offset shadows, no glows.
+   Brand rules here are scoped to html:not([data-cg-skin]), so a skinned site (see README "Skins") keeps its own look;
+   the lights-on and reduced-motion rules at the end apply everywhere. Colors only come from --cg-* variables. */
+
+/* skins keep their all-caps titles (the Charge default writes them in mixed case for the shout face) */
+html[data-cg-skin] .top h1, html[data-cg-skin] .say.go { text-transform: uppercase; }
+
+/* ---------- stage + header ---------- */
+html:not([data-cg-skin]) .stage { background-image: radial-gradient(rgba(243,236,221,.07) .09rem, transparent .12rem); background-size: 1.6rem 1.6rem; }
+html:not([data-cg-skin])[data-cg-lights="on"] .stage { background-image: radial-gradient(rgba(22,20,15,.09) .09rem, transparent .12rem); }
+html:not([data-cg-skin]) .top .mark { transform: rotate(-6deg); height: 4.8rem; width: 4.8rem; }
+html:not([data-cg-skin]) .top .t { border-left: 0; margin-left: 1.3rem; padding-left: 0; }
+html:not([data-cg-skin]) .top h1 { font-family: var(--cg-shout); font-weight: 400; font-size: 3.7rem; line-height: .95; letter-spacing: -.01em; text-transform: none; }
+html:not([data-cg-skin]) .top .sub { font-weight: 800; font-size: 1.15rem; letter-spacing: .1em; margin-top: .35rem; }
+html:not([data-cg-skin]) .chip { color: var(--cg-fg); border: .2rem solid var(--cg-rule); border-radius: 99rem; padding: .55rem 1.2rem; font-weight: 800; }
+html:not([data-cg-skin]) .reqchip { border-radius: 99rem; border: .2rem solid var(--cg-ink); padding: .5rem 1.1rem; }
+html:not([data-cg-skin]) .join { border: .2rem solid var(--cg-rule); padding: .5rem .9rem .5rem 1.1rem; }
+html:not([data-cg-skin]) .join .l { color: var(--cg-mute); font-weight: 800; }
+html:not([data-cg-skin]) .join .c { font-weight: 900; font-size: 3.4rem; letter-spacing: .04em; }
+
+/* ---------- rules + QR ---------- */
+html:not([data-cg-skin]) .rules h2 { font-size: 6rem; text-transform: uppercase; line-height: .9; margin-bottom: 1.6rem; }
+html:not([data-cg-skin]) .rules li { font-family: var(--cg-font); font-weight: 800; font-size: 2.35rem; line-height: 1.2; }
+html:not([data-cg-skin]) .rules li b { font-family: var(--cg-disp); background: var(--cg-game); color: var(--cg-on-game); border: .2rem solid var(--cg-ink); box-shadow: .3rem .3rem 0 var(--cg-ink); }
+html:not([data-cg-skin])[data-cg-lights="on"] .rules li b { box-shadow: .3rem .3rem 0 var(--cg-ink); }
+html:not([data-cg-skin]) .rules li.wild b { background: var(--cg-gold); }
+html:not([data-cg-skin]) .rules .pline { font-weight: 800; font-size: 1.35rem; }
+html:not([data-cg-skin]) .rules .home { border: .2rem solid var(--cg-rule); border-radius: 99rem; padding: .55rem 1.1rem; color: var(--cg-fg); }
+html:not([data-cg-skin]) .qrcard { border: .35rem solid var(--cg-ink); box-shadow: .9rem .9rem 0 var(--cg-acc); transform: rotate(1deg); }
+html:not([data-cg-skin])[data-cg-lights="on"] .qrcard { box-shadow: .9rem .9rem 0 var(--cg-ink); }
+html:not([data-cg-skin]) .qrcard .k { font-weight: 800; letter-spacing: .06em; }
+html:not([data-cg-skin]) .qrcard .code { font-weight: 900; font-size: 6.6rem; letter-spacing: .04em; }
+
+/* ---------- the call: "Charge!" / buzz banner / toast ---------- */
+html:not([data-cg-skin]) .say { font-weight: 900; text-transform: uppercase; letter-spacing: .01em; }
+html:not([data-cg-skin]) .say.go { font-family: var(--cg-shout); font-weight: 400; text-transform: none; letter-spacing: -.01em; animation: cg-land .42s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes cg-land { from { transform: scale(.7) rotate(-4deg); opacity: 0; } to { transform: rotate(-2deg); opacity: 1; } }
+html:not([data-cg-skin]) .say .cg-banner, html:not([data-cg-skin]) .wbanner .cg-banner { font-size: 3.6rem; text-transform: none; letter-spacing: -.01em; }
+html:not([data-cg-skin]) .toast { border: .4rem solid var(--cg-ink); box-shadow: 0 0 0 .4rem var(--cg-acc), 1.2rem 1.2rem 0 .4rem var(--cg-ink); background: var(--cg-acc); color: var(--cg-ink); }
+html:not([data-cg-skin]) .toast b { color: var(--cg-ink); font-size: 10rem; }
+html:not([data-cg-skin]) .toast span { font-family: var(--cg-shout); font-weight: 400; font-size: 3.6rem; letter-spacing: -.01em; }
+
+/* ---------- scoreboard ---------- */
+html:not([data-cg-skin]) .scores h2 { text-transform: uppercase; font-size: 5.2rem; }
+html:not([data-cg-skin]) .cg-tb { border-width: .2rem; }
+html:not([data-cg-skin]) .cg-tb.lead { box-shadow: .35rem .35rem 0 var(--cg-acc); }
+html:not([data-cg-skin])[data-cg-lights="on"] .cg-tb.lead { box-shadow: .35rem .35rem 0 var(--cg-acc); }
+
+/* ---------- mouse/keyboard bar + settings ---------- */
+html:not([data-cg-skin]) .bar { border: .2rem solid var(--cg-rule); }
+html:not([data-cg-skin]) .bar button, html:not([data-cg-skin]) .set button { font-weight: 800; letter-spacing: .04em; }
+html:not([data-cg-skin]) .set { border: .3rem solid var(--cg-ink); box-shadow: 0 0 0 .3rem var(--cg-acc), 1.2rem 1.2rem 0 .3rem var(--cg-deep); }
+html:not([data-cg-skin]) .set h3 { font-family: var(--cg-shout); font-weight: 400; font-size: 3rem; }
+
+/* settings: one more row (Room lights) than before, so keep the dialog inside the stage */
+.set { max-height: 53rem; overflow-y: auto; }
+.set .row { padding: .75rem 0; }
+
+/* ---------- lights on (every skin): fills that sat on a dark stage get an ink edge so they hold on paper ---------- */
+:root[data-cg-lights="on"] .qrcard { border: .3rem solid var(--cg-ink); }
+:root[data-cg-lights="on"] .bar { background: rgba(var(--cg-deep-rgb), .96); }
+:root[data-cg-lights="on"] .set .danger { color: var(--cg-no-dk) !important; }
+:root[data-cg-lights="on"] .set .danger.arm { background: var(--cg-no) !important; color: var(--cg-ink) !important; }
+
+/* ---------- reduced motion (every skin): nothing pulses, flashes or zooms; results land in place ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .say.go, html:not([data-cg-skin]) .say.go { animation: none !important; }
+  .toast { transition: opacity .15s !important; }
+  .bar { transition: none !important; }
+  /* Sword Drills: reels jump straight to the result (the game still waits the usual time before buzzers open) */
+  .strip { transition: none !important; }
+  .win.bonus, .intro.on, .intro div { animation: none !important; }
+  /* Who Am I?: clues and the answer appear in place */
+  .clue.new, .ans { animation: none !important; }
+}

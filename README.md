@@ -13,6 +13,7 @@ Live site: https://pastorontherun.github.io/charge-games/
 | `who-am-i/` | Who Am I?, big-screen (host); `controller/` leader remote; `table/` table buzzer |
 | `who-am-i/characters.js` | Who Am I? characters (5 clues each, hard to easy, CSB reference); review list in `who-am-i/CHARACTERS.md` |
 | `shared/charge-core.js`, `shared/charge-core.css` | Shared core every game uses |
+| `shared/charge-screen.css`, `shared/charge-remote.css` | Charge look (brand 2026) for the big-screen pages and the phone pages; brand rules skip skinned sites |
 | `shared/charge-embed.js` | Runs a game page on another site under that site's skin (see Skins) |
 | `shared/vendor/` | PeerJS (MIT, `LICENSE-peerjs.txt`) and qrcode-generator (MIT) |
 | `assets/` | Favicon, touch icon, OG image, logo mark |
@@ -158,7 +159,10 @@ html[data-cg-skin="mysite"] {
   --cg-disp: "My Display Font", "Arial Black", sans-serif;
   --cg-font: "My Text Font", system-ui, sans-serif;  /* body text (default Public Sans) */
   --cg-label: "My Text Font", system-ui, sans-serif; /* small caps labels (default Public Sans) */
-  --cg-round: 1;                                     /* corner radius multiplier (default .2, 0 = square) */
+  --cg-round: 1;                                     /* corner radius multiplier (default .5, 0 = square) */
+  /* optional (brand 2026; under a skin they default to the skin's own accent and display face): */
+  --cg-shout: "My Display Font";                     /* game titles and the buzz call (Charge: Bagel Fat One) */
+  --cg-game: #E4572E; --cg-game-dk: #9A3412;         /* this game's color (Charge: yellow for Sword Drills, violet for Who Am I?) */
 }
 html[data-cg-skin="mysite"][data-cg-page$="/controller/"] { /* one page only */ }
 html[data-cg-skin="mysite"] img.cg-skin-logo { width: auto !important; }
@@ -170,6 +174,21 @@ How it works: the embed fetches the game page from this site and copies its styl
 making relative URLs absolute to this site. Then it adds the skin CSS and runs the game's scripts in order. `location`
 stays on the host, so the QR code, the leader remote and the table pages all stay on the host site. Script and CSS URLs
 get a `?v=` from the page's Last-Modified date, so a deploy here reaches skinned sites within minutes.
+
+**Charge default look (brand 2026, "Loud covers, clear calls").** Warm black `#16140F`, newsprint `#F3ECDD`, Charge yellow
+`#FFC629`, one color per game, hard edges and hard offset shadows. Fonts (SIL OFL, Google Fonts): Bagel Fat One (shout:
+game titles, the buzz call), Big Shoulders (references, scores, headings), Atkinson Hyperlegible Next (text), Atkinson
+Hyperlegible Mono (labels). Screen pages load `shared/charge-screen.css` and phone pages `shared/charge-remote.css` after their
+own styles; their brand rules are scoped to `html:not([data-cg-skin])`, so a skinned site keeps its look.
+
+**Room lights.** The leader can switch the big screen to a light "lights on" look for bright rooms and weak projectors
+(remote Settings → Room lights, or `L` on the screen). It is saved with the game (`core.lights {on}`) and sets
+`<html data-cg-lights="on">`, which swaps the surface variables (`--cg-bg`, `--cg-fg`, `--cg-panel`, `--cg-line`, `--cg-mute`,
+`--cg-acc-tx`). It works under skins too: their paper, ink and accent stay, and a skin's light logo replaces its dark one.
+Page CSS paints the stage with `--cg-bg`/`--cg-fg` (not `--cg-ink`/white) and uses `--cg-acc-tx` for accent-colored text.
+
+**Reduced motion.** With the system setting "reduce motion" on, nothing blinks, pulses or flashes; the reels jump straight
+to the result (the game still waits the usual time before buzzers open).
 
 Rules for game pages, so skins keep working:
 - Colors, fonts and corner radii come only from the `--cg-*` variables (no hex values in page CSS, except fixed status greens and reds).
@@ -194,7 +213,7 @@ Every message is JSON: `{ p: 1, t, role, from, id, at, ...body }`.
 
 Lock commands: `lock.pass {hash}`, `lock.cohosts {hash}` (sign out everyone else, new passcode), `lock.release`.
 
-Core commands: `core.teams {n | d}`, `core.rename {i, name}`, `core.approve {id, name?}`, `core.reject {id}`, `core.buzz {team, slot}`, `core.correct {q, team}`, `core.wrong {q, team}`, `core.clearbuzz`, `core.lockout {on}`, `core.undo`, `core.reset`. Games add their own, prefixed (`sd.spin`, `sd.wild`, `sd.mode {mode}`, `sd.per {n}`, `sd.final {on}`, `sd.view {v}`).
+Core commands: `core.teams {n | d}`, `core.rename {i, name}`, `core.approve {id, name?}`, `core.reject {id}`, `core.buzz {team, slot}`, `core.correct {q, team}`, `core.wrong {q, team}`, `core.clearbuzz`, `core.lockout {on}`, `core.lights {on}`, `core.undo`, `core.reset`. Games add their own, prefixed (`sd.spin`, `sd.wild`, `sd.mode {mode}`, `sd.per {n}`, `sd.final {on}`, `sd.view {v}`).
 
 Duplicate `id`s are dropped, so a message can travel over both paths. A host reload starts a new `rev` sequence (clients reset when `from` changes).
 

@@ -1,37 +1,57 @@
 /* Charge! Games core styles: scoreboard (screen, rem units of the 16:9 stage) and remote pieces (phone, px). */
+/* Fonts for the Charge default (all SIL OFL, Google Fonts). Each page loads them with one <link>:
+   https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@500;700;800&family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&family=Bagel+Fat+One&family=Big+Shoulders:opsz,wght@10..72,600..900&display=swap */
 :root {
   /* Theme: every game page reads these. A skin (see README "Skins") overrides them; nothing else needs to change.
-     Charge default: warm black + newsprint cream, one loud accent (marquee yellow), flat colors, hard edges, no glows. */
+     Charge default (brand 2026, "Loud covers, clear calls"): warm black + newsprint, one loud yellow, one color per game,
+     hard edges, hard offset shadows, no glows. */
   --cg-ink: #16140F; --cg-ink-rgb: 22,20,15; --cg-deep: #0E0D0A; --cg-deep-rgb: 14,13,10;
   --cg-panel: #24211B; --cg-panel2: #322E26; --cg-line: #4A4436; --cg-line2: #3C372D;
   --cg-acc: #FFC629; --cg-acc-rgb: 255,198,41; --cg-acc-dk: #7A5600; --cg-acc-dk2: #5E4400; --cg-on-acc: #16140F;
   --cg-gold: #F3ECDD; --cg-gold-rgb: 243,236,221; --cg-gold-dk: #B5AA94; --cg-gold-lt: #FFFFFF;
   --cg-mute: #A8A090; --cg-mute2: #C7BFAE; --cg-mute3: #6F685A; --cg-soft: #DCD4C3; --cg-slate: #5B5446; --cg-text: #F7F2E8;
   --cg-paper: #F3ECDD; --cg-paper2: #E2D8C3; --cg-danger-bg: #3E1A12;
-  --cg-ok: #2EA05A; --cg-no: #E5482F;
-  /* type: a poster display face + a plain text face (both Google Fonts, loaded by each page) */
-  --cg-disp: "Anton", Impact, "Arial Narrow", sans-serif;
-  --cg-font: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --cg-label: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* status (always with a word or icon): ink text on both. Correct 10.3:1, Wrong 5.9:1 */
+  --cg-ok: #3DDC84; --cg-no: #FF5A3C; --cg-on-ok: #16140F; --cg-on-no: #16140F; --cg-ok-dk: #17703D; --cg-no-dk: #B3261E;
+  /* big-screen surface: what the stage is painted with. "Lights on" (bright rooms) swaps these, see below */
+  --cg-bg: var(--cg-ink); --cg-fg: var(--cg-text); --cg-rule: #7A7262;
+  --cg-acc-tx: var(--cg-acc);            /* the accent used as text or thin lines on the stage */
+  /* this game's color (each game page sets --cg-game / --cg-game-dk; Sword Drills = Charge yellow) */
+  --cg-game: var(--cg-acc); --cg-game-dk: var(--cg-acc-dk); --cg-game-tx: var(--cg-game); --cg-on-game: var(--cg-ink);
+  /* type: shout (titles, buzz banner), display (references, scores, headings), text, labels */
+  --cg-shout: "Bagel Fat One", "Arial Rounded MT Bold", "Arial Black", sans-serif;
+  --cg-disp: "Big Shoulders", "Arial Narrow", Impact, sans-serif;
+  --cg-font: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --cg-label: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   /* corners: multiplies every radius (0 = square, 1 = the old soft look) */
-  --cg-round: .2;
+  --cg-round: .5;
   /* "leading" tile on the light leader remote */
   --cg-lead-bg: var(--cg-gold); --cg-lead-ink: var(--cg-ink);
+}
+/* Skins keep their own look: the new brand-2026 pieces fall back to the skin's own accent and display face */
+html[data-cg-skin] { --cg-shout: var(--cg-disp); --cg-game: var(--cg-acc); --cg-game-dk: var(--cg-acc-dk); }
+/* Lights on: for bright rooms and washed-out projectors. Set by the leader (remote Settings, or L on the screen).
+   :root[...] outranks a skin's html[data-cg-skin] rule, so it works under skins too (their paper, ink and accent stay). */
+:root[data-cg-lights="on"] {
+  --cg-bg: var(--cg-paper); --cg-fg: var(--cg-ink); --cg-deep: var(--cg-paper2); --cg-deep-rgb: 226,216,195;
+  --cg-panel: #FFFFFF; --cg-panel2: var(--cg-paper2); --cg-line: #7D7563; --cg-line2: #7D7563; --cg-rule: #7D7563;
+  --cg-mute: var(--cg-slate); --cg-mute2: var(--cg-slate); --cg-mute3: #7D7563; --cg-soft: var(--cg-slate); --cg-text: var(--cg-ink);
+  --cg-acc-tx: var(--cg-acc-dk); --cg-game-tx: var(--cg-game-dk); --cg-danger-bg: #FBE3DD;
 }
 
 /* ---------- screen scoreboard ---------- */
 .cg-board { display: grid; grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr)); gap: .8rem; }
-.cg-tb { position: relative; min-width: 0; background: var(--cg-panel); border: .2rem solid var(--cg-line); border-radius: calc(.8rem * var(--cg-round)); padding: .5rem .9rem .6rem; display: flex; flex-direction: column; justify-content: center; overflow: hidden; color: #fff; cursor: pointer; }
-.cg-nm { font-family: var(--cg-label); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--cg-acc); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cg-sc { font-family: var(--cg-disp); font-synthesis: none; line-height: 1.05; white-space: nowrap; }
+.cg-tb { position: relative; min-width: 0; background: var(--cg-panel); border: .2rem solid var(--cg-rule); border-radius: calc(.8rem * var(--cg-round)); padding: .5rem .9rem .6rem; display: flex; flex-direction: column; justify-content: center; overflow: hidden; color: var(--cg-fg); cursor: pointer; }
+.cg-nm { font-family: var(--cg-label); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--cg-acc-tx); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cg-sc { font-family: var(--cg-disp); font-weight: 900; font-synthesis: none; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
 .cg-tb.lead { background: var(--cg-gold); border-color: var(--cg-gold); color: var(--cg-ink); } .cg-tb.lead .cg-nm { color: var(--cg-ink); }
-.cg-tb.buzz { border-color: var(--cg-acc); background: var(--cg-acc); color: var(--cg-ink); box-shadow: 0 0 0 .3rem var(--cg-deep), 0 0 0 .65rem var(--cg-acc); animation: cg-buzz 1s steps(1) infinite; } .cg-tb.buzz .cg-nm { color: var(--cg-ink); }
-@keyframes cg-buzz { 50% { box-shadow: 0 0 0 .3rem var(--cg-deep), 0 0 0 .65rem var(--cg-text); } }   /* marquee blink, once a second */
-.cg-tb.out { opacity: .35; } .cg-tb.out .cg-nm { text-decoration: line-through; }
+.cg-tb.buzz { border-color: var(--cg-ink); background: var(--cg-acc); color: var(--cg-ink); box-shadow: 0 0 0 .3rem var(--cg-bg), 0 0 0 .65rem var(--cg-acc); animation: cg-buzz 1s steps(1) infinite; } .cg-tb.buzz .cg-nm { color: var(--cg-ink); }
+@keyframes cg-buzz { 50% { box-shadow: 0 0 0 .3rem var(--cg-bg), 0 0 0 .65rem var(--cg-fg); } }   /* marquee blink, once a second */
+.cg-tb.out { opacity: .5; border-style: dashed; } .cg-tb.out .cg-nm { text-decoration: line-through; }
 .cg-tb.hit { animation: cg-hit .9s ease-out; }
-@keyframes cg-hit { 0% { transform: scale(1); box-shadow: 0 0 0 0 #fff; } 30% { transform: scale(1.08); box-shadow: 0 0 0 .5rem #fff; } 100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; } }
-.cg-rk { position: absolute; top: .35rem; right: .5rem; font-family: var(--cg-disp); font-size: 1rem; opacity: .7; }
-.cg-cr { font-family: var(--cg-label); font-weight: 900; letter-spacing: .14em; font-size: 1.5rem; min-height: 1.8rem; }
+@keyframes cg-hit { 0% { transform: scale(1); box-shadow: 0 0 0 0 var(--cg-ok); } 30% { transform: scale(1.08); box-shadow: 0 0 0 .5rem var(--cg-ok); } 100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; } }
+.cg-rk { position: absolute; top: .35rem; right: .5rem; font-family: var(--cg-label); font-weight: 800; font-size: 1rem; opacity: .8; }
+.cg-cr { font-family: var(--cg-label); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 1.5rem; min-height: 1.8rem; }
 .cg-pg { grid-column: 1 / -1; text-align: center; font-family: var(--cg-label); font-weight: 800; font-size: 1.05rem; letter-spacing: .12em; text-transform: uppercase; color: var(--cg-mute); margin-top: -.2rem; }
 /* strip (band under the game): density by rows */
 .cg-strip.cg-d1 .cg-tb { height: 7.4rem; } .cg-strip.cg-d1 .cg-nm { font-size: 1.3rem; } .cg-strip.cg-d1 .cg-sc { font-size: 4rem; }
@@ -47,9 +67,9 @@
 .cg-full.cg-d4 { gap: .5rem; } .cg-full.cg-d4 .cg-tb { padding: .3rem .5rem; border-radius: calc(.55rem * var(--cg-round)); } .cg-full.cg-d4 .cg-nm { font-size: 1rem; letter-spacing: .04em; max-width: 100%; } .cg-full.cg-d4 .cg-sc { font-size: 2.6rem; } .cg-full.cg-d4 .cg-rk { font-size: .8rem; top: .2rem; right: .35rem; }
 .cg-full .cg-pg { display: none; }
 /* buzz banner on the screen */
-.cg-banner { display: inline-flex; align-items: center; background: var(--cg-acc); color: var(--cg-ink); border-radius: calc(1rem * var(--cg-round)); padding: .7rem 1.8rem; font-family: var(--cg-disp); font-synthesis: none; font-size: 3.2rem; line-height: 1.1;  transform: rotate(-1.5deg); }
-.cg-banner small { font-family: var(--cg-label); font-weight: 800; font-size: 1.3rem; letter-spacing: .1em; text-transform: uppercase; margin-left: 1.4rem; }
-.cg-banner.no { background: var(--cg-no); color: #fff; }
+.cg-banner { display: inline-flex; align-items: center; background: var(--cg-paper); color: var(--cg-ink); border: .3rem solid var(--cg-ink); border-radius: calc(1rem * var(--cg-round)); padding: .7rem 1.8rem .6rem; font-family: var(--cg-shout); font-weight: 400; font-synthesis: none; font-size: 3.2rem; line-height: 1.1; letter-spacing: -.01em; transform: rotate(-1.5deg); box-shadow: .6rem .6rem 0 var(--cg-acc); }
+.cg-banner small { font-family: var(--cg-label); font-weight: 800; font-size: 1.3rem; letter-spacing: .08em; text-transform: uppercase; margin-left: 1.4rem; padding-left: 1.4rem; border-left: .2rem solid currentColor; line-height: 1.2; }
+.cg-banner.no { background: var(--cg-no); color: var(--cg-on-no); box-shadow: .6rem .6rem 0 var(--cg-ink); }
 
 /* ---------- phone: team picker ---------- */
 .cg-find { display: flex; margin-bottom: 8px; }
@@ -60,31 +80,31 @@
 .cg-tile { flex: 0 0 calc(33.333% - 8px); margin: 4px; min-height: 84px; border-radius: calc(12px * var(--cg-round)); background: #fff; border: 2px solid var(--cg-ink); color: var(--cg-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px; min-width: 0; }
 .cg-tiles.c2 .cg-tile { flex-basis: calc(50% - 8px); min-height: 96px; }
 .cg-tiles.c3 .cg-tile { min-height: 104px; }
-.cg-tile b { font-family: var(--cg-disp); font-synthesis: none; font-weight: 400; font-size: 18px; line-height: 1.1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cg-tile span { font-weight: 700; font-size: 13px; color: var(--cg-slate); margin-top: 3px; }
+.cg-tile b { font-family: var(--cg-disp); font-synthesis: none; font-weight: 800; font-size: 20px; line-height: 1.1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cg-tile span { font-weight: 700; font-size: 13px; color: var(--cg-slate); margin-top: 3px; font-variant-numeric: tabular-nums; }
 .cg-tile.lead { background: var(--cg-lead-bg); border-color: var(--cg-lead-bg); color: var(--cg-lead-ink); } .cg-tile.lead span { color: var(--cg-lead-ink); }
-.cg-tile.buzz { background: var(--cg-acc); border-color: var(--cg-ink); box-shadow: 0 0 0 3px var(--cg-acc); } .cg-tile.buzz span { color: var(--cg-ink); }
+.cg-tile.buzz { background: var(--cg-acc); border-color: var(--cg-ink); box-shadow: 3px 3px 0 var(--cg-ink); } .cg-tile.buzz span { color: var(--cg-ink); }
 .cg-tile.out { background: var(--cg-paper2); border-style: dashed; } .cg-tile.out b { text-decoration: line-through; }
-.cg-tile:active:not(:disabled) { transform: scale(.96); }
+.cg-tile:active:not(:disabled) { transform: translate(2px, 2px); }
 .cg-tiles.dense { max-height: 52vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 2px; margin: -2px; }
 .cg-tiles.dense .cg-tile { flex-basis: calc(25% - 6px); margin: 3px; min-height: 58px; border-radius: calc(10px * var(--cg-round)); padding: 3px; }
 .cg-tiles.dense .cg-tile b { font-size: 14px; } .cg-tiles.dense .cg-tile span { font-size: 11px; margin-top: 1px; }
 .cg-none { padding: 14px; text-align: center; font-weight: 700; color: var(--cg-slate); }
 
 /* ---------- phone: buzz-in panel ---------- */
-.cg-buzz { margin-top: 10px; background: #fff; border: 2px solid var(--cg-ink); border-radius: calc(12px * var(--cg-round)); padding: 10px 12px; color: var(--cg-ink); }
-.cg-bz-t { font-weight: 800; font-size: 16px; } .cg-bz-t b { font-family: var(--cg-disp); font-synthesis: none; font-weight: 400; font-size: 20px; }
+.cg-buzz { margin-top: 10px; background: #fff; border: 3px solid var(--cg-ink); box-shadow: 4px 4px 0 var(--cg-acc); border-radius: calc(12px * var(--cg-round)); padding: 10px 12px; color: var(--cg-ink); }
+.cg-bz-t { font-weight: 800; font-size: 16px; } .cg-bz-t b { font-family: var(--cg-disp); font-synthesis: none; font-weight: 900; font-size: 22px; text-transform: uppercase; }
 .cg-bz-h { font-size: 13px; color: var(--cg-slate); margin-top: 2px; line-height: 1.35; }
 .cg-bz-b { display: flex; margin: 10px -4px 0; }
-.cg-bz-b button { flex: 1 1 0; margin: 0 4px; min-height: 68px; border-radius: calc(12px * var(--cg-round)); font-family: var(--cg-disp); font-synthesis: none; font-size: 20px; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
-.cg-bz-b button small { font: 700 12px var(--cg-font); margin-top: 4px; opacity: .92; }
-.cg-bz-b .ok { background: #15803D; } .cg-bz-b .no { background: #BE123C; }
+.cg-bz-b button { flex: 1 1 0; margin: 0 4px; min-height: 68px; border-radius: calc(12px * var(--cg-round)); font-family: var(--cg-disp); font-weight: 900; font-synthesis: none; font-size: 22px; text-transform: uppercase; color: var(--cg-on-ok); border: 2px solid var(--cg-ink); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.cg-bz-b button small { font: 700 12px var(--cg-font); text-transform: none; margin-top: 4px; }
+.cg-bz-b .ok { background: var(--cg-ok); color: var(--cg-on-ok); } .cg-bz-b .no { background: var(--cg-no); color: var(--cg-on-no); }
 
 /* ---------- phone: shared settings rows ---------- */
 .cg-step { display: flex; align-items: center; margin-top: 8px; }
 .cg-step button { flex: 0 0 auto; width: 54px; min-height: 52px; border-radius: calc(10px * var(--cg-round)); background: var(--cg-ink); color: #fff; font-weight: 900; font-size: 20px; margin-right: 6px; }
 .cg-step button + b + button { margin-left: 6px; }
-.cg-step b { flex: 1; text-align: center; font-family: var(--cg-disp); font-weight: 400; font-size: 32px; }
+.cg-step b { flex: 1; text-align: center; font-family: var(--cg-disp); font-weight: 900; font-size: 34px; }
 .cg-names-btn { margin-top: 8px; min-height: 48px; padding: 0 16px; border-radius: calc(10px * var(--cg-round)); background: #fff; border: 1.5px solid var(--cg-ink) !important; font-weight: 800; font-size: 15px; }
 .cg-names { margin-top: 8px; max-height: 46vh; overflow-y: auto; border: 1.5px solid rgba(var(--cg-ink-rgb),.2); border-radius: calc(10px * var(--cg-round)); background: #fff; }
 .cg-names label { display: flex; align-items: center; padding: 4px 8px; border-bottom: 1px solid rgba(var(--cg-ink-rgb),.08); }
@@ -105,7 +125,7 @@
 .cg-gate-f input::placeholder { letter-spacing: .06em; font-size: 18px; }
 .cg-gate { position: fixed; inset: 0; z-index: 50; background: var(--cg-deep); display: flex; align-items: center; justify-content: center; padding: 20px; }
 .cg-gate-in { width: 100%; max-width: 380px; background: var(--cg-paper); color: var(--cg-ink); border-radius: calc(18px * var(--cg-round)); padding: 22px 18px; text-align: center; }
-.cg-gate-t { font-family: var(--cg-disp); font-synthesis: none; font-size: 26px; text-transform: uppercase; }
+.cg-gate-t { font-family: var(--cg-disp); font-weight: 900; font-synthesis: none; font-size: 28px; text-transform: uppercase; }
 .cg-gate-h { font-size: 14px; color: var(--cg-slate); margin: 6px 0 14px; line-height: 1.4; }
 .cg-gate-f { display: flex; }
 .cg-gate-f input { flex: 1 1 auto; min-width: 0; min-height: 56px; font: 800 24px var(--cg-font); letter-spacing: .2em; text-align: center; text-transform: uppercase; border: 2px solid var(--cg-ink); border-radius: calc(12px * var(--cg-round)); background: #fff; color: var(--cg-ink); }
@@ -113,3 +133,32 @@
 .cg-gate-take { margin: 0 0 4px; width: 100%; }
 .cg-gate-err { min-height: 20px; margin: 10px 0 6px; font-weight: 700; font-size: 14px; color: var(--cg-no); }
 .cg-gate-leave { background: none; border: 0; color: var(--cg-slate); font-weight: 700; text-decoration: underline; min-height: 44px; font-size: 14px; }
+
+/* lights on: the leading table is an ink tile (a paper tile would vanish on paper) */
+:root[data-cg-lights="on"] .cg-tb.lead { background: var(--cg-ink); border-color: var(--cg-ink); color: var(--cg-paper); }
+:root[data-cg-lights="on"] .cg-tb.lead .cg-nm { color: var(--cg-acc); }
+:root[data-cg-lights="on"] .cg-banner { box-shadow: .6rem .6rem 0 var(--cg-ink); }
+
+/* skins: keep the scoreboard and buzz banner they had before brand 2026 (accent banner, no ink frame) */
+html[data-cg-skin] .cg-tb { border-color: var(--cg-line); }
+html[data-cg-skin] .cg-tb.buzz { border-color: var(--cg-acc); }
+html[data-cg-skin] .cg-banner { background: var(--cg-acc); color: var(--cg-ink); border: 0; box-shadow: none; padding: .7rem 1.8rem; }
+html[data-cg-skin] .cg-banner.no { background: var(--cg-no); color: var(--cg-on-no); }
+html[data-cg-skin] .cg-banner small { border-left: 0; padding-left: 0; }
+html[data-cg-skin] .cg-tile b { font-size: 18px; }
+html[data-cg-skin] .cg-tile.buzz { box-shadow: 0 0 0 3px var(--cg-acc); }
+html[data-cg-skin] .cg-tile:active:not(:disabled) { transform: scale(.96); }
+html[data-cg-skin] .cg-buzz { border-width: 2px; box-shadow: none; }
+html[data-cg-skin] .cg-bz-t b { font-size: 20px; text-transform: none; }
+html[data-cg-skin] .cg-bz-b button { font-size: 20px; text-transform: none; border: 0; color: #fff; }
+html[data-cg-skin] .cg-bz-b button small { opacity: .92; }
+html[data-cg-skin] .cg-bz-b .ok { background: #15803D; color: #fff; } html[data-cg-skin] .cg-bz-b .no { background: #BE123C; color: #fff; }
+html[data-cg-skin] .cg-step b { font-size: 32px; }
+html[data-cg-skin] .cg-gate-t { font-size: 26px; }
+
+/* ---------- reduced motion: no blinking, pulsing or flashing; results appear in place ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cg-tb.buzz { animation: none; }
+  .cg-tb.hit { animation: none; outline: .4rem solid var(--cg-ok); outline-offset: .2rem; }
+  .cg-tile:active:not(:disabled) { transform: none; }
+}

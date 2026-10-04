@@ -22,282 +22,581 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@500;700;800&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Bagel+Fat+One&family=Big+Shoulders:opsz,wght@10..72,600..900&display=swap">
   <style>
-    /* Charge! Games: newsprint cream, warm black, one loud yellow. Flat colors, thick rules, no shadows that blur. */
-    :root { --paper: #F3ECDD; --paper2: #E6DCC6; --ink: #16140F; --acc: #FFC629; --red: #E5482F; --mute: #5B5446;
-      --disp: "Anton", Impact, "Arial Narrow", sans-serif; --body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
-    a { color: var(--ink); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
-    h1, h2, h3, .disp { font-family: var(--disp); font-weight: 400; font-synthesis: none; text-transform: uppercase; letter-spacing: .005em; line-height: .95; margin: 0; }
-    p { margin: 0 0 1em; }
-    :focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
-    .lbl { font: 800 13px/1.2 var(--body); letter-spacing: .14em; text-transform: uppercase; }
+/* =========================================================================
+   CHARGE! GAMES · brand tokens + components (brand 2026)
+   "Loud covers, clear calls."
+   Fonts (all SIL OFL, Google Fonts): Bagel Fat One (shout), Big Shoulders (display/numerals),
+   Atkinson Hyperlegible Next (text), Atkinson Hyperlegible Mono (labels).
+   ========================================================================= */
 
-    /* header */
-    .top { border-bottom: 4px solid var(--ink); background: var(--paper); }
-    .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 76px; }
-    .wm { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); min-height: 48px; }
-    .wm svg { width: 40px; height: 40px; flex: 0 0 auto; }
-    .wm span { font: 400 26px/1 var(--disp); letter-spacing: .02em; text-transform: uppercase; }
-    nav { display: flex; align-items: center; gap: 26px; }
-    nav a { font-weight: 700; font-size: 16px; text-decoration: none; }
-    nav a:hover { text-decoration: underline; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 24px; border: 3px solid var(--ink); background: var(--ink); color: var(--paper);
-      font: 800 17px/1 var(--body); text-decoration: none; box-shadow: 5px 5px 0 var(--acc); transition: transform .08s, box-shadow .08s; }
-    .btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--acc); }
-    .btn:active { transform: translate(3px,3px); box-shadow: 2px 2px 0 var(--acc); }
-    .btn.y { background: var(--acc); color: var(--ink); box-shadow: 5px 5px 0 var(--ink); }
-    .btn.y:hover { box-shadow: 7px 7px 0 var(--ink); } .btn.y:active { box-shadow: 2px 2px 0 var(--ink); }
-    .btn.o { background: transparent; color: var(--ink); box-shadow: none; }
-    .btn.o:hover { background: var(--paper2); transform: none; }
-    nav .btn { min-height: 46px; padding: 0 18px; font-size: 15px; box-shadow: 4px 4px 0 var(--acc); }
+:root {
+  /* core neutrals */
+  --ink: #16140F;        /* warm black: stage, text on light */
+  --deep: #0E0D0A;       /* deepest: big-screen surround */
+  --panel: #24211B;      /* raised panel on ink */
+  --panel-2: #322E26;
+  --rule: #7A7262;       /* UI borders on ink  (3.87:1 on ink) */
+  --rule-soft: #4A4436;  /* decorative hairlines only (1.9:1) */
+  --paper: #F3ECDD;      /* newsprint: phone + leader surfaces */
+  --paper-2: #E6DCC6;
+  --rule-light: #7D7563; /* UI borders on paper (3.88:1) */
+  --mute-d: #A8A090;     /* secondary text on ink  (7.10:1) */
+  --mute-l: #5B5446;     /* secondary text on paper (6.37:1) */
+  /* the one brand color */
+  --charge: #FFC629;     /* Charge Yellow: fills, highlights, the bang (11.71:1 with ink) */
+  --charge-deep: #7A5600;/* yellow-family TEXT on paper (5.65:1) */
+  /* game colors: always fills under ink text, never thin text on ink */
+  --g-sword: #FFC629;    --g-sword-deep: #7A5600;
+  --g-who: #A78BFF;      --g-who-deep: #5B3FD1;      /* 6.82:1 with ink */
+  --g-survey: #FF6FB0;   --g-survey-deep: #B0186A;   /* 7.14:1 */
+  --g-clash: #3CC4FF;    --g-clash-deep: #00658F;    /* 9.23:1 */
+  --g-scramble: #B8F23A; --g-scramble-deep: #3D6100; /* 13.85:1 */
+  /* status: always paired with a word + icon */
+  --go: #3DDC84;  --go-deep: #17703D;   /* Correct */
+  --no: #FF5A3C;  --no-deep: #B3261E;   /* Wrong (ink text on it: 5.94:1) */
 
-    /* hero: big type on the left, a printed "tonight's game" card hanging off the right */
-    .hero { padding: 64px 0 76px; border-bottom: 4px solid var(--ink); overflow: hidden; }
-    .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 56px; align-items: center; }
-    .hero h1 { font-size: clamp(60px, 8.6vw, 128px); line-height: .92; }
-    .hero h1 em { font-style: normal; text-decoration: underline; text-decoration-color: var(--acc); text-decoration-thickness: .2em; text-underline-offset: -.06em; text-decoration-skip-ink: none; }
-    .hero .lede { font-size: 21px; max-width: 34em; margin: 28px 0 0; }
-    .hero .lede b { font-weight: 800; }
-    .ctas { display: flex; flex-wrap: wrap; gap: 16px 18px; margin-top: 30px; }
-    .price { margin-top: 22px; font-weight: 700; font-size: 16px; color: var(--mute); }
+  /* type */
+  --f-shout: "Bagel Fat One", "Arial Rounded MT Bold", "Arial Black", sans-serif;
+  --f-disp: "Big Shoulders", "Arial Narrow", Impact, sans-serif;
+  --f-text: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-    .ticket { background: var(--ink); color: var(--paper); border: 4px solid var(--ink); transform: rotate(2.2deg); box-shadow: 12px 12px 0 var(--acc); max-width: 440px; justify-self: end; width: 100%; }
-    .ticket .hd { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 18px; border-bottom: 3px solid var(--paper); }
-    .ticket .hd .disp { font-size: 30px; }
-    .ticket .hd .lbl { color: var(--acc); }
-    .ticket .ref { background: var(--acc); color: var(--ink); margin: 18px; padding: 14px 18px 10px; display: flex; justify-content: space-between; align-items: end; gap: 12px; }
-    .ticket .ref small { display: block; font: 400 26px/1 var(--disp); }
-    .ticket .ref strong { display: block; font: 400 84px/.9 var(--disp); }
-    .ticket .ref .pts { font: 400 46px/1 var(--disp); }
-    .ticket .ref .pts i { display: block; font: 800 12px/1 var(--body); font-style: normal; letter-spacing: .14em; text-align: right; }
-    .ticket .tb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 18px 18px; }
-    .ticket .tb span { border: 2px solid #4A4436; padding: 8px 10px; font: 800 12px/1.2 var(--body); letter-spacing: .1em; }
-    .ticket .tb span b { display: block; font: 400 28px/1 var(--disp); letter-spacing: 0; margin-top: 4px; }
-    .ticket .tb span.on { background: var(--paper); color: var(--ink); border-color: var(--paper); outline: 3px solid var(--acc); outline-offset: 2px; }
-    .ticket .ft { border-top: 3px solid var(--paper); padding: 12px 18px; font-weight: 700; font-size: 15px; }
-    .ticket .ft b { color: var(--acc); }
+  /* scale (web, rem = 16px): 1.25 minor third up to display, then jumps */
+  --t-xs: .8125rem; --t-sm: .9375rem; --t-base: 1.125rem; --t-md: 1.375rem; --t-lg: 1.75rem;
+  --t-xl: 2.5rem; --t-2xl: 3.5rem; --t-3xl: 5rem; --t-4xl: clamp(4rem, 9vw, 9rem);
 
-    /* sections */
-    .s { padding: 76px 0; border-bottom: 4px solid var(--ink); }
-    .s.dark { background: var(--ink); color: var(--paper); }
-    .s.dark a { color: var(--paper); }
-    .sh { display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 40px; align-items: start; }
-    .sh > h2 { font-size: 56px; }
-    .sh > h2 .lbl { display: block; font-family: var(--body); margin-bottom: 14px; color: var(--mute); }
-    .s.dark .sh > h2 .lbl { color: var(--acc); }
+  /* shape + depth: hard edges, hard shadows, no blur */
+  --r: 6px; --r-lg: 14px; --bw: 3px; --bw-lg: 4px;
+  --shadow: 5px 5px 0 var(--ink); --shadow-y: 5px 5px 0 var(--charge);
 
-    /* how a night goes: numbered, ruled list (not an icon row) */
-    .steps { list-style: none; margin: 0; padding: 0; counter-reset: st; }
-    .steps li { counter-increment: st; display: grid; grid-template-columns: 88px minmax(0,1fr); gap: 20px; padding: 22px 0; border-top: 3px solid var(--ink); }
-    .steps li:last-child { border-bottom: 3px solid var(--ink); }
-    .steps li:before { content: counter(st); font: 400 72px/.85 var(--disp); }
-    .steps h3 { font-size: 30px; margin-bottom: 8px; }
-    .steps p { margin: 0; max-width: 40em; }
+  /* motion */
+  --e-land: cubic-bezier(.2,.9,.1,1);      /* things that arrive and stop */
+  --e-pop: cubic-bezier(.34,1.56,.64,1);   /* stickers, score pops (small overshoot) */
+  --d-tap: 110ms; --d-enter: 240ms; --d-pop: 420ms;
+}
 
-    /* the two games */
-    .game { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); border: 4px solid var(--ink); margin-top: 40px; background: var(--paper); }
-    .game + .game { margin-top: 34px; }
-    .game .main { padding: 34px 36px 36px; }
-    .game .side { padding: 34px 32px; background: var(--paper2); border-left: 4px solid var(--ink); }
-    .game.b { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
-    .game.b .main { order: 2; } .game.b .side { order: 1; border-left: 0; border-right: 4px solid var(--ink); }
-    .game h3 { font-size: clamp(54px, 6vw, 84px); }
-    .game .free { display: inline-block; background: var(--acc); border: 3px solid var(--ink); padding: 6px 10px; margin-bottom: 18px; transform: rotate(-2deg); }
-    .game .main > p { margin: 18px 0 0; max-width: 36em; }
-    .facts { margin: 20px 0 0; padding: 0; list-style: none; }
-    .facts li { padding: 9px 0 9px 26px; position: relative; font-weight: 600; border-top: 2px solid rgba(22,20,15,.18); }
-    .facts li:before { content: ""; position: absolute; left: 2px; top: 17px; width: 12px; height: 4px; background: var(--ink); }
-    .game .ctas { margin-top: 26px; }
-    .side .lbl { margin-bottom: 12px; color: var(--mute); }
-    .side dl { margin: 0; }
-    .side dt { font: 400 28px/1 var(--disp); text-transform: uppercase; margin-top: 18px; }
-    .side dt:first-of-type { margin-top: 0; }
-    .side dd { margin: 6px 0 0; font-size: 16px; }
+/* ---------- base ---------- */
+.cg * { box-sizing: border-box; }
+.cg { font: 400 var(--t-base)/1.55 var(--f-text); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.cg :focus-visible { outline: 4px solid var(--charge); outline-offset: 3px; box-shadow: 0 0 0 7px var(--ink); }
+.shout { font-family: var(--f-shout); font-weight: 400; line-height: .9; letter-spacing: -.01em; }
+.disp { font-family: var(--f-disp); font-weight: 900; font-variation-settings: "opsz" 72; line-height: .9; text-transform: uppercase; letter-spacing: .005em; }
+.mono { font-family: var(--f-mono); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: var(--t-xs); }
+.num { font-family: var(--f-disp); font-weight: 900; font-variant-numeric: tabular-nums lining-nums; }
 
-    /* later + needs: plain lists */
-    .two { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 56px; }
-    .two h2 { font-size: 46px; margin-bottom: 20px; }
-    .plain { list-style: none; margin: 0; padding: 0; }
-    .plain li { padding: 16px 0; border-top: 2px solid rgba(243,236,221,.35); }
-    .plain li:last-child { border-bottom: 2px solid rgba(243,236,221,.35); }
-    .plain b { display: block; font-weight: 800; font-size: 19px; margin-bottom: 2px; }
-    .plain b i { font-style: normal; font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: var(--acc); padding: 2px 6px; margin-left: 8px; vertical-align: 2px; }
-    .plain span { opacity: .85; }
-    .note { margin-top: 44px; padding: 22px 26px; border: 3px solid var(--acc); max-width: 760px; }
-    .note b { color: var(--acc); }
+/* dotted grid (shared DNA with Stage Ready) */
+.dots-d { background-color: var(--ink); background-image: radial-gradient(rgba(243,236,221,.13) 1.1px, transparent 1.5px); background-size: 22px 22px; }
+.dots-l { background-color: var(--paper); background-image: radial-gradient(rgba(22,20,15,.13) 1.1px, transparent 1.5px); background-size: 22px 22px; }
+/* halftone (poster texture only) */
+.halftone { background-image: radial-gradient(rgba(22,20,15,.22) 30%, transparent 32%); background-size: 9px 9px; }
 
-    /* faq */
-    .faq details { border-top: 3px solid var(--ink); }
-    .faq details:last-of-type { border-bottom: 3px solid var(--ink); }
-    .faq summary { cursor: pointer; list-style: none; padding: 20px 44px 20px 0; position: relative; font-weight: 800; font-size: 20px; }
-    .faq summary::-webkit-details-marker { display: none; }
-    .faq summary:after { content: "+"; position: absolute; right: 4px; top: 10px; font: 400 36px/1 var(--disp); }
-    .faq details[open] summary:after { content: "\2013"; }
-    .faq details p { margin: 0 0 22px; max-width: 46em; }
+/* ---------- logo ---------- */
+.wm { display: inline-flex; align-items: center; gap: .08em; text-decoration: none; color: inherit; font-size: 34px; line-height: 1; }
+.wm .word { font-family: var(--f-shout); letter-spacing: -.01em; }
+.wm .bang { width: .98em; height: .98em; transform: rotate(-6deg) translateY(-.04em); flex: 0 0 auto; }
+.wm .sub { font: 800 .3em/1 var(--f-mono); letter-spacing: .16em; margin-left: .55em; padding-left: .55em; border-left: 2px solid currentColor; align-self: center; }
 
-    footer { padding: 34px 0 44px; }
-    footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-    footer small { font-size: 15px; color: var(--mute); }
+/* ---------- buttons ---------- */
+.btn { --bg: var(--charge); --fg: var(--ink); --sh: var(--ink);
+  display: inline-flex; align-items: center; justify-content: center; gap: .55em; min-height: 54px; padding: 0 26px;
+  background: var(--bg); color: var(--fg); border: var(--bw) solid var(--ink); border-radius: var(--r);
+  font: 800 1.0625rem/1 var(--f-text); text-decoration: none; cursor: pointer; box-shadow: 5px 5px 0 var(--sh);
+  transition: transform var(--d-tap) var(--e-land), box-shadow var(--d-tap) var(--e-land); }
+.btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--sh); }
+.btn:active { transform: translate(4px,4px); box-shadow: 1px 1px 0 var(--sh); }
+.btn.ink { --bg: var(--ink); --fg: var(--paper); --sh: var(--charge); }
+.on-ink .btn.ink { border-color: var(--paper); }
+.btn.ghost { --bg: transparent; --fg: currentColor; box-shadow: none; border-color: currentColor; }
+.btn.ghost:hover { transform: none; background: rgba(127,127,127,.12); }
+.btn.lg { min-height: 64px; padding: 0 32px; font-size: 1.25rem; }
+.btn svg { width: 1.1em; height: 1.1em; }
 
-    @media (max-width: 900px) {
-      .hero .wrap, .sh, .two, .game, .game.b { grid-template-columns: minmax(0,1fr); }
-      .ticket { justify-self: start; max-width: 420px; }
-      .game.b .main { order: 1; } .game.b .side { order: 2; }
-      .game .side, .game.b .side { border-left: 0; border-right: 0; border-top: 4px solid var(--ink); }
-      .sh { gap: 22px; }
-    }
-    @media (max-width: 640px) {
-      body { font-size: 17px; }
-      .wrap { padding: 0 18px; }
-      nav a:not(.btn) { display: none; }
-      .wm span { font-size: 22px; } .wm svg { width: 34px; height: 34px; }
-      .hero { padding: 40px 0 56px; }
-      .hero .wrap { gap: 46px; }
-      .hero .lede { font-size: 18px; }
-      .ticket { transform: rotate(1.5deg); box-shadow: 8px 8px 0 var(--acc); width: calc(100% - 8px); }
-      .ticket .ref strong { font-size: 64px; }
-      .s { padding: 54px 0; }
-      .sh > h2 { font-size: 44px; }
-      .steps li { grid-template-columns: 56px minmax(0,1fr); gap: 12px; }
-      .steps li:before { font-size: 52px; }
-      .steps h3 { font-size: 25px; }
-      .game .main, .game .side { padding: 26px 20px; }
-      .two { gap: 44px; }
-      .two h2 { font-size: 38px; }
-    }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+/* ---------- chips ---------- */
+.chip { display: inline-flex; align-items: center; gap: .45em; min-height: 36px; padding: 0 14px; border: 2px solid currentColor; border-radius: 999px;
+  font: 700 .8125rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; background: transparent; color: inherit; }
+.chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.on-ink .chip.on { background: var(--charge); color: var(--ink); border-color: var(--charge); }
+.chip .sw { width: 12px; height: 12px; border-radius: 3px; background: var(--c, var(--charge)); border: 2px solid var(--ink); }
+
+/* ---------- stickers + tape ---------- */
+.sticker { display: inline-grid; place-items: center; align-content: center; text-align: center; width: 136px; height: 136px; padding: 14px; border-radius: 50%; background: var(--paper); color: var(--ink);
+  border: var(--bw) solid var(--ink); font: 800 .8rem/1.1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; transform: rotate(-12deg); box-shadow: 4px 4px 0 var(--ink); }
+.sticker b { display: block; font: 400 1.3rem/1 var(--f-shout); margin-top: 2px; letter-spacing: 0; text-transform: none; }
+.tape { display: inline-block; padding: .3em .7em .25em; background: var(--paper); color: var(--ink); font: 800 .85rem/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase;
+  transform: rotate(-3deg); box-shadow: 3px 3px 0 var(--ink); border: 2px solid var(--ink); }
+.tape.ink { background: var(--ink); color: var(--paper); box-shadow: 3px 3px 0 var(--charge); }
+
+/* ---------- game poster covers ---------- */
+.poster { --c: var(--charge); position: relative; overflow: hidden; background: var(--c); color: var(--ink); border-bottom: var(--bw-lg) solid var(--ink); aspect-ratio: 16 / 11; isolation: isolate; }
+.poster::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(22,20,15,.2) 28%, transparent 31%); background-size: 8px 8px; mask-image: linear-gradient(160deg, transparent 35%, #000 95%); -webkit-mask-image: linear-gradient(160deg, transparent 35%, #000 95%); z-index: -1; }
+.poster .ptitle { position: absolute; left: 22px; bottom: 18px; font: 400 clamp(2.4rem, 4.2vw, 3.6rem)/.86 var(--f-shout); color: var(--ink); text-shadow: 3px 3px 0 var(--paper); letter-spacing: -.01em; }
+.poster .ptag { position: absolute; top: 18px; left: 20px; }
+.p-who { --c: var(--g-who); } .p-survey { --c: var(--g-survey); } .p-clash { --c: var(--g-clash); } .p-scramble { --c: var(--g-scramble); }
+
+/* sword drills poster art: slot windows */
+.p-sword .reel { position: absolute; right: -5%; top: 8%; width: 74%; display: grid; grid-template-columns: 1.25fr 1fr; gap: 8px; transform: rotate(-5deg); }
+.p-sword .reel > div:first-child { font-size: clamp(1.7rem, 3.1vw, 2.9rem); padding-top: 14px; }
+.p-sword .reel > div { background: var(--ink); color: var(--charge); border-radius: 8px; padding: 6px 12px 2px; font: 900 clamp(2.6rem,5vw,4.6rem)/.95 var(--f-disp); font-variation-settings: "opsz" 72; text-align: center; overflow: hidden; position: relative; }
+.p-sword .reel > div::before, .p-sword .reel > div::after { content: attr(data-a); display: block; opacity: .28; font-size: .55em; line-height: 1.1; }
+.p-sword .reel > div::after { content: attr(data-b); }
+.p-sword .reel small { display: block; font: 800 .8rem/1 var(--f-mono); letter-spacing: .14em; color: var(--paper); opacity: .8; margin: 4px 0; }
+
+/* who am i poster art: big ? + clue ladder */
+.p-who .q { position: absolute; right: 2%; top: -14%; font: 400 clamp(13rem, 24vw, 19rem)/1 var(--f-shout); color: var(--ink); transform: rotate(9deg); }
+.p-who .ladder { position: absolute; left: 20px; top: 62px; display: grid; gap: 5px; width: 48%; }
+.p-who .ladder span { display: flex; justify-content: space-between; background: var(--ink); color: var(--paper); font: 700 .72rem/1 var(--f-mono); letter-spacing: .08em; padding: 6px 8px; border-radius: 4px; }
+.p-who .ladder span:nth-child(n+3) { background: transparent; color: var(--ink); border: 2px dashed var(--ink); }
+.p-who .ladder b { color: var(--g-who); } .p-who .ladder span:nth-child(n+3) b { color: var(--ink); }
+
+/* coming soon posters */
+.p-survey .bars { position: absolute; right: 18px; top: 22px; width: 46%; display: grid; gap: 6px; }
+.p-survey .bars i { display: flex; justify-content: space-between; height: 26px; align-items: center; padding: 0 8px; background: var(--ink); color: var(--g-survey); font: 900 1.1rem/1 var(--f-disp); font-style: normal; border-radius: 4px; }
+.p-survey .bars i:nth-child(2) { width: 82%; } .p-survey .bars i:nth-child(3) { width: 64%; } .p-survey .bars i:nth-child(4) { width: 44%; background: transparent; border: 2px dashed var(--ink); color: var(--ink); }
+.p-clash .board { position: absolute; right: 16px; top: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: 54%; transform: rotate(4deg); }
+.p-clash .board i { background: var(--ink); color: var(--g-clash); font: 900 1.05rem/1 var(--f-disp); font-style: normal; text-align: center; padding: 8px 0; border-radius: 4px; }
+.p-clash .board i.x { background: transparent; border: 2px solid var(--ink); color: transparent; }
+.p-scramble .words { position: absolute; right: 14px; top: 20px; width: 60%; display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.p-scramble .words i { font: 900 1.25rem/1 var(--f-disp); font-style: normal; text-transform: uppercase; background: var(--paper); border: 2px solid var(--ink); padding: 6px 9px 4px; border-radius: 4px; box-shadow: 3px 3px 0 var(--ink); }
+.p-scramble .words i:nth-child(odd) { transform: rotate(-6deg); } .p-scramble .words i:nth-child(3n) { transform: rotate(5deg); background: var(--ink); color: var(--g-scramble); }
+
+/* ---------- game card ---------- */
+.gcard { display: flex; flex-direction: column; background: var(--paper); color: var(--ink); border: var(--bw-lg) solid var(--ink); border-radius: var(--r-lg); overflow: hidden; box-shadow: 8px 8px 0 var(--ink); }
+.gcard .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+.gcard .hook { font: 800 1.25rem/1.25 var(--f-text); margin: 0; }
+.gcard .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.gcard .acts { margin-top: auto; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.gcard.soon { box-shadow: 8px 8px 0 var(--rule-light); }
+.gcard.soon .poster { filter: saturate(.85); }
+
+/* ---------- scoreboard tile (screen + web) ---------- */
+.tb { position: relative; background: var(--panel); color: var(--paper); border: 3px solid var(--rule); border-radius: 10px; padding: 10px 14px 8px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.tb .nm { font: 800 .9rem/1.1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--charge); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb .sc { font: 900 3rem/1 var(--f-disp); font-variation-settings: "opsz" 72; font-variant-numeric: tabular-nums; }
+.tb .rk { position: absolute; top: 8px; right: 10px; font: 800 .75rem/1 var(--f-mono); opacity: .75; }
+.tb.lead { background: var(--paper); color: var(--ink); border-color: var(--paper); } .tb.lead .nm { color: var(--ink); }
+.tb.buzz { background: var(--charge); color: var(--ink); border-color: var(--charge); box-shadow: 0 0 0 5px var(--deep), 0 0 0 10px var(--charge); animation: buzz 1s steps(1) infinite; } .tb.buzz .nm { color: var(--ink); }
+.tb.out { opacity: .5; } .tb.out .nm { text-decoration: line-through; }
+@keyframes buzz { 50% { box-shadow: 0 0 0 5px var(--deep), 0 0 0 10px var(--paper); } }  /* 1 Hz: far under WCAG 2.3.1's 3 flashes/s */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .btn:hover, .btn:active { transition: none; transform: none; }
+  .tb.buzz { animation: none; box-shadow: 0 0 0 5px var(--deep), 0 0 0 10px var(--paper); }
+  * { scroll-behavior: auto !important; }
+}
+
+/* ===================== homepage ===================== */
+
+  body { margin: 0; background: var(--paper); }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; }
+  /* header */
+  .top { background: var(--ink); color: var(--paper); border-bottom: 4px solid var(--charge); position: relative; z-index: 3; }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 78px; gap: 20px; }
+  .top .wm { color: var(--paper); font-size: 32px; }
+  .top nav { display: flex; align-items: center; gap: 28px; }
+  .top nav a.l { font: 700 .82rem/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; text-decoration: none; padding: 12px 0; }
+  .top nav a.l:hover { color: var(--charge); }
+  .top .btn { min-height: 46px; padding: 0 18px; font-size: .95rem; }
+
+  /* hero */
+  .hero { position: relative; color: var(--paper); overflow: hidden; border-bottom: 4px solid var(--ink); }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: 40px; align-items: center; padding-top: 70px; padding-bottom: 120px; }
+  .hero .kick { margin-bottom: 26px; }
+  .hero h1 { margin: 0; font: 900 clamp(4.2rem, 8.4vw, 8.6rem)/.84 var(--f-disp); font-variation-settings: "opsz" 72; text-transform: uppercase; letter-spacing: -.005em; }
+  .hero h1 .dim { color: var(--mute-d); }
+  .hero h1 .shoutline { display: inline-block; margin-top: .08em; font: 400 1.18em/.8 var(--f-shout); text-transform: none; color: var(--charge); transform: rotate(-4deg); transform-origin: left; text-shadow: 6px 6px 0 var(--deep); letter-spacing: -.02em; }
+  .hero .lede { font-size: 1.3rem; line-height: 1.5; max-width: 31em; margin: 30px 0 0; color: #E9E1D0; }
+  .hero .lede b { color: var(--paper); }
+  .hero .ctas { display: flex; flex-wrap: wrap; gap: 16px 18px; margin-top: 32px; }
+  .hero .ctas .ghost { color: var(--paper); }
+  .proof { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 28px; color: var(--mute-d); }
+  .proof span { display: inline-flex; align-items: center; gap: 8px; }
+  .proof span::before { content: ""; width: 10px; height: 10px; background: var(--charge); border-radius: 2px; transform: rotate(45deg); }
+
+  /* devices */
+  .stage { position: relative; min-height: 520px; }
+  .tv { position: absolute; right: -40px; top: 0; width: 640px; background: #050504; border-radius: 18px; padding: 14px; box-shadow: 0 0 0 3px var(--rule-soft), 18px 18px 0 var(--charge); transform: rotate(1.5deg); }
+  .tv::after { content: ""; position: absolute; left: 50%; bottom: -34px; width: 140px; height: 20px; transform: translateX(-50%); background: var(--panel); border-radius: 4px; }
+  .scr { aspect-ratio: 16/9; background: var(--ink); border-radius: 6px; overflow: hidden; padding: 16px 18px 14px; display: grid; grid-template-rows: auto 1fr auto; gap: 10px; }
+  .scr .bar { display: flex; justify-content: space-between; align-items: center; }
+  .scr .bar .g { font: 400 1.25rem/1 var(--f-shout); color: var(--paper); display: flex; align-items: center; gap: 8px; }
+  .scr .bar .g svg { width: 24px; height: 24px; }
+  .scr .bar .code { font: 800 .62rem/1.1 var(--f-mono); letter-spacing: .1em; color: var(--mute-d); text-align: right; }
+  .scr .bar .code b { display: block; font: 900 1.25rem/1 var(--f-disp); color: var(--charge); letter-spacing: .06em; }
+  .scr .mid { display: grid; grid-template-columns: 1fr 120px; gap: 10px; }
+  .scr .ref { background: var(--charge); color: var(--ink); border-radius: 8px; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 6%; align-items: center; position: relative; }
+  .scr .ref small { font: 900 1.6rem/1 var(--f-disp); text-transform: uppercase; letter-spacing: .02em; }
+  .scr .ref strong { font: 900 5.6rem/.86 var(--f-disp); font-variation-settings: "opsz" 72; }
+  .scr .ref .lab, .scr .pts .lab { position: absolute; top: 7px; left: 9px; font: 800 .55rem/1 var(--f-mono); letter-spacing: .12em; }
+  .scr .pts { position: relative; background: var(--panel); border: 2px solid var(--rule); border-radius: 8px; display: grid; place-items: center; color: var(--paper); font: 900 3.2rem/1 var(--f-disp); }
+  .scr .pts .lab { color: var(--mute-d); }
+  .scr .strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .scr .tb { padding: 5px 8px 4px; border-width: 2px; border-radius: 6px; }
+  .scr .tb .nm { font-size: .55rem; } .scr .tb .sc { font-size: 1.7rem; }
+  .scr .tb.buzz { box-shadow: 0 0 0 3px var(--ink), 0 0 0 6px var(--charge); animation: none; }
+  .scr .banner { position: absolute; }
+  .buzzflag { position: absolute; left: 30%; bottom: 84px; transform: translateX(-50%) rotate(-2deg); background: var(--paper); color: var(--ink); border: 3px solid var(--ink); padding: 6px 14px 4px; font: 400 1.35rem/1 var(--f-shout); white-space: nowrap; box-shadow: 4px 4px 0 var(--charge); }
+  .buzzflag small { font: 800 .6rem/1 var(--f-mono); letter-spacing: .1em; margin-left: 8px; vertical-align: 3px; }
+
+  .phone { position: absolute; left: -34px; bottom: -120px; width: 210px; background: #050504; border-radius: 30px; padding: 9px; transform: rotate(-6deg); box-shadow: 10px 10px 0 var(--deep), 0 0 0 3px var(--rule-soft); }
+  .phone .ps { background: var(--paper); color: var(--ink); border-radius: 22px; overflow: hidden; padding: 14px 12px 14px; display: grid; gap: 8px; }
+  .phone .ph { display: flex; justify-content: space-between; align-items: center; }
+  .phone .ph b { font: 400 .95rem/1 var(--f-shout); }
+  .phone .ph i { font: 800 .5rem/1 var(--f-mono); letter-spacing: .08em; background: var(--ink); color: var(--go); padding: 4px 7px; border-radius: 99px; font-style: normal; }
+  .phone .now { background: var(--ink); color: var(--paper); border-radius: 8px; padding: 8px 10px; }
+  .phone .now small { display: block; font: 800 .5rem/1 var(--f-mono); letter-spacing: .12em; color: var(--charge); }
+  .phone .now strong { font: 900 1.35rem/1 var(--f-disp); text-transform: uppercase; }
+  .phone .who { font: 700 .7rem/1.25 var(--f-text); }
+  .phone .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .phone .judge span { display: grid; place-items: center; min-height: 40px; border: 2px solid var(--ink); border-radius: 6px; font: 800 .75rem/1 var(--f-text); }
+  .phone .judge .ok { background: var(--go); } .phone .judge .no { background: var(--no); }
+  .phone .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .phone .tiles span { min-height: 38px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 6px; font: 800 .6rem/1.1 var(--f-text); text-align: center; background: #fff; }
+  .phone .tiles span.on { background: var(--charge); }
+  .hero .sticker { position: absolute; right: 10px; bottom: -70px; z-index: 2; width: 156px; height: 156px; padding: 18px; align-content: center; background: var(--g-scramble); font-size: .8rem; }
+  .hero .sticker b { font-size: 1.22rem; margin-top: 2px; }
+
+  /* sections */
+  .sec { padding: 92px 0; border-bottom: 4px solid var(--ink); }
+  .sh { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
+  .sh h2 { margin: 10px 0 0; font: 900 clamp(3rem, 5.4vw, 4.8rem)/.88 var(--f-disp); font-variation-settings: "opsz" 72; text-transform: uppercase; }
+  .sh p { margin: 0; max-width: 30em; font-size: 1.15rem; }
+  .lineup { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px; }
+  .lineup .gcard .poster { aspect-ratio: 16 / 9.5; }
+  .soonrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; margin-top: 44px; }
+  .soonrow .poster { aspect-ratio: 16 / 9; }
+  .soonrow .poster .ptitle { font-size: 2.1rem; }
+  .soonrow .gcard .body { padding: 16px 18px 18px; gap: 10px; }
+  .soonrow .hook { font-size: 1.05rem; }
+  .soonhead { display: flex; align-items: center; gap: 16px; margin-top: 64px; }
+  .soonhead h3 { margin: 0; font: 900 2.1rem/1 var(--f-disp); text-transform: uppercase; }
+  .soonhead::after { content: ""; flex: 1; height: 3px; background: var(--ink); }
+  .linkish { font: 800 1rem/1 var(--f-text); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; text-decoration-color: var(--charge); }
+
+  /* how */
+  .how { color: var(--paper); }
+  .how .sh p { color: #E9E1D0; }
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; list-style: none; padding: 0; margin: 0; }
+  .steps li { background: var(--panel); border: 3px solid var(--rule); border-radius: 14px; padding: 22px 24px 26px; position: relative; }
+  .steps .n { font: 900 7rem/.8 var(--f-disp); font-variation-settings: "opsz" 72; color: var(--charge); display: block; margin-bottom: 18px; }
+  .steps h3 { margin: 0 0 10px; font: 900 2rem/.95 var(--f-disp); text-transform: uppercase; }
+  .steps p { margin: 0; color: #E9E1D0; }
+  .steps li:nth-child(3) { background: var(--charge); color: var(--ink); border-color: var(--charge); }
+  .steps li:nth-child(3) .n { color: var(--ink); } .steps li:nth-child(3) p { color: var(--ink); }
+  .steps li:nth-child(3) h3 .shout { font-size: 1.15em; text-transform: none; }
+
+  /* themes */
+  .themes { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 50px; align-items: center; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chips .chip { min-height: 44px; padding: 0 18px; font-size: .9rem; background: var(--paper); }
+  .chips .chip.on { background: var(--ink); }
+  .refs { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .refs span { font: 900 1.6rem/1 var(--f-disp); text-transform: uppercase; background: var(--ink); color: var(--charge); padding: 10px 14px 8px; border-radius: 6px; }
+  .refs span:nth-child(2) { transform: rotate(-3deg); background: var(--charge); color: var(--ink); border: 3px solid var(--ink); }
+  .refs span:nth-child(4) { transform: rotate(2deg); }
+
+  /* need + faq */
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 60px; }
+  .two h2 { margin: 10px 0 24px; font: 900 3.2rem/.9 var(--f-disp); text-transform: uppercase; }
+  .need { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .need li { display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: center; background: var(--paper); border: 3px solid var(--ink); border-radius: 10px; padding: 12px 16px; }
+  .need li svg { width: 40px; height: 40px; }
+  .need b { display: block; font: 800 1.1rem/1.2 var(--f-text); }
+  .need span { color: var(--mute-l); font-size: 1rem; }
+  .faq details { border-top: 3px solid var(--ink); }
+  .faq details:last-child { border-bottom: 3px solid var(--ink); }
+  .faq summary { list-style: none; cursor: pointer; padding: 20px 50px 20px 0; position: relative; font: 800 1.2rem/1.3 var(--f-text); min-height: 48px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; position: absolute; right: 6px; top: 12px; font: 900 2.2rem/1 var(--f-disp); }
+  .faq details[open] summary::after { content: "–"; }
+  .faq p { margin: 0 0 22px; max-width: 40em; }
+
+  footer { background: var(--ink); color: var(--paper); padding: 46px 0 54px; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  footer .wm { font-size: 30px; }
+  footer small { color: var(--mute-d); font: 700 .8rem/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+
+  @media (max-width: 1100px) {
+    .tv { right: -20px; width: 560px; }
+  }
+  @media (max-width: 960px) {
+    .hero .wrap { grid-template-columns: minmax(0,1fr); padding-top: 44px; padding-bottom: 70px; gap: 30px; }
+    .stage { min-height: 0; }
+    .tv { position: relative; right: auto; width: 100%; transform: rotate(1deg); }
+    .phone { width: 150px; left: auto; right: -6px; bottom: -90px; border-radius: 22px; padding: 6px; }
+    .phone .ps { border-radius: 16px; padding: 10px 8px; gap: 6px; }
+    .phone .tiles { display: none; }
+    .hero .sticker { display: none; }
+    .lineup, .soonrow, .steps, .themes, .two { grid-template-columns: minmax(0,1fr); }
+    .soonrow { gap: 20px; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 0 18px; }
+    .top .wrap { min-height: 64px; }
+    .top .wm { font-size: 25px; } .top .wm .sub { display: none; }
+    .top nav a.l { display: none; }
+    .top .btn { min-height: 44px; padding: 0 14px; font-size: .9rem; }
+    .hero h1 { font-size: 4.1rem; }
+    .hero .lede { font-size: 1.12rem; }
+    .hero .ctas .btn { width: 100%; }
+    .scr { padding: 8px 9px 8px; gap: 6px; }
+    .scr .bar .g { font-size: .8rem; } .scr .bar .g svg { width: 16px; height: 16px; }
+    .scr .bar .code { font-size: .42rem; } .scr .bar .code b { font-size: .85rem; }
+    .scr .mid { grid-template-columns: 1fr 64px; gap: 6px; }
+    .scr .ref small { font-size: .85rem; } .scr .ref strong { font-size: 3rem; }
+    .scr .pts { font-size: 1.6rem; }
+    .scr .ref .lab, .scr .pts .lab { font-size: .38rem; top: 4px; left: 5px; }
+    .scr .strip { gap: 4px; grid-template-columns: repeat(4, 1fr); } .scr .strip .tb:nth-child(5) { display: none; }
+    .scr .tb { padding: 3px 5px 2px; } .scr .tb .nm { font-size: .38rem; } .scr .tb .sc { font-size: 1rem; }
+    .buzzflag { bottom: 40px; font-size: .85rem; padding: 4px 8px 3px; } .buzzflag small { display: none; }
+    .tv { padding: 7px; border-radius: 10px; box-shadow: 0 0 0 2px var(--rule-soft), 9px 9px 0 var(--charge); }
+    .tv::after { display: none; }
+    .phone { width: 116px; bottom: -96px; right: -6px; border-radius: 18px; padding: 5px; }
+    .phone .ps { padding: 8px 7px; gap: 5px; border-radius: 13px; } .phone .ph b { font-size: .7rem; } .phone .ph i { display: none; } .phone .now { padding: 5px 6px; } .phone .now small { font-size: .38rem; }
+    .hero .kick { font-size: .7rem; }
+    .buzzflag { left: 24%; bottom: 44px; }
+    .p-sword .reel { top: 26%; width: 70%; } .p-sword .reel > div { font-size: 1.9rem; } .p-sword .reel > div:first-child { font-size: 1.3rem; padding-top: 8px; }
+    .poster .ptitle { font-size: 2.3rem; }
+    .phone .now strong { font-size: .95rem; } .phone .who { font-size: .58rem; } .phone .judge span { min-height: 30px; font-size: .62rem; }
+    .sec { padding: 64px 0; }
+    .hero .wrap { padding-bottom: 110px; }
+    .sh h2 { font-size: 3rem; }
+    .gcard { box-shadow: 6px 6px 0 var(--ink); }
+    .steps .n { font-size: 5rem; }
+    .two h2 { font-size: 2.6rem; }
+  }
+
+  /* added for the live page */
+  .poster .ptitle { margin: 0; font-weight: 400; }
+  .gcard .desc { margin: 0; }
+  .gcard .facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .gcard .facts li { position: relative; padding-left: 22px; font-weight: 600; }
+  .gcard .facts li::before { content: ""; position: absolute; left: 0; top: .62em; width: 12px; height: 4px; background: var(--ink); }
+  .gcard details { border-top: 3px solid var(--ink); padding-top: 4px; }
+  .gcard summary { cursor: pointer; list-style: none; min-height: 48px; display: flex; align-items: center; justify-content: space-between; font: 800 1rem/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+  .gcard summary::-webkit-details-marker { display: none; }
+  .gcard summary::after { content: "+"; font: 900 2rem/1 var(--f-disp); }
+  .gcard details[open] summary::after { content: "\2013"; }
+  .gcard dl { margin: 0 0 6px; display: grid; gap: 12px; }
+  .gcard dt { font: 900 1.5rem/1 var(--f-disp); text-transform: uppercase; }
+  .gcard dd { margin: 4px 0 0; }
+  .bigrooms { margin-top: 56px; display: grid; grid-template-columns: auto minmax(0,1fr); gap: 20px; align-items: center; background: var(--ink); color: var(--paper); border-radius: var(--r-lg); padding: 22px 26px; box-shadow: 8px 8px 0 var(--charge); max-width: 900px; }
+  .bigrooms b.k { font: 900 2.2rem/1 var(--f-disp); text-transform: uppercase; color: var(--charge); }
+  .bigrooms p { margin: 0; }
+  .refs { min-height: 56px; }
+  .chips .chip { cursor: pointer; }
+  .chips .chip:hover { background: var(--paper-2); } .chips .chip.on:hover { background: var(--ink); }
+  footer .made { display: block; margin-top: 4px; }
+  @media (max-width: 960px) { .bigrooms { grid-template-columns: minmax(0,1fr); gap: 10px; } }
+  @media (max-width: 640px) { .p-who .ladder { top: 54px; width: 46%; } .p-who .ladder span:nth-child(n+3) { display: none; } }
+
   </style>
 </head>
-<body>
+<body class="cg">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="bang" viewBox="0 0 64 64"><rect x="3" y="3" width="58" height="58" rx="6" fill="#FFC629" stroke="#16140F" stroke-width="4"/><path d="M27 11h14l-4.5 30h-7z" fill="#16140F"/><rect x="28" y="45" width="10" height="9" fill="#16140F"/></symbol>
+  <symbol id="i-tv" viewBox="0 0 40 40"><rect x="3" y="6" width="34" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M14 35h12M20 28v7" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 40 40"><rect x="11" y="3" width="18" height="34" rx="4" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M18 31h4" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 40 40"><path d="M5 15a22 22 0 0 1 30 0M10 21a14 14 0 0 1 20 0M15 27a7 7 0 0 1 10 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><rect x="18" y="31" width="4" height="4" fill="currentColor"/></symbol>
+  <symbol id="i-bible" viewBox="0 0 40 40"><path d="M8 5h22a2 2 0 0 1 2 2v28H10a3 3 0 0 1-3-3V6z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M19.5 11v12M14 15.5h11" stroke="currentColor" stroke-width="3.5" stroke-linecap="square"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></symbol>
+</svg>
+
 <header class="top">
   <div class="wrap">
-    <a class="wm" href="./" aria-label="Charge! Games home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="3" y="3" width="58" height="58" rx="3" fill="#FFC629" stroke="#16140F" stroke-width="4"/><path d="M27 11h14l-4.5 30h-7z" fill="#16140F"/><rect x="28" y="45" width="10" height="9" fill="#16140F"/></svg><span>Charge! Games</span></a>
+    <a class="wm" href="./" aria-label="Charge! Games home"><span class="word">Charge</span><svg class="bang" aria-hidden="true"><use href="#bang"/></svg><span class="sub">GAMES</span></a>
     <nav aria-label="Main">
-      <a href="#how">How it works</a><a href="#games">Games</a><a href="#faq">FAQ</a>
+      <a class="l" href="#games">Games</a><a class="l" href="#how">How it works</a><a class="l" href="#faq">FAQ</a>
       <a class="btn" href="sword-drills/">Play Sword Drills</a>
     </nav>
   </div>
 </header>
 
 <main>
-  <section class="hero">
+  <section class="hero dots-d">
     <div class="wrap">
       <div>
-        <p class="lbl">Free Bible games for youth group</p>
-        <h1>Put a Bible game on the <em>big screen.</em></h1>
-        <p class="lede">The TV shows the game. You run it from your phone. Students split into tables and race with their Bibles open. <b>Free, nothing to install, no account.</b></p>
-        <div class="ctas"><a class="btn y" href="sword-drills/">Play Sword Drills</a><a class="btn o" href="who-am-i/">Play Who Am I?</a></div>
-        <p class="price">Two games ready now. Both free.</p>
+        <span class="tape kick">Free Bible games for youth group</span>
+        <h1>Bibles up.<br><span class="dim">Eyes front.</span><br><span class="shoutline">Charge!</span></h1>
+        <p class="lede">Put a Bible game on the big screen. The TV shows the game and you run it from your phone. Students split into tables and race with their Bibles open. <b>Free, nothing to install, no account.</b></p>
+        <div class="ctas">
+          <a class="btn lg" href="sword-drills/"><svg aria-hidden="true"><use href="#i-play"/></svg>Play Sword Drills</a>
+          <a class="btn lg ghost" href="who-am-i/">Play Who Am I?</a>
+        </div>
+        <div class="proof mono"><span>Two games ready now</span><span>2–50 tables</span><span>Free, no sign-up</span></div>
       </div>
-      <div class="ticket" aria-hidden="true">
-        <div class="hd"><span class="disp">Sword Drills</span><span class="lbl">Round 4</span></div>
-        <div class="ref"><div><small>Romans</small><strong>8:28</strong></div><div class="pts">300<i>Points</i></div></div>
-        <div class="tb"><span>Table 1<b>600</b></span><span class="on">Table 2<b>900</b></span><span>Table 3<b>300</b></span></div>
-        <div class="ft"><b>Table 2</b> buzzed in first.</div>
+
+      <div class="stage" aria-label="Preview: the big screen shows Romans 8:28 for 300 points and Table 2 has buzzed in; the leader's phone shows Correct and Wrong buttons.">
+        <div class="tv" aria-hidden="true">
+          <div class="scr">
+            <div class="bar"><span class="g"><svg><use href="#bang"/></svg>Sword Drills</span><span class="code">ROUND 4 · PHONE CODE<b>DNBZ</b></span></div>
+            <div class="mid">
+              <div class="ref"><span class="lab">FIND THIS</span><small>Romans</small><strong>8:28</strong></div>
+              <div class="pts"><span class="lab">POINTS</span>300</div>
+            </div>
+            <div class="strip">
+              <div class="tb"><span class="nm">Table 1</span><span class="sc">600</span></div>
+              <div class="tb buzz"><span class="nm">Table 2</span><span class="sc">900</span></div>
+              <div class="tb lead"><span class="nm">Table 3</span><span class="sc">1,200</span></div>
+              <div class="tb"><span class="nm">Table 4</span><span class="sc">300</span></div>
+              <div class="tb"><span class="nm">Table 5</span><span class="sc">500</span></div>
+            </div>
+          </div>
+          <div class="buzzflag">Table 2 buzzed in<small>READ IT OUT</small></div>
+        </div>
+        <div class="phone" aria-hidden="true">
+          <div class="ps">
+            <div class="ph"><b>Sword Drills</b><i>● LIVE</i></div>
+            <div class="now"><small>CLASSIC · 300 PTS</small><strong>Romans 8:28</strong></div>
+            <div class="who">Table 2 buzzed in first. Did they get it?</div>
+            <div class="judge"><span class="ok">✓ Correct</span><span class="no">✕ Wrong</span></div>
+            <div class="tiles"><span>Table 1</span><span class="on">Table 2</span><span>Table 3</span><span>Table 4</span><span>Table 5</span><span>Table 6</span></div>
+          </div>
+        </div>
+        <span class="sticker" aria-hidden="true"><span>The Bible is<br>the</span><b>controller</b></span>
       </div>
     </div>
   </section>
 
-  <section class="s" id="how">
-    <div class="wrap sh">
-      <h2><span class="lbl">How it works</span>Set up in a couple of minutes</h2>
+  <section class="sec dots-l" id="games">
+    <div class="wrap">
+      <div class="sh">
+        <div><span class="mono">The lineup</span><h2>Ready to play</h2></div>
+        <p>Both games run on one screen and one leader phone, and both are free.</p>
+      </div>
+      <div class="lineup">
+        <article class="gcard">
+          <div class="poster p-sword">
+            <span class="tape ink ptag">Free · no sign-up</span>
+            <div class="reel" aria-hidden="true">
+              <div data-a="JOHN" data-b="PSALM"><small>BOOK</small>Romans</div>
+              <div data-a="3:16" data-b="46:10"><small>REF</small>8:28</div>
+            </div>
+            <h3 class="ptitle">Sword<br>Drills</h3>
+          </div>
+          <div class="body">
+            <p class="hook">The old Bible race, run by a slot machine.</p>
+            <p class="desc">Bibles closed and held up. The reels land on a reference, and the first table to find it buzzes in. Tap Correct and the points go to that table; tap Wrong and the buzzers open again. Scores stay on the screen all night.</p>
+            <ul class="facts">
+              <li>2 to 50 tables, with a scoreboard that fits them all</li>
+              <li>Optional buzzer for each table on any phone or tablet</li>
+              <li>Team names show only after you approve them</li>
+            </ul>
+            <details>
+              <summary>Three ways to play</summary>
+              <dl>
+                <div><dt>Classic</dt><dd>Any well-known verse from anywhere in the Bible, with random point values and the occasional bonus.</dd></div>
+                <div><dt>Themed</dt><dd>Each round picks a theme, like Courage or God’s Love, and draws 2 to 4 verses from it.</dd></div>
+                <div><dt>Wildcard</dt><dd>1 to 6 verses at once for double points. Award each verse on its own, or save it for the final round.</dd></div>
+              </dl>
+            </details>
+            <div class="acts"><a class="btn" href="sword-drills/"><svg aria-hidden="true"><use href="#i-play"/></svg>Open Sword Drills</a></div>
+          </div>
+        </article>
+        <article class="gcard">
+          <div class="poster p-who">
+            <span class="tape ink ptag">Free · no sign-up</span>
+            <div class="ladder" aria-hidden="true">
+              <span>CLUE 1 <b>50</b></span><span>CLUE 2 <b>40</b></span><span>CLUE 3 <b>30</b></span><span>CLUE 4 <b>20</b></span><span>CLUE 5 <b>10</b></span>
+            </div>
+            <span class="q" aria-hidden="true">?</span>
+            <h3 class="ptitle">Who<br>Am I?</h3>
+          </div>
+          <div class="body">
+            <p class="hook">A Bible character hides behind five clues, from hard to easy.</p>
+            <p class="desc">Each tap of Next Clue shows one more on the screen, and the points drop with every clue. Buzz in early for more points; a wrong guess opens the buzzers again. Every answer comes with a Scripture reference to look up together.</p>
+            <ul class="facts">
+              <li>32 characters from Genesis to Acts, 5 clues each</li>
+              <li>Same table buzzers, name approval and Undo as Sword Drills</li>
+              <li>Only your phone sees the answer early</li>
+            </ul>
+            <details>
+              <summary>Settings</summary>
+              <dl>
+                <div><dt>Points</dt><dd>50, 40, 30, 20, 10 for clues 1 to 5. Or use hundreds, or a steep ladder that halves with each clue.</dd></div>
+                <div><dt>Rounds</dt><dd>5, 10, 15 or 20 characters, then final scores.</dd></div>
+                <div><dt>Mix</dt><dd>Whole Bible, Old Testament only or New Testament only. Use 3 or 4 clues for younger groups.</dd></div>
+              </dl>
+            </details>
+            <div class="acts"><a class="btn" href="who-am-i/"><svg aria-hidden="true"><use href="#i-play"/></svg>Open Who Am I?</a></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="soonhead"><span class="tape">Being built</span><h3>Coming next</h3></div>
+      <div class="soonrow">
+        <article class="gcard soon">
+          <div class="poster p-survey"><div class="bars" aria-hidden="true"><i>#1 <span>38</span></i><i>#2 <span>24</span></i><i>#3 <span>15</span></i><i>#4 <span>?</span></i></div><h4 class="ptitle">Survey<br>Showdown</h4></div>
+          <div class="body"><p class="hook">Two tables guess the top answers from a survey of youth groups, revealed one by one.</p><span class="mono" style="color:var(--mute-l)">Not ready yet</span></div>
+        </article>
+        <article class="gcard soon">
+          <div class="poster p-clash"><div class="board" aria-hidden="true"><i>100</i><i>100</i><i class="x">.</i><i>100</i><i>200</i><i class="x">.</i><i>200</i><i>200</i><i>300</i><i>300</i><i>300</i><i class="x">.</i></div><h4 class="ptitle">Category<br>Clash</h4></div>
+          <div class="body"><p class="hook">A Bible trivia board with categories and point values. Tables pick a square and answer.</p><span class="mono" style="color:var(--mute-l)">Not ready yet</span></div>
+        </article>
+        <article class="gcard soon">
+          <div class="poster p-scramble"><div class="words" aria-hidden="true"><i>lamp</i><i>word</i><i>my</i><i>is</i><i>feet</i><i>a</i><i>your</i><i>to</i></div><h4 class="ptitle">Scripture<br>Scramble</h4></div>
+          <div class="body"><p class="hook">A well-known verse with its words shuffled. Tables race to put it back in order.</p><span class="mono" style="color:var(--mute-l)">Not ready yet</span></div>
+        </article>
+      </div>
+
+      <div class="bigrooms" id="big-events"><b class="k">Big rooms</b><p>Sword Drills handles up to 50 tables today, so camps and multi-church nights can play by table now. A mode where every player buzzes in from their own phone is planned but not built yet.</p></div>
+    </div>
+  </section>
+
+  <section class="sec how dots-d" id="how">
+    <div class="wrap">
+      <div class="sh">
+        <div><span class="mono" style="color:var(--charge)">How it works</span><h2>Set up in a<br>couple of minutes</h2></div>
+        <p>One screen, one phone, a room full of Bibles. Nothing to install and no account.</p>
+      </div>
       <ol class="steps">
-        <li><div><h3>Open a game on the TV</h3><p>Use the TV’s web browser, or plug a laptop into the TV or projector with HDMI. The screen shows a QR code.</p></div></li>
-        <li><div><h3>Scan it with your phone</h3><p>Your phone becomes the remote. You spin, give points, undo mistakes and change settings from there. Only your phone can run the game.</p></div></li>
-        <li><div><h3>Split the room into tables</h3><p>Bibles out, eyes on the screen. The first table to find the verse or name the character gets the points. Tables can buzz in from a phone if you want.</p></div></li>
+        <li><span class="n">01</span><h3>Open a game on the TV</h3><p>Use the TV’s web browser, or plug a laptop into the TV or projector with HDMI. The screen shows a QR code.</p></li>
+        <li><span class="n">02</span><h3>Scan it with your phone</h3><p>Your phone becomes the remote. You spin, give points, undo mistakes and change settings from there. Only your phone can run the game.</p></li>
+        <li><span class="n">03</span><h3>Bibles up. <span class="shout">Charge!</span></h3><p>Split the room into tables. The first table to find the verse or name the character gets the points. Tables can buzz in from a phone if you want.</p></li>
       </ol>
     </div>
   </section>
 
-  <section class="s" id="games">
-    <div class="wrap">
-      <div class="sh"><h2><span class="lbl">Games</span>Ready to play</h2><p style="margin:0;font-size:20px;max-width:30em;align-self:end">Both games run on one screen and one leader phone, and both are free.</p></div>
-
-      <article class="game">
-        <div class="main">
-          <span class="free lbl">Free · no sign-up</span>
-          <h3>Sword Drills</h3>
-          <p>The old Bible race, run by a slot machine. Bibles closed and held up. The reels land on a reference, and the first table to find it buzzes in. Tap Correct and the points go to that table; tap Wrong and the buzzers open again. Scores stay on the screen all night.</p>
-          <ul class="facts">
-            <li>2 to 50 tables, with a scoreboard that fits them all</li>
-            <li>Optional buzzer for each table on any phone or tablet</li>
-            <li>Team names show only after you approve them</li>
-          </ul>
-          <div class="ctas"><a class="btn" href="sword-drills/">Open Sword Drills</a></div>
-        </div>
-        <div class="side">
-          <p class="lbl">Three ways to play</p>
-          <dl>
-            <dt>Classic</dt><dd>Any well-known verse from anywhere in the Bible, with random point values and the occasional bonus.</dd>
-            <dt>Themed</dt><dd>Each round picks a theme, like Courage or God’s Love, and draws 2 to 4 verses from it.</dd>
-            <dt>Wildcard</dt><dd>1 to 6 verses at once for double points. Award each verse on its own, or save it for the final round.</dd>
-          </dl>
-        </div>
-      </article>
-
-      <article class="game b">
-        <div class="main">
-          <span class="free lbl">Free · no sign-up</span>
-          <h3>Who Am I?</h3>
-          <p>A Bible character hides behind five clues, from hard to easy. Each tap of Next Clue shows one more on the screen, and the points drop with every clue. Buzz in early for more points; a wrong guess opens the buzzers again. Every answer comes with a Scripture reference to look up together.</p>
-          <ul class="facts">
-            <li>32 characters from Genesis to Acts, 5 clues each</li>
-            <li>Same table buzzers, name approval and Undo as Sword Drills</li>
-            <li>Only your phone sees the answer early</li>
-          </ul>
-          <div class="ctas"><a class="btn" href="who-am-i/">Open Who Am I?</a></div>
-        </div>
-        <div class="side">
-          <p class="lbl">Settings</p>
-          <dl>
-            <dt>Points</dt><dd>50, 40, 30, 20, 10 for clues 1 to 5. Or use hundreds, or a steep ladder that halves with each clue.</dd>
-            <dt>Rounds</dt><dd>5, 10, 15 or 20 characters, then final scores.</dd>
-            <dt>Mix</dt><dd>Whole Bible, Old Testament only or New Testament only. Use 3 or 4 clues for younger groups.</dd>
-          </dl>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <section class="s dark" id="next">
-    <div class="wrap">
-      <div class="two">
-        <div>
-          <h2>What you need</h2>
-          <ul class="plain">
-            <li><b>A big screen</b><span>A TV with a web browser, or a laptop connected to a TV or projector.</span></li>
-            <li><b>Your phone</b><span>iPhone or Android, with a camera to scan the QR code.</span></li>
-            <li><b>Internet</b><span>Wi-Fi or cell data on both the screen and the phone.</span></li>
-            <li><b>Bibles</b><span>One per student or one per table. Any translation works.</span></li>
-          </ul>
-        </div>
-        <div>
-          <h2>Being built</h2>
-          <ul class="plain">
-            <li><b>Survey Showdown <i>Not ready yet</i></b><span>Two tables guess the top answers from a survey of youth groups, revealed one by one.</span></li>
-            <li><b>Category Clash <i>Not ready yet</i></b><span>A Bible trivia board with categories and point values. Tables pick a square and answer.</span></li>
-            <li><b>Scripture Scramble <i>Not ready yet</i></b><span>A well-known verse with its words shuffled. Tables race to put it back in order.</span></li>
-          </ul>
-        </div>
+  <section class="sec">
+    <div class="wrap themes">
+      <div>
+        <span class="mono">Sword Drills · Themed mode</span>
+        <h2 style="margin:10px 0 18px;font:900 clamp(2.8rem,5vw,4.2rem)/.9 var(--f-disp);text-transform:uppercase">Teach a theme while they race</h2>
+        <p style="margin:0;max-width:30em">Pick Themed in Settings and each round draws 2 to 4 verses from one theme. Or play Classic: any well-known verse from anywhere in the Bible. The screen shows references only, so any translation works.</p>
       </div>
-      <div class="note" id="big-events"><b>Big rooms.</b> Sword Drills handles up to 50 tables today, so camps and multi-church nights can play by table now. A mode where every player buzzes in from their own phone is planned but not built yet.</div>
+      <div>
+        <div class="chips" id="themes" role="group" aria-label="Sword Drills themes">
+          <button type="button" class="chip on" aria-pressed="true">Courage</button><button type="button" class="chip" aria-pressed="false">God's Love</button><button type="button" class="chip" aria-pressed="false">Trust</button><button type="button" class="chip" aria-pressed="false">Good News</button><button type="button" class="chip" aria-pressed="false">New Life</button><button type="button" class="chip" aria-pressed="false">Peace &amp; Hope</button><button type="button" class="chip" aria-pressed="false">God's Word</button>
+        </div>
+        <div class="refs" id="refs" aria-live="polite" aria-label="Verses in this theme"><span>Joshua 1:9</span><span>Deuteronomy 31:6</span><span>Isaiah 41:10</span><span>Psalm 27:1</span><span>1 Samuel 17:47</span></div>
+      </div>
     </div>
   </section>
 
-  <section class="s" id="faq">
-    <div class="wrap sh">
-      <h2><span class="lbl">FAQ</span>Questions</h2>
+  <section class="sec dots-l" id="faq">
+    <div class="wrap two">
+      <div>
+        <span class="mono">Checklist</span>
+        <h2>What you need</h2>
+        <ul class="need">
+          <li><svg aria-hidden="true"><use href="#i-tv"/></svg><div><b>A big screen</b><span>A TV with a web browser, or a laptop connected to a TV or projector.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-phone"/></svg><div><b>Your phone</b><span>iPhone or Android, with a camera to scan the QR code.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-wifi"/></svg><div><b>Internet</b><span>Wi-Fi or cell data on both the screen and the phone.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-bible"/></svg><div><b>Bibles</b><span>One per student or one per table. Any translation works.</span></div></li>
+        </ul>
+      </div>
       <div class="faq">
+        <span class="mono">FAQ</span>
+        <h2>Questions</h2>
         <details><summary>What does it cost?</summary><p>Nothing. Sword Drills and Who Am I? are free to play, with no account. Paid subscriptions may come later for new games; these two are free today.</p></details>
         <details><summary>Do students need phones?</summary><p>No. Your phone runs the game, and students play with Bibles at their tables. If you like, each table can use one phone or tablet as its buzzer and send in a team name. Names show on the screen only after you approve them.</p></details>
         <details><summary>Does it work offline?</summary><p>No. The screen and the phone talk over the internet, so both need a connection (Wi-Fi or cell data). If the connection drops, scores are saved on the screen and the phone reconnects on its own.</p></details>
         <details><summary>Which Bible translation does it use?</summary><p>The games show references only (like “Romans 8:28”), never the verse text, so any translation your group reads works. Who Am I? clues are written in plain words, and its answer references follow the CSB.</p></details>
         <details><summary>Do I need to sign up or install anything?</summary><p>No. Open the game in a browser and scan the code.</p></details>
+        <details><summary>Our room is bright. Can the screen be lighter?</summary><p>Yes. In either game, open Settings on your phone and set Room lights to Lights on. The big screen switches to a light newsprint look that holds up in a bright room or on a weak projector. On the screen’s keyboard, press L.</p></details>
       </div>
     </div>
   </section>
@@ -305,9 +604,23 @@
 
 <footer>
   <div class="wrap">
-    <a class="wm" href="./" aria-label="Charge! Games home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="3" y="3" width="58" height="58" rx="3" fill="#FFC629" stroke="#16140F" stroke-width="4"/><path d="M27 11h14l-4.5 30h-7z" fill="#16140F"/><rect x="28" y="45" width="10" height="9" fill="#16140F"/></svg><span>Charge! Games</span></a>
-    <small>© 2026 Charge! Games · Free Bible games for youth group</small>
+    <a class="wm" href="./" aria-label="Charge! Games home"><span class="word">Charge</span><svg class="bang" aria-hidden="true"><use href="#bang"/></svg><span class="sub">GAMES</span></a>
+    <small>Free Bible games for youth group · © 2026 Charge! Games</small>
   </div>
 </footer>
+<script src="sword-drills/verses.js"></script>
+<script>
+  /* Themed mode preview: the real Sword Drills themes (sword-drills/verses.js), five references each */
+  (function () {
+    var T = window.SD_THEMES, box = document.getElementById("themes"), refs = document.getElementById("refs");
+    if (!T || !box) return;
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      var t = T.filter(function (x) { return x.name === b.textContent; })[0]; if (!t) return;
+      [].forEach.call(box.children, function (c) { var on = c === b; c.classList.toggle("on", on); c.setAttribute("aria-pressed", on ? "true" : "false"); });
+      refs.innerHTML = t.refs.slice(0, 5).map(function (r) { return "<span>" + r.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</span>"; }).join("");
+    });
+  })();
+</script>
 </body>
 </html>

@@ -449,6 +449,8 @@
         api.clearBuzz(); opts.onChange(); return true;
       },
       setLockout: function (on) { D.lockout = !!on; opts.onChange(); },
+      // room lights (screen look only): off = dark stage, on = paper stage for bright rooms. Saved with the game.
+      setLights: function (on) { D.lights = !!on; C.lights(D.lights); opts.onChange(); },
       newQuestionSet: function () { D.locked = {}; D.buzz = { q: null, slot: null, team: null, at: 0 }; },      // call when a new spin/round starts
       lockedFor: function (q) { return q ? (D.locked[q] || []) : []; },
       // Undo the last scoring event. An undone auto-award (or Wrong) puts that table back in the "buzzed in" state.
@@ -465,7 +467,7 @@
       pub: function (role) {
         var q = D.buzz.q, ns = {};
         for (var k in D.nameState) if (+k < D.n) ns[k] = D.nameState[k];
-        var o = { n: D.n, names: D.names.slice(0, D.n), scores: D.scores.slice(0, D.n), word: word, lockout: D.lockout,
+        var o = { n: D.n, names: D.names.slice(0, D.n), scores: D.scores.slice(0, D.n), word: word, lockout: D.lockout, lights: !!D.lights,
                   buzz: { q: q, slot: D.buzz.slot, team: D.buzz.team }, locked: D.locked, canUndo: D.history.length > 0,
                   last: D.history.length ? D.history[D.history.length - 1] : null, nameState: ns };
         if (role === "remote") o.requests = D.requests.filter(function (r) { return r.team < D.n; }).map(function (r) { return { id: r.id, team: r.team, name: r.name, at: r.at }; });
@@ -488,14 +490,22 @@
         else if (a === "core.wrong") api.wrong(m.q, m.team | 0);
         else if (a === "core.clearbuzz") { api.clearBuzz(); opts.onChange(); }
         else if (a === "core.lockout") api.setLockout(m.on);
+        else if (a === "core.lights") api.setLights(m.on);
         else if (a === "core.undo") api.undo();
         else return false;                       // "core.reset" is left to the game: it resets its own state, then calls reset()
         return true;
       }
     };
+    C.lights(!!D.lights);
     return api;
   };
-  C.core.fresh = function (n) { var d = { n: n || 6, names: [], scores: [], history: [], lockout: true, locked: {}, buzz: { q: null, slot: null, team: null, at: 0 }, requests: [], nameState: {} }; for (var i = 0; i < C.MAX_TEAMS; i++) { d.names.push(""); d.scores.push(0); } return d; };
+  // the screen's look: <html data-cg-lights="on"> (theme variables in charge-core.css)
+  C.lights = function (on) {
+    var h = document.documentElement; if (on) h.setAttribute("data-cg-lights", "on"); else h.removeAttribute("data-cg-lights");
+    // a skin's white "dark" logo would vanish on the light stage: show its "light" logo while the lights are on
+    if (SK && SK.logo && SK.logo.light && SK.logo.dark) [].forEach.call(document.querySelectorAll('img.cg-skin-logo[data-cg-logo="dark"]'), function (im) { var u = on ? SK.logo.light : SK.logo.dark; if (im.getAttribute("src") !== u) im.src = u; });
+  };
+  C.core.fresh = function (n) { var d = { n: n || 6, names: [], scores: [], history: [], lockout: true, lights: false, locked: {}, buzz: { q: null, slot: null, team: null, at: 0 }, requests: [], nameState: {} }; for (var i = 0; i < C.MAX_TEAMS; i++) { d.names.push(""); d.scores.push(0); } return d; };
   C.core.upgrade = function (d, n) { var f = C.core.fresh(n); if (!d || typeof d !== "object") return f; for (var k in f) if (!(k in d)) d[k] = f[k]; while (d.scores.length < C.MAX_TEAMS) d.scores.push(0); while (d.names.length < C.MAX_TEAMS) d.names.push(""); return d; };
   C.label = function (T, i) { return ((T.names && T.names[i]) || "").trim() || (T.word || "Table") + " " + (i + 1); };
 
@@ -611,6 +621,7 @@
       '<div class="cg-step"><button type="button" data-d="-5" aria-label="5 fewer">−5</button><button type="button" data-d="-1" aria-label="One fewer">−</button><b class="cg-n">6</b><button type="button" data-d="1" aria-label="One more">+</button><button type="button" data-d="5" aria-label="5 more">+5</button></div></div>' +
       '<div class="sr"><div class="n">Table names</div><div class="h">Optional. Leave blank to keep “Table 7”.</div><button type="button" class="cg-names-btn">Rename tables</button><div class="cg-names" hidden></div></div>' +
       '<div class="sr"><div class="n">Wrong answer locks that table out</div><div class="h">For the rest of that question. Off: everyone can buzz again.</div><div class="seg cg-lock"><button type="button" data-v="1">On</button><button type="button" data-v="0">Off</button></div></div>' +
+      '<div class="sr"><div class="n">Room lights</div><div class="h">Lights on: a light screen that holds up in a bright room or on a weak projector.</div><div class="seg cg-lights"><button type="button" data-v="0">Dark room</button><button type="button" data-v="1">Lights on</button></div></div>' +
       '<div class="sr"><div class="n">Reset scores</div><div class="h">Clears every table and the current question. Names stay.</div><button type="button" class="danger cg-reset">Reset scores</button></div>' +
       '<div class="sr"><button type="button" class="link cg-leave">Leave this room</button></div>';
     var names = el.querySelector(".cg-names"), armT, last = null;
@@ -618,6 +629,7 @@
       var b = e.target.closest("button"); if (!b) return;
       if (b.hasAttribute("data-d")) R.send("core.teams", { d: +b.getAttribute("data-d") });
       else if (b.parentNode.classList.contains("cg-lock")) R.send("core.lockout", { on: b.getAttribute("data-v") === "1" });
+      else if (b.parentNode.classList.contains("cg-lights")) R.send("core.lights", { on: b.getAttribute("data-v") === "1" });
       else if (b.classList.contains("cg-names-btn")) { names.hidden = !names.hidden; b.textContent = names.hidden ? "Rename tables" : "Done renaming"; drawNames(); }
       else if (b.classList.contains("cg-reset")) {
         if (b.classList.contains("arm")) { R.send("core.reset"); b.classList.remove("arm"); b.textContent = "Reset scores"; if (o.onReset) o.onReset(); return; }
@@ -660,6 +672,7 @@
         el.querySelector(".cg-n").textContent = T.n;
         [].forEach.call(el.querySelectorAll("[data-d]"), function (b) { var d = +b.getAttribute("data-d"); b.disabled = !linkOk || (d < 0 ? T.n <= C.MIN_TEAMS : T.n >= C.MAX_TEAMS); });
         [].forEach.call(el.querySelectorAll(".cg-lock button"), function (b) { b.classList.toggle("sel", (b.getAttribute("data-v") === "1") === !!T.lockout); b.disabled = !linkOk; });
+        [].forEach.call(el.querySelectorAll(".cg-lights button"), function (b) { b.classList.toggle("sel", (b.getAttribute("data-v") === "1") === !!T.lights); b.disabled = !linkOk; });
         drawNames();
       }
     };

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#EEF2F8">
+  <meta name="theme-color" content="#F3ECDD">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Who Am I? · Leader remote · Charge! Games</title>
   <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon-32.png">
@@ -11,11 +11,12 @@
   <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@500;700;800&family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&family=Bagel+Fat+One&family=Big+Shoulders:opsz,wght@10..72,600..900&display=swap">
   <link rel="stylesheet" href="../../shared/charge-core.css">
   <!-- Who Am I? leader remote (the leader's phone), built on ../../shared/charge-core.js. Joins the screen (../) by 4-letter room code or QR (?room=CODE).
        Sends commands only; the screen keeps the scores. The host phone sees the answer; tables never do. -->
   <style>
+    :root { --cg-game: #A78BFF; --cg-game-dk: #5B3FD1; }   /* Who Am I? game color; skins fall back to their accent */
     :root { --cg-lead-bg: var(--cg-ink); --cg-lead-ink: var(--cg-acc); }   /* leading table on the light remote: ink tile (a skin may override) */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; background: var(--cg-paper); }
@@ -85,11 +86,12 @@
     .empty { padding: 14px 0; color: var(--cg-slate); font-weight: 600; line-height: 1.4; }
     .tjoin { margin-top: 6px; padding: 10px 12px; border-radius: calc(10px * var(--cg-round)); background: #fff; border: 1px dashed rgba(var(--cg-ink-rgb),.35); font-size: 13px; line-height: 1.4; color: var(--cg-ink); word-break: break-all; }
   </style>
+  <link rel="stylesheet" href="../../shared/charge-remote.css">
 </head>
-<body>
+<body class="cg-remote">
   <div class="hd">
     <a href="../../" aria-label="Charge! Games home" data-cg-home-mark><svg class="mark" data-cg-logo="light" viewBox="0 0 64 64" role="img" aria-label="Charge! Games"><rect x="3" y="3" width="58" height="58" rx="3" fill="#15130F"/><path d="M27 11h14l-4.5 30h-7z" fill="#FFC629"/><rect x="28" y="45" width="10" height="9" fill="#FFC629"/></svg></a>
-    <div class="t"><h1 class="wide">WHO AM I?</h1><div class="r mono" id="room">Leader remote</div></div>
+    <div class="t"><h1 class="wide">Who Am I?</h1><div class="r mono" id="room">Leader remote</div></div>
     <button class="nreq" id="b-req" hidden>Names<span class="bdg" id="reqn" hidden>0</span></button>
     <div class="pill mono" id="pill">Not joined</div>
   </div>
