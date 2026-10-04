@@ -205,7 +205,7 @@
       <div class="rgt">
         <div class="qrcard">
           <div class="qr" id="qr"></div>
-          <div class="k mono">Leader phone: scan or enter code</div>
+          <div class="k mono">Tables: scan to buzz in</div>
           <div class="code wide" id="code2">····</div>
           <div class="u mono" id="url"></div>
           <div class="tline mono" id="tline"></div>
@@ -444,8 +444,9 @@
   }
 
   /* ---------- QR ---------- */
-  function drawQR() { var u = link.remoteUrl("controller/"); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
-    $("tline").innerHTML = "Table buzzers (optional)<br><b>" + esc(new URL("table/", location.href.split("#")[0].split("?")[0]).href.replace(/^https?:\/\//, "")) + "</b>"; }
+  // public QR = table buzzer join (Jake, Oct 4); the leader remote link is listed under it.
+  function drawQR() { var u = link.remoteUrl("table/"); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
+    $("tline").innerHTML = "Leader remote<br><b>" + esc(new URL("controller/", location.href.split("#")[0].split("?")[0]).href.replace(/^https?:\/\//, "")) + "</b>"; }
 
   /* ---------- keyboard + mouse backup ---------- */
   var armT;

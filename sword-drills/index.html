@@ -164,6 +164,8 @@
     .set .row > span { font-weight: 700; font-size: 1.5rem; } .set .row > span small { display: block; color: var(--cg-mute); font-size: 1.05rem; font-weight: 600; margin-top: .2rem; }
     .set .seg button { padding: .8rem 1.3rem; font-size: 1.2rem; } .set .seg button.sel { background: var(--cg-acc); color: var(--cg-ink); }
     .set .seg.off { opacity: .35; }
+    .set .row.tall { flex-wrap: wrap; } .set .row.tall > span:first-child { flex: 1 0 100%; margin-bottom: .6rem; }
+    .set .seg.wrap { display: flex; flex-wrap: wrap; gap: .5rem; } .set .seg.wrap button { margin: 0; }
     .set .num { display: inline-block; min-width: 4rem; text-align: center; font-weight: 900; font-size: 2.2rem; vertical-align: middle; }
     .set .keys { margin-top: 1rem; color: var(--cg-mute); font-size: 1rem; line-height: 1.6; }
     .set .danger { background: var(--cg-danger-bg) !important; color: #FF6B81 !important; } .set .danger.arm { background: #FF6B81 !important; color: var(--cg-ink) !important; }
@@ -231,7 +233,7 @@
       <div class="rgt">
         <div class="qrcard">
           <div class="qr" id="qr"></div>
-          <div class="k mono">Leader phone: scan or enter code</div>
+          <div class="k mono">Tables: scan to buzz in</div>
           <div class="code wide" id="code2">····</div>
           <div class="u mono" id="url"></div>
           <div class="tline mono" id="tline"></div>
@@ -276,6 +278,7 @@
   <div class="set" id="set" role="dialog" aria-label="Settings">
     <h3 class="wide">Settings</h3>
     <div class="row"><span>Game mode<small>Classic: any verse. Themed: one theme, a few verses.</small></span><span class="seg" id="s-mode"><button data-v="classic">Classic</button><button data-v="themed">Themed</button></span></div>
+    <div class="row tall"><span>Theme<small>Pick the theme for Themed rounds (picking one switches to Themed). Surprise me = a new theme each round. Key T.</small></span><span class="seg wrap" id="s-theme"></span></div>
     <div class="row"><span>Tables<small>2 to 50</small></span><span><button data-k="tminus">−</button><span class="num wide" id="s-tables">6</span><button data-k="tplus">+</button></span></div>
     <div class="row"><span>Verses per themed round</span><span class="seg" id="s-per"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></span></div>
     <div class="row"><span>End with a Wildcard round<small>Wildcard becomes the final round, then final scores.</small></span><span class="seg" id="s-final"><button data-v="0">Off</button><button data-v="1">On</button></span></div>
@@ -283,7 +286,7 @@
     <div class="row"><span>Room lights<small>Lights on: a light screen for bright rooms and weak projectors. Key L.</small></span><span class="seg" id="s-lights"><button data-v="0">Dark room</button><button data-v="1">Lights on</button></span></div>
     <div class="row"><span>Reset scores<small>Clears scores and the current spin. Press twice.</small></span><button class="danger" id="s-reset" data-k="reset">Reset</button></div>
     <div class="row"><span>Host lock<small id="s-host">No leader remote yet. The first one to open becomes host.</small></span><button data-k="unlock" id="s-unlock">Release</button></div>
-    <div class="keys mono">Keys: Space spin · W wildcard · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · M mode · L lights · [ ] tables · F full screen</div>
+    <div class="keys mono">Keys: Space spin · W wildcard · 1–9, 0, −, = buzz in table 1–12 (or click a table) · Y correct · N wrong · U undo · R rules · G game · B scores · O settings · M mode · T theme · L lights · [ ] tables · F full screen</div>
     <div style="text-align:right;margin-top:1rem"><button class="o" data-k="settings">Done</button></div>
   </div>
 </div>
@@ -297,6 +300,7 @@
   var GAME = "sworddrills", KEY = Charge.NS + ":sworddrills:v2";
   var THEMES = window.SD_THEMES, REFS = [];
   THEMES.forEach(function (t, ti) { t.refs.forEach(function (r) { REFS.push({ ref: r, t: ti }); }); });
+  document.getElementById("s-theme").innerHTML = '<button data-v="-1">Surprise me</button>' + THEMES.map(function (t, ti) { return '<button data-v="' + ti + '">' + t.name.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</button>"; }).join("");
   var PTS = [100, 100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 300, 300, 300, 300, 500, 500, 500, 1000]; // 1000 = rare bonus (1 in 20)
   var WPTS = [200, 400, 600, 1000];                                   // wildcard: double of 100/200/300/500
   var $ = function (id) { return document.getElementById(id); };
@@ -304,7 +308,7 @@
   var pick = function (a) { return a[rnd(a.length)]; };
 
 
-  function fresh() { return { v: 2, code: "", core: Charge.core.fresh(6), view: "rules", mode: "classic", per: 3, finalWild: false, spin: null, used: [], round: null, lastTheme: -1 }; }
+  function fresh() { return { v: 2, code: "", core: Charge.core.fresh(6), view: "rules", mode: "classic", per: 3, finalWild: false, spin: null, used: [], round: null, lastTheme: -1, theme: -1 }; }
   var S;
   try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
   if (!S || S.v !== 2) S = fresh();
@@ -362,7 +366,7 @@
       if (!S.round || S.round.n >= S.per) {
         var ts = THEMES.map(function (_, t) { return t; }).filter(function (t) { return t !== S.lastTheme; });
         var good = ts.filter(function (t) { return freeIn(t) >= S.per; });
-        var t = pick(good.length ? good : ts);
+        var t = fixedTheme() >= 0 ? fixedTheme() : pick(good.length ? good : ts);
         S.round = { t: t, n: 0 }; S.lastTheme = t; sp.newRound = true;
       }
       idx = draw(themeIdx(S.round.t)); S.round.n++;
@@ -386,6 +390,10 @@
     toast("Undo", h.k === "award" ? "−" + h.pts + " · " + core.label(h.t) : core.label(h.t) + " back in");
   }
   function reset() { core.reset(); S.spin = null; S.round = null; S.used = []; S.view = "rules"; save(); render(); }
+  function fixedTheme() { var t = S.theme | 0; return t >= 0 && t < THEMES.length ? t : -1; }
+  function themeName() { var t = fixedTheme(); return t >= 0 ? THEMES[t].name : ""; }
+  // leader picks the theme (-1 = surprise me: a new random theme each round). Picking a theme switches to Themed; the next spin starts a round in it
+  function setTheme(t) { t = +t; if (!(t >= -1 && t < THEMES.length) || t !== (t | 0)) return; S.theme = t; if (t >= 0) S.mode = "themed"; S.round = null; save(); render(); }
   function setMode(m) { if (m !== "classic" && m !== "themed") return; S.mode = m; S.round = null; save(); render(); }
   function setPer(n) { n = n | 0; if (n < 2 || n > 4) return; S.per = n; save(); render(); }
   function setFinal(on) { S.finalWild = !!on; save(); render(); }
@@ -474,16 +482,16 @@
   function render() {
     document.body.classList.toggle("themed", S.mode === "themed");
     $("code").textContent = $("code2").textContent = S.code;
-    $("modechip").textContent = S.mode === "themed" ? "Themed · " + S.per + " per round" : "Classic";
+    $("modechip").textContent = S.mode === "themed" ? "Themed · " + (themeName() || "Surprise") + " · " + S.per + " per round" : "Classic";
     $("ptsline").innerHTML = "Points <span>100 · 200 · 300 · 500</span> · rare <span>Bonus 1000</span><br>" +
-      (S.mode === "themed" ? "Themed: one theme, <span>" + S.per + " verses</span> per round" : "Classic: <span>any verse</span>, any book") + (S.finalWild ? " · <span>Wildcard</span> ends the game" : "");
+      (S.mode === "themed" ? "Themed: " + (themeName() ? "<span>" + esc(themeName()) + "</span>, " : "one theme, ") + "<span>" + S.per + " verses</span> per round" : "Classic: <span>any verse</span>, any book") + (S.finalWild ? " · <span>Wildcard</span> ends the game" : "");
     ["rules", "game", "wild", "scores"].forEach(function (v) { $("v-" + v).classList.toggle("on", S.view === v); });
     var sp = S.spin, B = S.core.buzz, q = openQ(), buzzT = q && B.team !== null ? B.team : null;
     if (!busy) {
       if (sp && sp.kind === "std") {
         still($("w-ref"), refCell(sp.ref)); still($("w-pts"), ptsTarget(sp));
         if (S.mode === "themed" && sp.theme) { still($("w-theme"), themeCell(sp.theme)); $("rn").textContent = "Verse " + sp.rn + " of " + sp.per; }
-        else if (S.mode === "themed") { still($("w-theme"), themeCell("Spin to pick")); $("rn").textContent = "–"; }
+        else if (S.mode === "themed") { still($("w-theme"), themeCell(themeName() || "Spin to pick")); $("rn").textContent = "–"; }
         var say = $("say"), lw = lastWrong(sp.id);
         if (sp.to !== null) { say.className = "say wide up"; say.textContent = core.label(sp.to) + " +" + sp.pts; }
         else if (buzzT !== null) { say.className = "say wide"; say.innerHTML = '<span class="cg-banner">' + esc(core.label(buzzT)) + ' buzzed in!<small>Is it right?</small></span>'; }
@@ -494,7 +502,7 @@
       } else if (!sp || sp.kind !== "std") {
         still($("w-ref"), '<div class="cell"><div class="bk wide">Ready?</div><div class="cv wide">?:?</div></div>');
         still($("w-pts"), ptsCell("?")); $("refnote").textContent = "";
-        still($("w-theme"), themeCell("Spin to pick")); $("rn").textContent = "–";
+        still($("w-theme"), themeCell(themeName() || "Spin to pick")); $("rn").textContent = "–";
         $("say").className = "say wide"; $("say").textContent = "Press SPIN to draw a reference";
       }
       if (sp && sp.kind === "wild") renderWild(false);
@@ -507,7 +515,7 @@
     board.game.render(T, X); board.wild.render(T, X); board.scores.render(T, X);
     $("v-wild").classList.toggle("dense", T.n > 12);   // 3-row scoreboard: shorter verse cards so both fit
     $("scoretitle").innerHTML = finished() ? 'Final <span>scores</span>' : 'Score<span>board</span>';
-    sel("s-mode", S.mode); sel("s-per", String(S.per)); sel("s-final", S.finalWild ? "1" : "0"); sel("s-lock", S.core.lockout ? "1" : "0"); sel("s-lights", S.core.lights ? "1" : "0");
+    sel("s-mode", S.mode); sel("s-per", String(S.per)); sel("s-final", S.finalWild ? "1" : "0"); sel("s-lock", S.core.lockout ? "1" : "0"); sel("s-lights", S.core.lights ? "1" : "0"); sel("s-theme", String(fixedTheme()));
     $("s-per").classList.toggle("off", S.mode !== "themed"); $("s-tables").textContent = S.core.n;
     var nreq = S.core.requests.length; $("reqchip").hidden = !nreq; $("reqchip").textContent = nreq + " name request" + (nreq > 1 ? "s" : "") + " · approve on the phone";
   }
@@ -520,7 +528,7 @@
     var sp = S.spin, p = null;
     if (sp) p = sp.kind === "wild" ? { id: sp.id, kind: "wild", count: sp.count, refs: sp.status === "landed" ? sp.refs : [], awards: sp.awards, pts: sp.pts, status: sp.status, final: sp.final }
                                    : { id: sp.id, kind: "std", ref: sp.status === "landed" ? sp.ref : "", pts: sp.status === "landed" ? sp.pts : 0, bonus: sp.status === "landed" && sp.bonus, status: sp.status, to: sp.to, theme: sp.theme, rn: sp.rn, per: sp.per };
-    return { core: core.pub(role), view: S.view, mode: S.mode, per: S.per, finalWild: S.finalWild, spin: p, finished: finished(), busy: busy };
+    return { core: core.pub(role), view: S.view, mode: S.mode, per: S.per, theme: fixedTheme(), themes: THEMES.map(function (t) { return t.name; }), finalWild: S.finalWild, spin: p, finished: finished(), busy: busy };
   }
   function run(a, m) {
     m = m || {};
@@ -530,7 +538,7 @@
     if (a === "core.undo") { undo(); return; }
     if (core.command(a, m)) return;
     if (a === "sd.spin") spin(); else if (a === "sd.wild") wildcard();
-    else if (a === "sd.mode") setMode(m.mode); else if (a === "sd.per") setPer(m.n); else if (a === "sd.final") setFinal(m.on);
+    else if (a === "sd.mode") setMode(m.mode); else if (a === "sd.per") setPer(m.n); else if (a === "sd.theme") setTheme(m.ti); else if (a === "sd.final") setFinal(m.on);
     else if (a === "sd.view") view(m.v);
   }
   var link = null;
@@ -554,8 +562,9 @@
     $("s-unlock").disabled = !L.claimed;
   }
   /* ---------- QR ---------- */
-  function drawQR() { var u = link.remoteUrl("controller/"); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
-    $("tline").innerHTML = "Table buzzers (optional)<br><b>" + esc(new URL("table/", location.href.split("#")[0].split("?")[0]).href.replace(/^https?:\/\//, "")) + "</b>"; }
+  // public QR = table buzzer join (Jake, Oct 4); the leader remote link is listed under it.
+  function drawQR() { var u = link.remoteUrl("table/"); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
+    $("tline").innerHTML = "Leader remote<br><b>" + esc(new URL("controller/", location.href.split("#")[0].split("?")[0]).href.replace(/^https?:\/\//, "")) + "</b>"; }
 
   /* ---------- keyboard + mouse backup ---------- */
   var armT;
@@ -576,7 +585,7 @@
   document.addEventListener("click", function (e) {
     var b = e.target.closest("button"), tb = e.target.closest(".cg-tb");
     if (b) { var sg = b.parentNode.id; var v = b.getAttribute("data-v");
-      if (sg === "s-mode") setMode(v); else if (sg === "s-per") setPer(+v); else if (sg === "s-final") setFinal(v === "1"); else if (sg === "s-lock") core.setLockout(v === "1"); else if (sg === "s-lights") core.setLights(v === "1"); else key(b.getAttribute("data-k"), b);
+      if (sg === "s-mode") setMode(v); else if (sg === "s-theme") setTheme(+v); else if (sg === "s-per") setPer(+v); else if (sg === "s-final") setFinal(v === "1"); else if (sg === "s-lock") core.setLockout(v === "1"); else if (sg === "s-lights") core.setLights(v === "1"); else key(b.getAttribute("data-k"), b);
       b.blur(); return; }
     if (tb && !$("set").classList.contains("on")) buzz(+tb.getAttribute("data-t"), null, "remote");
   });
@@ -594,6 +603,7 @@
     else if (k === "r" || k === "R") view("rules"); else if (k === "g" || k === "G") view("game"); else if (k === "b" || k === "B" || k === "s" || k === "S") view("scores");
     else if (k === "o" || k === "O") settings(); else if (k === "Escape") settings(false);
     else if (k === "l" || k === "L") core.setLights(!S.core.lights);
+    else if (k === "t" || k === "T") setTheme(fixedTheme() + 1 < THEMES.length ? fixedTheme() + 1 : -1);
     else if (k === "m" || k === "M") setMode(S.mode === "themed" ? "classic" : "themed");
     else if (k === "[") core.setCount(S.core.n - 1); else if (k === "]") core.setCount(S.core.n + 1);
     else if (k === "f" || k === "F") key("fs");
