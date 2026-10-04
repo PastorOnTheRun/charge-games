@@ -251,7 +251,7 @@
 <script src="characters.js"></script>
 <script src="../shared/vendor/qrcode.js"></script>
 <script src="../shared/vendor/peerjs.min.js"></script>
-<script src="../shared/charge-core.js"></script>
+<script src="../shared/charge-core.js?v=20261004"></script>
 <script>
 (function () {
   "use strict";
@@ -445,8 +445,8 @@
 
   /* ---------- QR ---------- */
   // public QR = table buzzer join (Jake, Oct 4); the leader remote link is listed under it.
-  function drawQR() { var u = link.remoteUrl("table/"); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
-    $("tline").innerHTML = "Leader remote<br><b>" + esc(new URL("controller/", location.href.split("#")[0].split("?")[0]).href.replace(/^https?:\/\//, "")) + "</b>"; }
+  function drawQR() { var u = link.screenQrUrl(); Charge.qr($("qr"), u); $("url").textContent = u.replace(/^https?:\/\//, "");
+    $("tline").innerHTML = "Leader remote<br><b>" + esc(link.leaderRemoteUrl().replace(/^https?:\/\//, "")) + "</b>"; }
 
   /* ---------- keyboard + mouse backup ---------- */
   var armT;

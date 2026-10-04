@@ -227,6 +227,9 @@
       setCode: function (c) { code = c; lock = freshLock(); saveLock(); startPeer(); restartRelay(); if (opts.onCode) opts.onCode(c); broadcast(); },
       broadcast: broadcast,
       remoteUrl: function (path) { return new URL((path || "controller/") + "?room=" + code, location.href.split("#")[0].split("?")[0]).href; },
+      // what the TV screen's public QR code opens: the table buzzer (table/?room=CODE), never the leader remote. Every game screen uses this.
+      screenQrUrl: function () { return api.remoteUrl("table/"); },
+      leaderRemoteUrl: function () { return new URL("controller/", location.href.split("#")[0].split("?")[0]).href; },   // shown as text; the leader types the room code
       // "on" = a phone is connected, "wait" = ready for a phone, "off" = still connecting
       status: function () { return conns.some(function (c) { return c.open && c.role === "remote"; }) || Date.now() - relaySeen < 90000 ? "on" : peer && peer.open ? "wait" : "off"; },
       tables: function () { return conns.filter(function (c) { return c.open && c.role === "player"; }).length; },

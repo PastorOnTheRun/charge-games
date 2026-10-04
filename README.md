@@ -40,7 +40,9 @@ const link = Charge.host({
   onLock: lock => {}                   // host lock changed: { claimed, owner, hosts: [deviceIds], passv }
 });
 link.broadcast();                      // push state after any change (debounced 30 ms)
-link.remoteUrl("controller/");         // URL with ?room=CODE for the QR code
+link.screenQrUrl();                    // URL for the TV screen's QR code: the table buzzer, table/?room=CODE (never the leader remote)
+link.leaderRemoteUrl();                // controller/ address shown as text under the QR; the leader types the room code
+link.remoteUrl("controller/");         // any page with ?room=CODE
 link.code(); link.setCode(c); link.status(); link.tables();
 link.lock(); link.releaseLock();       // e.g. a "Release host lock" row in the screen's Settings
 
